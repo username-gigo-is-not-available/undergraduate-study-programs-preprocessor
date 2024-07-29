@@ -1,18 +1,25 @@
+import re
 from decorators.field_sanitizers import sentence_case, clean_whitespace
-from static import INVALID_COURSE_CODES
+from static import INVALID_COURSE_CODES_REGEX
 
 
-def handle_invalid_course_rows(course_code: str, course_name_mk: str, course_name_en: str | None = None) -> (tuple[str, str, str]
-                                                                                                             | tuple[str, str]):
+def handle_invalid_course_rows(course_code: str | None = None,
+                               course_name_mk: str | None = None,
+                               course_name_en: str | None = None) -> tuple[str, ...]:
+    result = []
 
-    if course_code not in INVALID_COURSE_CODES:
-        return (course_code, course_name_mk, course_name_en) if course_name_en else (course_code, course_name_mk)
+    if re.search(INVALID_COURSE_CODES_REGEX, course_name_mk):
+        result.extend(
+            [
+                handle_invalid_course_code(course_name_mk) if course_code is not None else None,
+                handle_invalid_course_name(course_name_mk) if course_name_mk is not None else None,
+                handle_invalid_course_name(course_name_en) if course_name_en is not None else None,
+            ]
+        )
+    else:
+        result.extend([course_code, course_name_mk, course_name_en])
 
-    new_course_code = handle_invalid_course_code(course_name_mk)
-    new_course_name_mk = handle_invalid_course_name(course_name_mk)
-    new_course_name_en = handle_invalid_course_name(course_name_en) if course_name_en else None
-
-    return (new_course_code, new_course_name_mk, new_course_name_en) if new_course_name_en else (new_course_code, new_course_name_mk)
+    return tuple([item for item in result if item is not None])
 
 
 @clean_whitespace
