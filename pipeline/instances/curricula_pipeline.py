@@ -27,6 +27,7 @@ curricula_handle_invalid_data_pipeline = Pipeline(
 )
 
 
-def run_curricula_pipeline(df: pd.DataFrame) -> None:
+def run_curricula_pipeline(df: pd.DataFrame) -> pd.DataFrame:
     curricula_clean_data_pipeline.run(df)
     curricula_handle_invalid_data_pipeline.run(df)
+    return df
