@@ -7,8 +7,8 @@ from pipeline.model.steps import PipelineStep
 
 class Pipeline:
     def __init__(self, name: str, steps: list[PipelineStep]):
-        self.name = name
-        self.steps = steps
+        self.name: str = name
+        self.steps: list[PipelineStep] = steps
 
     def run(self, data: pd.DataFrame) -> pd.DataFrame:
         logging.info(f"Running pipeline: {self.__repr__()}")
