@@ -1,7 +1,12 @@
-from dotenv import dotenv_values, load_dotenv
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
-ENVIRONMENT_VARIABLES: dict[str, str | None] = dotenv_values(".env")
+from static import MAX_WORKERS, ENVIRONMENT_VARIABLES
 
-for variable_name, variable_value in ENVIRONMENT_VARIABLES.items():
-    if not variable_value:
-        raise RuntimeError(f"{variable_name} is not set!")
+
+def get_executor() -> ThreadPoolExecutor | ProcessPoolExecutor:
+    if ENVIRONMENT_VARIABLES.get('EXECUTOR_TYPE') == 'THREAD':
+        return ThreadPoolExecutor(max_workers=MAX_WORKERS)
+    elif ENVIRONMENT_VARIABLES.get('EXECUTOR_TYPE') == 'PROCESS':
+        return ProcessPoolExecutor(max_workers=MAX_WORKERS)
+    else:
+        raise ValueError('Invalid executor type')
