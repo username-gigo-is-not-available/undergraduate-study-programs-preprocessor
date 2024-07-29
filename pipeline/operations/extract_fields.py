@@ -1,8 +1,7 @@
 from functools import cache
 
+import patterns.singleton.instances.singleton_instances as singleton_instances
 from utils.enums import CourseSeason, CoursePrerequisiteType
-from utils.string_matchers import get_most_similar_course_name
-from static import COURSE_NAMES
 
 
 @cache
@@ -24,7 +23,7 @@ def extract_course_prerequisite_type(course_prerequisite: str,
         return CoursePrerequisiteType.NUMBER_OF_SUBJECTS_PASSED.value
     elif ' или ' in course_prerequisite:
         return CoursePrerequisiteType.MULTIPLE_COURSES.value
-    elif get_most_similar_course_name(course_prerequisite) in COURSE_NAMES:
+    elif singleton_instances.COURSE_NAMES_SINGLETON.get_most_similar_item(course_prerequisite) in singleton_instances.COURSE_NAMES_SINGLETON.get_items():
         return CoursePrerequisiteType.SINGLE_COURSE.value
     else:
         raise ValueError(f"Invalid course prerequisite: {course_prerequisite}")
