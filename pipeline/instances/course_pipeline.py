@@ -6,6 +6,7 @@ from pipeline.operations.clean_fields import clean_course_code, clean_course_nam
     clean_course_prerequisites
 from pipeline.operations.extract_fields import extract_course_level, extract_course_semester, extract_course_prerequisite_type
 from pipeline.operations.handle_invalid_fields import handle_invalid_course_rows
+from pipeline.operations.map_fields import map_course_prerequisites_to_ids, map_course_professors_to_ids
 from pipeline.operations.transform_fields import transform_course_professors, transform_course_prerequisites
 
 courses_clean_data_pipeline = Pipeline(
@@ -48,6 +49,13 @@ courses_extract_data_pipeline = Pipeline(
     ]
 )
 
+courses_generate_data_pipeline = Pipeline(
+    name='generate_course_data',
+    steps=[
+        PipelineStep(name='generate_surrogate_course_id', function=None, source_columns=['course_code'], destination_columns=['course_id']),
+    ],
+)
+
 courses_transform_data_pipeline = Pipeline(
     name='transform_course_data',
     steps=[
@@ -58,9 +66,23 @@ courses_transform_data_pipeline = Pipeline(
     ]
 )
 
+courses_map_data_pipeline = Pipeline(
+    name='map_course_data',
+    steps=[
+        PipelineStep(name='map_course_prerequisites_to_ids', function=map_course_prerequisites_to_ids,
+                     source_columns=['course_prerequisite_type', 'course_prerequisite'], destination_columns=['course_prerequisite_ids']),
+        PipelineStep(name='map_course_professors_to_ids', function=map_course_professors_to_ids, source_columns=['course_professors'],
+                     destination_columns=['course_professors_ids']),
+    ]
+)
 
-def run_courses_pipeline(df: pd.DataFrame) -> None:
+
+def run_courses_pipeline(df: pd.DataFrame) -> pd.DataFrame:
     courses_clean_data_pipeline.run(df)
     courses_handle_invalid_data_pipeline.run(df)
     courses_extract_data_pipeline.run(df)
+    df.sort_values(by=['course_name_mk'], ignore_index=True, inplace=True)
+    courses_generate_data_pipeline.run(df)
     courses_transform_data_pipeline.run(df)
+    courses_map_data_pipeline.run(df)
+    return df
