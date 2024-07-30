@@ -1,6 +1,24 @@
+import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 import pandas as pd
+
+from configurations.model import Configuration
+from static import ENVIRONMENT_VARIABLES, OUTPUT_DIRECTORY_PATH
+
+
+async def run_process_data(executor: ThreadPoolExecutor, config: Configuration) -> Configuration:
+    loop = asyncio.get_event_loop()
+
+    await loop.run_in_executor(executor, config.run_read_csv_file)
+
+    await loop.run_in_executor(executor, config.run_pipeline)
+
+    await loop.run_in_executor(executor, config.run_save_csv_file)
+
+    return config
 
 
 def drop_and_rename_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -22,3 +40,21 @@ def merge_dataframes(df_curricula: pd.DataFrame, df_courses: pd.DataFrame, df_st
     return merged_df
 
 
+def get_dataset_name_from_configs(configs: list[Configuration], dataset_name: str) -> Configuration:
+    return next(filter(lambda x: x.dataset_name == dataset_name, configs))
+
+
+async def run_join_data(executor: ThreadPoolExecutor, configs: list[Configuration]) -> None:
+    loop = asyncio.get_event_loop()
+
+    study_programs: Configuration = get_dataset_name_from_configs(configs, 'study_programs')
+    curricula: Configuration = get_dataset_name_from_configs(configs, 'curricula')
+    courses: Configuration = get_dataset_name_from_configs(configs, 'courses')
+
+    df_merged = await loop.run_in_executor(executor, merge_dataframes, curricula.dataframe, courses.dataframe,
+                                           study_programs.dataframe)
+
+    df_merged.sort_values(by=['study_program_id', 'course_id'], ignore_index=True, inplace=True)
+    logging.info(f"Saving merged data to file: {ENVIRONMENT_VARIABLES['MERGED_DATA_OUTPUT_FILE_NAME']}.csv")
+    loop.run_in_executor(executor, df_merged.to_csv,
+                         Path(OUTPUT_DIRECTORY_PATH, f"{ENVIRONMENT_VARIABLES['MERGED_DATA_OUTPUT_FILE_NAME']}.csv"))
