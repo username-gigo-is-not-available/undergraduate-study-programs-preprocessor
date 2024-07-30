@@ -23,6 +23,10 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Clean the `study_program_name` column by removing any leading or trailing whitespaces, as well as occurrences of multiple whitespaces, and
   converting the text to sentence case
 
+##### Generation Stage
+
+- Generate the `study_program_id` column by indexing the study programs
+
 #### Curriculum:
 
 ##### Cleaning Stage
@@ -59,11 +63,20 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Extract the `course_semester` column from the columns `course_season` and `course_academic_year`
 - Extract the `course_prerequisite_type` column from the `course_prerequisite` column
 
-#### Transformation Stage
+##### Generation Stage
+
+- Generate the `course_id` column by indexing the courses
+
+##### Transformation Stage
 
 - Transform the `course_professors` column by splitting the values and removing the academic titles
 - Transform the `course_prerequisite` column by splitting the values and validating the course names and calculating the minimum number
   of subjects that need to be passed in order to enroll in the course
+
+##### Mapping Stage
+
+- Map `course_prerequisites` to `course_prerequisite_ids` using the singletons for `course_name_mk`
+- Map `course_professors` to `course_professor_ids` using the singletons for `course_professors`
 
 ### Results:
 
@@ -90,8 +103,8 @@ Before running the scraper, make sure to set the following environment variables
 - `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the curricula output file
 - `COURSE_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
 - `MERGED_DATA_OUTPUT_FILE_NAME`: the name of the merged output file
+- `EXECUTOR_TYPE`: the type of executor that will be used to run the ETL pipeline
 - `MAX_WORKERS`: the number of threads that will be used to read and write the data
-
 
 ## Installation
 
