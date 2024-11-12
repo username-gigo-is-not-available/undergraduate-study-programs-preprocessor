@@ -158,7 +158,7 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
                     name='generate_course_prerequisites_id',
                     function=PipelineStep.generate_index,
                     source_columns='course_prerequisites',
-                    destination_columns='course_prerequisite_id',
+                    destination_columns='course_prerequisites_id',
                 )
             )
             .add_step(
