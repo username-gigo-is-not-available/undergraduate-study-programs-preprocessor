@@ -34,8 +34,7 @@ def sentence_case(func: callable) -> callable:
     @wraps(func)
     def wrapper(*args, **kwargs) -> str:
         result: str = str(func(*args, **kwargs))
-
-        return ' '.join([word.lower().capitalize() if not word.isupper() and len(word) > 2 else word for word in result.split(' ')])
+        return ''.join([result[0].capitalize(), result[1:]])
 
     return wrapper
 
