@@ -19,19 +19,22 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 ##### Cleaning Stage
 
-- Read the study programs data from the `study_programs.csv` file
 - Clean the `study_program_name` column by removing any leading or trailing whitespaces, as well as occurrences of multiple whitespaces, and
   converting the text to sentence case
 
+#### Extraction Stage
+
+- Extract `study_program_code` from `study_program_url` and `study_program_duration`. The `study_program_code` is the last part of the
+  `study_program_url` concatenated with the `study_program_duration`
+
 ##### Generation Stage
 
-- Generate the `study_program_id` column by indexing the study programs
+- Generate the `study_program_id` column by indexing column `study_program_code`
 
 #### Curriculum:
 
 ##### Cleaning Stage
 
-- Read the curriculum data from the `curriculum.csv` file
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple whitespaces
 - Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as occurrences of
   multiple whitespaces, and converting the text to sentence case
@@ -51,6 +54,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   multiple whitespaces, and converting the text to sentence case
 - Clean the `course_professors` and `course_prerequisite` columns by replacing newline characters with commas, removing any leading or
   trailing whitespaces, as well as occurrences of multiple whitespaces and replacing `nulls` with `нема`
+- Clean the `course_professors` column by splitting the values and removing the academic titles
 
 ##### Handling Invalid Data
 
@@ -63,20 +67,27 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Extract the `course_semester` column from the columns `course_season` and `course_academic_year`
 - Extract the `course_prerequisite_type` column from the `course_prerequisite` column
 
-##### Generation Stage
-
-- Generate the `course_id` column by indexing the courses
-
 ##### Transformation Stage
 
-- Transform the `course_professors` column by splitting the values and removing the academic titles
 - Transform the `course_prerequisite` column by splitting the values and validating the course names and calculating the minimum number
   of subjects that need to be passed in order to enroll in the course
 
-##### Mapping Stage
+#### Flattening Stage
 
-- Map `course_prerequisites` to `course_prerequisite_ids` using the singletons for `course_name_mk`
-- Map `course_professors` to `course_professor_ids` using the singletons for `course_professors`
+- Flatten the `course_professors` column by splitting the values and creating a new row for each professor
+- Flatten the `course_prerequisite` column by splitting the values and creating a new row for each prerequisite
+
+##### Generation Stage
+
+- Generate the `course_id` column by indexing the courses
+- Generate the `course_professor_id` column by indexing the professors
+- Generate the `course_prerequisite_id` column by indexing the prerequisites
+
+
+### Merged Data:
+
+- Merge `study_programs` and `curriculum` on `study_program_name`, `study_program_duration` and `study_program_url` columns
+- Merge the merged data from the previous step with `courses` on `course_code` and `course_name_mk` columns
 
 ### Results:
 
@@ -85,7 +96,7 @@ This ETL application will save the transformed data in four different files:
 - `study_programs.csv`: contains the details of the study programs
 - `curriculum.csv`: contains the details of the study programs and related courses
 - `courses.csv`: contains the details of the courses
-- `merged.csv`: contains the merged data from `curriculum.csv` and `courses.csv`
+- `merged_data.csv`: contains the merged data from `curriculum.csv` and `courses.csv`
 
 ## Requirements
 
@@ -95,7 +106,7 @@ This ETL application will save the transformed data in four different files:
 
 Before running the scraper, make sure to set the following environment variables:
 
-- `OUTPUT_DIRECTORY_PATH`: the path to the directory where the output files will be saved
+- `STORAGE_TYPE`: the type of storage to use (either `LOCAL` or `MINIO`)
 - `STUDY_PROGRAMS_INPUT_DATA_FILE_PATH`: the path to the study programs data file
 - `CURRICULA_INPUT_DATA_FILE_PATH`: the path to the curricula data file
 - `COURSE_INPUT_DATA_FILE_PATH`: the path to the courses data file
@@ -103,8 +114,20 @@ Before running the scraper, make sure to set the following environment variables
 - `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the curricula output file
 - `COURSE_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
 - `MERGED_DATA_OUTPUT_FILE_NAME`: the name of the merged output file
-- `EXECUTOR_TYPE`: the type of executor that will be used to run the ETL pipeline
-- `MAX_WORKERS`: the number of threads that will be used to read and write the data
+
+
+##### If running the scraper with local storage:
+
+- `INPUT_DIRECTORY_PATH`: the path to the directory where the input files are stored
+- `OUTPUT_DIRECTORY_PATH`: the path to the directory where the output files will be saved
+
+##### If running the scraper with MinIO:
+
+- `MINIO_ENDPOINT`: the endpoint of the MinIO server
+- `MINIO_ACCESS_KEY`: the access key of the MinIO server
+- `MINIO_SECRET_KEY`: the secret key of the MinIO server
+- `MINIO_SOURCE_BUCKET_NAME`: the name of the bucket where the input files are stored
+- `MINIO_DESTINATION_BUCKET_NAME`: the name of the bucket where the output files will be saved
 
 ## Installation
 
