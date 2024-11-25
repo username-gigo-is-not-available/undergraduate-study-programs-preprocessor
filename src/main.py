@@ -44,7 +44,6 @@ if __name__ == '__main__':
                         default=list(DatasetType))
 
     args = parser.parse_args()
-    print(Config.MERGED_DATA_COLUMN_ORDER)
     datasets: list[DatasetType] = args.datasets
 
     asyncio.run(main(datasets))
