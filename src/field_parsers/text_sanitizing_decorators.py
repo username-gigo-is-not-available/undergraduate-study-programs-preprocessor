@@ -24,7 +24,7 @@ def clean_newlines(func: callable) -> callable:
     @wraps(func)
     def wrapper(*args, **kwargs) -> str:
         result: str = str(func(*args, **kwargs))
-        cleaned_result: str = ', '.join(filter(lambda x: x, result.split('\n')))
+        cleaned_result: str = ', '.join(map(str.strip, filter(lambda x: x, result.split('\n'))))
         return cleaned_result
 
     return wrapper
