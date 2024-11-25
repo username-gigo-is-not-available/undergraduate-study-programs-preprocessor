@@ -72,7 +72,7 @@ def build_merge_data_pipeline(df_study_programs: pd.DataFrame | None = None,
                 name='merge_curricula_and_courses',
                 function=PipelineStep.merge_dataframes,
                 merge_df=df_courses,
-                on=['course_code', 'course_name_mk'],
+                on=['course_code', 'course_name_mk', 'course_url'],
                 how='inner'
             )
         )

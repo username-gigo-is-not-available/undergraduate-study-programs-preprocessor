@@ -5,6 +5,7 @@ import time
 
 import pandas as pd
 
+from src.config import Config
 from src.pipeline.models.enums import DatasetType
 from src.pipeline.courses_pipeline import build_courses_pipeline
 from src.pipeline.curricula_pipeline import build_curricula_pipeline
@@ -43,7 +44,7 @@ if __name__ == '__main__':
                         default=list(DatasetType))
 
     args = parser.parse_args()
-
+    print(Config.MERGED_DATA_COLUMN_ORDER)
     datasets: list[DatasetType] = args.datasets
 
     asyncio.run(main(datasets))

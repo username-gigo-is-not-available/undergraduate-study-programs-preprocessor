@@ -51,6 +51,7 @@ class Config:
         'course_id',
         'course_code',
         'course_name_mk',
+        'course_url',
         'course_name_en',
         'course_semester',
         'course_academic_year',
