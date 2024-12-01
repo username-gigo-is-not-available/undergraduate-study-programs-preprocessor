@@ -49,7 +49,7 @@ def build_study_programs_pipeline(stages: list[StageType] = tuple(StageType)) ->
             .add_step(
                 PipelineStep(
                     name='generate_study_program_id',
-                    function=PipelineStep.generate_index,
+                    function=PipelineStep.generate_indeces,
                     source_columns='study_program_code',
                     destination_columns='study_program_id'
                 )

@@ -12,7 +12,7 @@ class StorageStrategy:
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         raise NotImplementedError
 
-    def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str]) -> pd.DataFrame:
+    def save_data(self, df: pd.DataFrame, output_file_name: Path) -> pd.DataFrame:
         raise NotImplementedError
 
 
@@ -28,9 +28,8 @@ class LocalStorage(StorageStrategy):
             logging.error(f"Failed to read data from local storage: {e}")
             raise
 
-    def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str]) -> pd.DataFrame:
+    def save_data(self, df: pd.DataFrame, output_file_name: Path) -> pd.DataFrame:
         try:
-            df = df[column_order]
             df.to_csv(Config.OUTPUT_DIRECTORY_PATH / output_file_name, index=False)
             logging.info(f"Saved data to local storage: {output_file_name}")
             return df
@@ -50,9 +49,9 @@ class MinioStorage(StorageStrategy):
             logging.error(f"Failed to read data from MinIO bucket {Config.MINIO_SOURCE_BUCKET_NAME}: {e}")
             raise
 
-    def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str]) -> pd.DataFrame:
+    def save_data(self, df: pd.DataFrame, output_file_name: Path) -> pd.DataFrame:
         try:
-            csv_bytes: bytes = df[column_order].to_csv(index=False).encode('utf-8')
+            csv_bytes: bytes = df.to_csv(index=False).encode('utf-8')
             csv_buffer: BytesIO = BytesIO(csv_bytes)
             Config.MINIO_CLIENT.put_object(
                 bucket_name=str(Config.MINIO_DESTINATION_BUCKET_NAME),

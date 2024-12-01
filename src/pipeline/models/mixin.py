@@ -24,9 +24,12 @@ class StorageMixin:
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         return self.storage_strategy.read_data(input_file_name)
 
-    def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str]) -> pd.DataFrame:
+    def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str], drop_duplicates: bool = False) -> pd.DataFrame:
         column_order = [col for col in column_order if col in df.columns]
-        return self.storage_strategy.save_data(df, output_file_name, column_order)
+        df = df[column_order]
+        if drop_duplicates:
+            df = df.drop_duplicates()
+        return self.storage_strategy.save_data(df, output_file_name)
 
 
 class DataTransformationMixin:
@@ -84,11 +87,18 @@ class DataTransformationMixin:
         )
         return df
 
-    def generate_index(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str | list[str]) -> pd.DataFrame:
+    def generate_indeces(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str) -> pd.DataFrame:
         df = df.sort_values(by=source_columns)
         df[destination_columns] = df.groupby(source_columns).ngroup().values
-
         return df
+
+    def map_values_to_indeces(self, df: pd.DataFrame, value_column: str, reference_column: str, merge_column: str, destination_column: str,
+                              how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
+        values_subset = df[value_column].drop_duplicates()
+        reference_subset = df[[reference_column, merge_column]].drop_duplicates().rename(columns={merge_column: value_column})
+        result = pd.merge(reference_subset, values_subset, on=value_column, how=how).rename(columns={reference_column: destination_column})
+
+        return pd.merge(df, result, on=value_column, how=how).fillna({destination_column: -1}).astype({destination_column: int})
 
     def merge_dataframes(self, df: pd.DataFrame, merge_df: pd.DataFrame, on: str | list[str],
                          how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
