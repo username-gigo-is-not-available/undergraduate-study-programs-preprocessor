@@ -5,7 +5,6 @@ import time
 
 import pandas as pd
 
-from src.config import Config
 from src.pipeline.models.enums import DatasetType
 from src.pipeline.courses_pipeline import build_courses_pipeline
 from src.pipeline.curricula_pipeline import build_curricula_pipeline
