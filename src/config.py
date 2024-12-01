@@ -59,6 +59,7 @@ class Config:
         'course_level',
         'course_prerequisites_id',
         'course_prerequisites',
+        'course_prerequisites_course_id',
         'course_prerequisite_type',
         'course_professors_id',
         'course_professors'

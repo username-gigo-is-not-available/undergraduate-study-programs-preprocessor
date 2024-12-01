@@ -148,7 +148,7 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
             .add_step(
                 PipelineStep(
                     name='generate_course_id',
-                    function=PipelineStep.generate_index,
+                    function=PipelineStep.generate_indeces,
                     source_columns='course_code',
                     destination_columns='course_id',
                 )
@@ -156,7 +156,7 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
             .add_step(
                 PipelineStep(
                     name='generate_course_prerequisites_id',
-                    function=PipelineStep.generate_index,
+                    function=PipelineStep.generate_indeces,
                     source_columns='course_prerequisites',
                     destination_columns='course_prerequisites_id',
                 )
@@ -164,9 +164,20 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
             .add_step(
                 PipelineStep(
                     name='generate_course_professors_id',
-                    function=PipelineStep.generate_index,
+                    function=PipelineStep.generate_indeces,
                     source_columns='course_professors',
                     destination_columns='course_professors_id',
+                )
+            )
+            .add_step(
+                PipelineStep(
+                    name='map_course_prerequisites',
+                    function=PipelineStep.map_values_to_indeces,
+                    value_column='course_prerequisites',
+                    reference_column='course_id',
+                    merge_column='course_name_mk',
+                    destination_column='course_prerequisites_course_id',
+                    how='left',
                 )
             )
         )
