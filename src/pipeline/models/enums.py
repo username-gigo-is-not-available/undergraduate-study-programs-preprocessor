@@ -16,7 +16,6 @@ class DatasetType(UpperStrEnum):
 class StageType(UpperStrEnum):
     LOADING: str = auto()
     CLEANING: str = auto()
-    VALIDATING: str = auto()
     EXTRACTING: str = auto()
     TRANSFORMING: str = auto()
     GENERATING: str = auto()

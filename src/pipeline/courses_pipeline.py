@@ -5,7 +5,6 @@ from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
 from src.pipeline.models.step import PipelineStep
 from src.field_parsers.clean_fields import clean_and_format_multivalued_field, clean_and_format_field, clean_professor_titles
 from src.field_parsers.extract_fields import extract_course_level, extract_course_semester, extract_course_prerequisite_type
-from src.field_parsers.handle_invalid_fields import validate_course_rows
 from src.field_parsers.transform_fields import transform_course_prerequisites
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.config import Config
@@ -56,20 +55,6 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
                     mapping_function=clean_professor_titles,
                     source_columns='course_professors',
                     destination_columns='course_professors',
-                )
-            )
-        )
-    # Validating Stage
-    if StageType.VALIDATING in stages:
-        builder.add_stage(
-            PipelineStageBuilder(name='validate_course_data', stage_type=StageType.VALIDATING)
-            .add_step(
-                PipelineStep(
-                    name='validate_course_data',
-                    function=PipelineStep.apply_function,
-                    mapping_function=validate_course_rows,
-                    source_columns=['course_code', 'course_name_mk', 'course_name_en'],
-                    destination_columns=['course_code', 'course_name_mk', 'course_name_en'],
                 )
             )
         )
