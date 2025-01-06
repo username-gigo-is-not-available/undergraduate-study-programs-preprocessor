@@ -58,7 +58,7 @@ class DataTransformationMixin:
 
     @wrap_columns
     def explode_column(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str | list[str]) -> pd.DataFrame:
-        df[destination_columns] = df[source_columns].map(lambda x: x.split(', '))
+        df[destination_columns] = df[source_columns].map(lambda x: x.split("|"))
         df = df.explode(source_columns)
         return df
 

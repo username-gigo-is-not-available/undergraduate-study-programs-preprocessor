@@ -31,4 +31,4 @@ def clean_professor_titles(course_professors: str) -> str:
             professor_name = professor_name.replace(title, "").strip()
         return professor_name
 
-    return ', '.join(sorted((map(parse_professor_title, str(course_professors).split(", ")))))
+    return "|".join(sorted((map(parse_professor_title, str(course_professors).split(", ")))))
