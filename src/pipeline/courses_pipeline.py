@@ -4,7 +4,8 @@ from src.patterns.builder.pipeline_builder import PipelineBuilder
 from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
 from src.pipeline.models.step import PipelineStep
 from src.field_parsers.clean_fields import clean_and_format_multivalued_field, clean_and_format_field, clean_professor_titles
-from src.field_parsers.extract_fields import extract_course_level, extract_course_semester, extract_course_prerequisite_type
+from src.field_parsers.extract_fields import extract_course_level, extract_course_semester, extract_course_prerequisite_type, \
+    extract_minimum_number_of_courses_passed
 from src.field_parsers.transform_fields import transform_course_prerequisites
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.config import Config
@@ -89,6 +90,15 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
                     destination_columns='course_prerequisite_type',
                 )
             )
+            .add_step(
+                PipelineStep(
+                    name='extract_course_minimum_number_of_courses_passed',
+                    function=PipelineStep.apply_function,
+                    mapping_function=extract_minimum_number_of_courses_passed,
+                    source_columns=['course_prerequisite_type', 'course_prerequisites'],
+                    destination_columns='course_prerequisites_minimum_required_courses',
+                )
+            )
         )
     # Transformation Stage
     if StageType.TRANSFORMING in stages:
@@ -99,7 +109,7 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
                     name='transform_course_prerequisites',
                     function=PipelineStep.apply_matching,
                     mapping_function=transform_course_prerequisites,
-                    source_columns=['course_prerequisite_type', 'course_prerequisites'],
+                    source_columns=['course_prerequisite_type', 'course_prerequisites', 'course_name_mk'],
                     destination_columns='course_prerequisites',
                     truth_columns='course_name_mk',
                 )
@@ -136,14 +146,6 @@ def build_courses_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipeli
                     function=PipelineStep.generate_indeces,
                     source_columns='course_code',
                     destination_columns='course_id',
-                )
-            )
-            .add_step(
-                PipelineStep(
-                    name='generate_course_prerequisites_id',
-                    function=PipelineStep.generate_indeces,
-                    source_columns='course_prerequisites',
-                    destination_columns='course_prerequisites_id',
                 )
             )
             .add_step(

@@ -57,10 +57,10 @@ class Config:
         'course_academic_year',
         'course_semester_season',
         'course_level',
-        'course_prerequisites_id',
-        'course_prerequisites',
-        'course_prerequisites_course_id',
         'course_prerequisite_type',
+        'course_prerequisites_minimum_required_courses',
+        'course_prerequisites_course_id',
+        'course_prerequisites',
         'course_professors_id',
         'course_professors'
     ]
