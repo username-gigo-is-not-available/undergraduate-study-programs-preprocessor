@@ -39,11 +39,6 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as occurrences of
   multiple whitespaces, and converting the text to sentence case
 
-##### Handling Invalid Data
-
-- Handle invalid `course_code` values by extracting the course code from the `course_name_mk` column, as well as removing the
-  valid `course_code` from `course_name_mk`
-
 #### Courses:
 
 ##### Cleaning Stage
@@ -56,16 +51,12 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   trailing whitespaces, as well as occurrences of multiple whitespaces and replacing `nulls` with `нема`
 - Clean the `course_professors` column by splitting the values and removing the academic titles
 
-##### Handling Invalid Data
-
-- Handle invalid `course_code` values by extracting the course code from the `course_name_mk` column, as well as removing the
-  valid `course_code` from `course_name_mk` and `course_name_en`
-
 ##### Extraction Stage
 
 - Extract the `course_level` column from the `course_code` column
 - Extract the `course_semester` column from the columns `course_season` and `course_academic_year`
 - Extract the `course_prerequisite_type` column from the `course_prerequisite` column
+- Extract the `course_prerequisites_minimum_required_courses` column from the columns `course_prerequisites` and `course_prerequisite_type`
 
 ##### Transformation Stage
 
@@ -82,7 +73,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Generate the `course_id` column by indexing the courses
 - Generate the `course_professor_id` column by indexing the professors
 - Generate the `course_prerequisite_id` column by indexing the prerequisites
-
+- Generate the `course_prerequisites_course_id` by joining the `course_id` and `course_prerequisites` columns
 
 ### Merged Data:
 
