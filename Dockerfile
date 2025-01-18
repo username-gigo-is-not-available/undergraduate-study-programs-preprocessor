@@ -8,7 +8,7 @@ RUN apk update && \
     apk upgrade && \
     apk add --no-cache gcc musl-dev libc-dev libpq-dev expat-dev openssl-dev
 
-WORKDIR /undergraduate-program-etl
+WORKDIR /undergraduate-study-program-etl
 
 COPY requirements.txt .
 RUN pip install --upgrade pip \
@@ -27,13 +27,13 @@ RUN apk update && \
 RUN addgroup -S app_group && adduser -S app_user -G app_group
 
 USER app_user
-WORKDIR /undergraduate-program-etl
+WORKDIR /undergraduate-study-program-etl
 
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY ./src ./src
 
-ENV PYTHONPATH=/undergraduate-program-etl
+ENV PYTHONPATH=/undergraduate-study-program-etl
 
 CMD ["python", "src/main.py"]
