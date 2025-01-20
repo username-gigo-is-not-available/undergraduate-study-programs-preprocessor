@@ -97,7 +97,7 @@ This ETL application will save the transformed data in four different files:
 
 Before running the scraper, make sure to set the following environment variables:
 
-- `STORAGE_TYPE`: the type of storage to use (either `LOCAL` or `MINIO`)
+- `FILE_STORAGE_TYPE`: the type of storage to use (either `LOCAL` or `MINIO`)
 - `STUDY_PROGRAMS_INPUT_DATA_FILE_PATH`: the path to the study programs data file
 - `CURRICULA_INPUT_DATA_FILE_PATH`: the path to the curricula data file
 - `COURSE_INPUT_DATA_FILE_PATH`: the path to the courses data file
