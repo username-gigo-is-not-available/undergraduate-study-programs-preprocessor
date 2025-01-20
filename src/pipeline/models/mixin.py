@@ -5,31 +5,31 @@ from typing import Literal, Any
 import pandas as pd
 
 from src.config import Config
-from src.patterns.strategy.storage_strategy import LocalStorage, MinioStorage
+from src.patterns.strategy.storage_strategy import LocalFileStorage, MinioFileStorage
 
 
-class StorageMixin:
+class FileStorageMixin:
     def __init__(self):
-        if Config.STORAGE_TYPE == 'LOCAL':
+        if Config.FILE_STORAGE_TYPE == 'LOCAL':
             if not Config.OUTPUT_DIRECTORY_PATH.exists():
                 Config.OUTPUT_DIRECTORY_PATH.mkdir(parents=True)
-            self.storage_strategy = LocalStorage()
-        elif Config.STORAGE_TYPE == 'MINIO':
+            self.file_storage_strategy = LocalFileStorage()
+        elif Config.FILE_STORAGE_TYPE == 'MINIO':
             if not Config.MINIO_CLIENT.bucket_exists(Config.MINIO_DESTINATION_BUCKET_NAME):
                 Config.MINIO_CLIENT.make_bucket(Config.MINIO_DESTINATION_BUCKET_NAME)
-            self.storage_strategy = MinioStorage()
+            self.file_storage_strategy = MinioFileStorage()
         else:
-            raise ValueError(f"Unsupported storage type: {Config.STORAGE_TYPE}")
+            raise ValueError(f"Unsupported storage type: {Config.FILE_STORAGE_TYPE}")
 
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
-        return self.storage_strategy.read_data(input_file_name)
+        return self.file_storage_strategy.read_data(input_file_name)
 
     def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str], drop_duplicates: bool = False) -> pd.DataFrame:
         column_order = [col for col in column_order if col in df.columns]
         df = df[column_order]
         if drop_duplicates:
             df = df.drop_duplicates()
-        return self.storage_strategy.save_data(df, output_file_name)
+        return self.file_storage_strategy.save_data(df, output_file_name)
 
 
 class DataTransformationMixin:

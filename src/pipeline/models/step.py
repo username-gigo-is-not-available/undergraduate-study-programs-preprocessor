@@ -2,10 +2,10 @@ import logging
 
 import pandas as pd
 
-from src.pipeline.models.mixin import StorageMixin, DataTransformationMixin
+from src.pipeline.models.mixin import FileStorageMixin, DataTransformationMixin
 
 
-class PipelineStep(StorageMixin, DataTransformationMixin):
+class PipelineStep(FileStorageMixin, DataTransformationMixin):
     def __init__(self, name: str, function: callable, *args, **kwargs):
         super().__init__()
         self.name: str = name

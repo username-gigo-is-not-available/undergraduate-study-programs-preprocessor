@@ -8,7 +8,7 @@ from minio import S3Error
 from src.config import Config
 
 
-class StorageStrategy:
+class FileStorageStrategy:
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         raise NotImplementedError
 
@@ -16,7 +16,7 @@ class StorageStrategy:
         raise NotImplementedError
 
 
-class LocalStorage(StorageStrategy):
+class LocalFileStorage(FileStorageStrategy):
 
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         try:
@@ -38,7 +38,7 @@ class LocalStorage(StorageStrategy):
             raise
 
 
-class MinioStorage(StorageStrategy):
+class MinioFileStorage(FileStorageStrategy):
 
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         try:
