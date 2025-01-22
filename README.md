@@ -107,12 +107,12 @@ Before running the scraper, make sure to set the following environment variables
 - `MERGED_DATA_OUTPUT_FILE_NAME`: the name of the merged output file
 
 
-##### If running the scraper with local storage:
+##### If running the application with local storage:
 
 - `INPUT_DIRECTORY_PATH`: the path to the directory where the input files are stored
 - `OUTPUT_DIRECTORY_PATH`: the path to the directory where the output files will be saved
 
-##### If running the scraper with MinIO:
+##### If running the application with MinIO:
 
 - `MINIO_ENDPOINT_URL`: the endpoint of the MinIO server
 - `MINIO_ACCESS_KEY`: the access key of the MinIO server
@@ -132,7 +132,7 @@ Before running the scraper, make sure to set the following environment variables
     pip install -r requirements.txt
     ```
 
-3. Run the scraper
+3. Run the application
     ```bash
     python main.py
     ```
