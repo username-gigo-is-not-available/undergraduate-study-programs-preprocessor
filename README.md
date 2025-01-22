@@ -114,7 +114,7 @@ Before running the scraper, make sure to set the following environment variables
 
 ##### If running the scraper with MinIO:
 
-- `MINIO_ENDPOINT`: the endpoint of the MinIO server
+- `MINIO_ENDPOINT_URL`: the endpoint of the MinIO server
 - `MINIO_ACCESS_KEY`: the access key of the MinIO server
 - `MINIO_SECRET_KEY`: the secret key of the MinIO server
 - `MINIO_SOURCE_BUCKET_NAME`: the name of the bucket where the input files are stored
