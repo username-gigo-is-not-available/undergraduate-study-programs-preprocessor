@@ -2,7 +2,7 @@ import pandas as pd
 
 from src.pipeline.models.enums import DatasetType
 from src.pipeline.models.pipeline import Pipeline
-from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
+from src.patterns.builder.pipeline_stage import PipelineStageBuilder
 
 
 class PipelineBuilder:

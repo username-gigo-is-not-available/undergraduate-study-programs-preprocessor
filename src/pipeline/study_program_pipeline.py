@@ -1,11 +1,11 @@
 from src.pipeline.models.enums import DatasetType, StageType
 from src.pipeline.common_steps import clean_study_program_name_step
-from src.pipeline.models.mixin import FileStorageMixin
+from src.patterns.mixin.file_storage import FileStorageMixin
 from src.pipeline.models.pipeline import Pipeline
-from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
+from src.patterns.builder.pipeline_stage import PipelineStageBuilder
 from src.pipeline.models.step import PipelineStep
 from src.field_parsers.extract_fields import extract_study_program_code
-from src.patterns.builder.pipeline_builder import PipelineBuilder
+from src.patterns.builder.pipeline import PipelineBuilder
 from src.config import Config
 
 

@@ -1,8 +1,8 @@
 from src.pipeline.models.enums import DatasetType, StageType
-from src.pipeline.models.mixin import FileStorageMixin
+from src.patterns.mixin.file_storage import FileStorageMixin
 from src.pipeline.models.pipeline import Pipeline
-from src.patterns.builder.pipeline_builder import PipelineBuilder
-from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
+from src.patterns.builder.pipeline import PipelineBuilder
+from src.patterns.builder.pipeline_stage import PipelineStageBuilder
 from src.pipeline.models.step import PipelineStep
 from src.field_parsers.clean_fields import clean_and_format_multivalued_field, clean_and_format_field, clean_professor_titles
 from src.field_parsers.extract_fields import extract_course_level, extract_course_semester, extract_course_prerequisite_type, \

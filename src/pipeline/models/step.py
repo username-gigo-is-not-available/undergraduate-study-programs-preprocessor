@@ -2,7 +2,8 @@ import logging
 
 import pandas as pd
 
-from src.pipeline.models.mixin import FileStorageMixin, DataTransformationMixin
+from src.patterns.mixin.file_storage import FileStorageMixin
+from src.patterns.mixin.data_transformation import DataTransformationMixin
 
 
 class PipelineStep(FileStorageMixin, DataTransformationMixin):
