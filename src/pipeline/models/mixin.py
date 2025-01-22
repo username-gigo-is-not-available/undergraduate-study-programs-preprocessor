@@ -21,15 +21,30 @@ class FileStorageMixin:
         else:
             raise ValueError(f"Unsupported storage type: {Config.FILE_STORAGE_TYPE}")
 
-    def read_data(self, input_file_name: Path) -> pd.DataFrame:
-        return self.file_storage_strategy.read_data(input_file_name)
+    @classmethod
+    def get_input_file_location(cls) -> Path | str:
+        if Config.FILE_STORAGE_TYPE == 'LOCAL':
+            return Config.INPUT_DIRECTORY_PATH
+        elif Config.FILE_STORAGE_TYPE == 'MINIO':
+            return Config.MINIO_SOURCE_BUCKET_NAME
 
-    def save_data(self, df: pd.DataFrame, output_file_name: Path, column_order: list[str], drop_duplicates: bool = False) -> pd.DataFrame:
+    @classmethod
+    def get_output_file_location(cls) -> Path | str:
+        if Config.FILE_STORAGE_TYPE == 'LOCAL':
+            return Config.OUTPUT_DIRECTORY_PATH
+        elif Config.FILE_STORAGE_TYPE == 'MINIO':
+            return Config.MINIO_DESTINATION_BUCKET_NAME
+
+    def read_data(self, input_file_location: Path | str, input_file_name: Path) -> pd.DataFrame:
+        return self.file_storage_strategy.read_data(input_file_location, input_file_name)
+
+    def save_data(self, df: pd.DataFrame, output_file_location: Path | str, output_file_name: Path, column_order: list[str],
+                  drop_duplicates: bool = False) -> pd.DataFrame:
         column_order = [col for col in column_order if col in df.columns]
         df = df[column_order]
         if drop_duplicates:
             df = df.drop_duplicates()
-        return self.file_storage_strategy.save_data(df, output_file_name)
+        return self.file_storage_strategy.save_data(df, output_file_location, output_file_name)
 
 
 class DataTransformationMixin:

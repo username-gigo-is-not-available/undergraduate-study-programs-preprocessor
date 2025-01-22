@@ -1,5 +1,6 @@
 from src.pipeline.models.enums import DatasetType, StageType
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
+from src.pipeline.models.mixin import FileStorageMixin
 from src.pipeline.models.pipeline import Pipeline
 from src.patterns.builder.pipeline_builder import PipelineBuilder
 from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
@@ -16,6 +17,7 @@ def build_curricula_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipe
             .add_step(PipelineStep(
                 name='load_curricula_data',
                 function=PipelineStep.read_data,
+                input_file_location=FileStorageMixin.get_input_file_location(),
                 input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
             ))
         )
@@ -34,6 +36,7 @@ def build_curricula_pipeline(stages: list[StageType] = tuple(StageType)) -> Pipe
             .add_step(PipelineStep(
                 name='store_curricula_data',
                 function=PipelineStep.save_data,
+                output_file_location=FileStorageMixin.get_output_file_location(),
                 output_file_name=Config.CURRICULA_OUTPUT_FILE_NAME,
                 column_order=Config.CURRICULA_COLUMN_ORDER,
             ))

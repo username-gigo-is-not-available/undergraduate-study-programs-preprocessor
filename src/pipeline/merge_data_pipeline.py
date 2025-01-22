@@ -1,5 +1,6 @@
 import pandas as pd
 from src.pipeline.models.enums import DatasetType, StageType
+from src.pipeline.models.mixin import FileStorageMixin
 from src.pipeline.models.pipeline import Pipeline
 from src.patterns.builder.pipeline_builder import PipelineBuilder
 from src.patterns.builder.pipeline_stage_builder import PipelineStageBuilder
@@ -22,6 +23,7 @@ def build_merge_data_pipeline(df_study_programs: pd.DataFrame | None = None,
                 PipelineStep(
                     name='load_study_programs',
                     function=PipelineStep.read_data,
+                    input_file_location=FileStorageMixin.get_output_file_location(),
                     input_file_name=Config.STUDY_PROGRAMS_OUTPUT_FILE_NAME,
                 )
             )
@@ -32,6 +34,7 @@ def build_merge_data_pipeline(df_study_programs: pd.DataFrame | None = None,
                 PipelineStep(
                     name='load_curricula',
                     function=PipelineStep.read_data,
+                    input_file_location=FileStorageMixin.get_output_file_location(),
                     input_file_name=Config.CURRICULA_OUTPUT_FILE_NAME,
                 )
             )
@@ -42,6 +45,7 @@ def build_merge_data_pipeline(df_study_programs: pd.DataFrame | None = None,
                 PipelineStep(
                     name='load_courses',
                     function=PipelineStep.read_data,
+                    input_file_location=FileStorageMixin.get_output_file_location(),
                     input_file_name=Config.COURSES_OUTPUT_FILE_NAME,
                 )
             )
@@ -84,6 +88,7 @@ def build_merge_data_pipeline(df_study_programs: pd.DataFrame | None = None,
             PipelineStep(
                 name='store_data',
                 function=PipelineStep.save_data,
+                output_file_location=FileStorageMixin.get_output_file_location(),
                 output_file_name=Config.MERGED_DATA_OUTPUT_FILE_NAME,
                 column_order=Config.MERGED_DATA_COLUMN_ORDER
             )
