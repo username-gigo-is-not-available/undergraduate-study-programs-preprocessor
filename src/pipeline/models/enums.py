@@ -6,13 +6,6 @@ class UpperStrEnum(StrEnum):
         return name.upper()
 
 
-class DatasetType(UpperStrEnum):
-    STUDY_PROGRAMS: str = auto()
-    CURRICULA: str = auto()
-    COURSES: str = auto()
-    MERGED_DATA: str = auto()
-
-
 class StageType(UpperStrEnum):
     LOADING: str = auto()
     CLEANING: str = auto()
@@ -25,10 +18,10 @@ class StageType(UpperStrEnum):
 
 
 class CoursePrerequisiteType(UpperStrEnum):
-    REQUIRED_COURSE: str = auto()
-    OPTIONAL_COURSES: str = auto()
-    NO_PREREQUISITE: str = auto()
-    MINIMUM_NUMBER_OF_COURSES_PASSED: str = auto()
+    NONE: str = auto()
+    ONE: str = auto()
+    ANY: str = auto()
+    TOTAL: str = auto()
 
 
 class CourseSemesterSeasonType(UpperStrEnum):
