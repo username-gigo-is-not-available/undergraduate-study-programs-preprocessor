@@ -1,5 +1,6 @@
 from difflib import SequenceMatcher
 
+from src.config import Config
 from src.pipeline.models.enums import CoursePrerequisiteType
 
 
@@ -8,12 +9,13 @@ def transform_course_prerequisites(course_prerequisite_type: CoursePrerequisiteT
                                    course_name_mk: str,
                                    course_names: list[str]
                                    ) -> str:
+
     def get_most_similar_course_prerequisite(course_prerequisite: str,
                                              course_names: list[str]) -> str:
         similarity = {}
         for course in course_names:
             ratio = SequenceMatcher(None, course_prerequisite, course).ratio()
-            if ratio >= 0.835:
+            if ratio >= Config.COURSE_SIMILARITY_THRESHOLD:
                 similarity[course] = ratio
 
         return max(similarity, key=lambda k: similarity[k]) if similarity else None
