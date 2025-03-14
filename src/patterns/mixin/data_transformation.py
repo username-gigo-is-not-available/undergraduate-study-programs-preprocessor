@@ -29,9 +29,12 @@ class DataTransformationMixin:
         return wrapper
 
     @wrap_columns
-    def explode_column(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str | list[str]) -> pd.DataFrame:
+    def explode_column(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str | list[str],
+                       drop_duplicates: bool = False) -> pd.DataFrame:
         df[destination_columns] = df[source_columns].map(lambda x: x.split("|"))
         df = df.explode(source_columns)
+        if drop_duplicates:
+            df = df.drop_duplicates()
         return df
 
     @wrap_columns
@@ -50,14 +53,33 @@ class DataTransformationMixin:
                        source_columns: str | list[str],
                        destination_columns: str | list[str],
                        mapping_function: callable,
-                       truth_columns: str | list[str]
+                       group_by_columns: str | list[str],
+                       truth_columns: str | list[str],
+                       sort_columns: str | list[str],
+                       sort_order: dict[str,int]
                        ) -> pd.DataFrame:
-        truth_data = tuple([row.pop() for row in df[truth_columns].values.tolist()])
 
-        df[destination_columns] = df[source_columns].apply(
-            lambda row: pd.Series(mapping_function(*row, truth_data)), axis=1
-        )
-        return df
+        updated_rows = []
+
+        df_grouped = df.sort_values(by=[sort_columns], key=lambda x: x.map(sort_order)).groupby(group_by_columns)
+        for key, group in df_grouped:
+            truth_data = [row.pop() for row in group[truth_columns].values.tolist()]
+            new_group = group.copy()
+            is_invalid = True
+            while is_invalid:
+                new_group[destination_columns] = new_group[source_columns].apply(
+                    lambda row: pd.Series(mapping_function(*row[source_columns], tuple(truth_data))), axis=1
+                )
+                invalid_records = [
+                    item for items in new_group[new_group.isna().any(axis=1)][truth_columns].to_dict(orient='records')
+                    for item in items.values()
+                ]
+                is_invalid = bool(invalid_records)
+                truth_data = [item for item in truth_data if item not in invalid_records]
+                new_group = new_group.dropna()
+            updated_rows.append(new_group.dropna())
+
+        return pd.concat(updated_rows, ignore_index=True)
 
     def generate_indeces(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str) -> pd.DataFrame:
         df = df.sort_values(by=source_columns)
