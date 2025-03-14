@@ -33,13 +33,20 @@ class FileStorageMixin:
         elif Config.FILE_STORAGE_TYPE == 'MINIO':
             return Config.MINIO_DESTINATION_BUCKET_NAME
 
-    def read_data(self, input_file_location: Path | str, input_file_name: Path) -> pd.DataFrame:
-        return self.file_storage_strategy.read_data(input_file_location, input_file_name)
+    def read_data(self, input_file_location: Path | str, input_file_name: Path, column_order: list[str] = None,
+                  drop_duplicates: bool = False) -> pd.DataFrame:
+        df: pd.DataFrame = self.file_storage_strategy.read_data(input_file_location, input_file_name)
+        if column_order:
+            df = df[column_order]
+        if drop_duplicates:
+            df = df.drop_duplicates()
+        return df
 
     def save_data(self, df: pd.DataFrame, output_file_location: Path | str, output_file_name: Path, column_order: list[str],
                   drop_duplicates: bool = False) -> pd.DataFrame:
         column_order = [col for col in column_order if col in df.columns]
-        df = df[column_order]
+        df_copy = df.copy()[column_order]
         if drop_duplicates:
-            df = df.drop_duplicates()
-        return self.file_storage_strategy.save_data(df, output_file_location, output_file_name)
+            df_copy = df_copy.drop_duplicates()
+        self.file_storage_strategy.save_data(df_copy, output_file_location, output_file_name)
+        return df

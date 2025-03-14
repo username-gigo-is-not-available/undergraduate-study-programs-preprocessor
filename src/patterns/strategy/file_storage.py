@@ -22,19 +22,19 @@ class LocalFileStorage(FileStorageStrategy):
         try:
             return pd.read_csv(input_file_location / input_file_name)
         except FileNotFoundError as e:
-            logging.error(f"File not found: {Config.INPUT_DIRECTORY_PATH / input_file_name}, {e}")
+            logging.error(f"File not found: {input_file_location / input_file_name}, {e}")
             raise
         except Exception as e:
-            logging.error(f"Failed to read data from local storage: {e}")
+            logging.error(f"Failed to read data from local storage: {input_file_location} {e}")
             raise
 
     def save_data(self, df: pd.DataFrame, output_file_location: Path, output_file_name: Path) -> pd.DataFrame:
         try:
             df.to_csv(output_file_location / output_file_name, index=False)
-            logging.info(f"Saved data to local storage: {output_file_name}")
+            logging.info(f"Saved data to local storage: {output_file_location / output_file_name}")
             return df
         except Exception as e:
-            logging.error(f"Failed to save data to local storage: {e}")
+            logging.error(f"Failed to save data to local storage: {output_file_location / output_file_name} {e}")
             raise
 
 
@@ -46,7 +46,7 @@ class MinioFileStorage(FileStorageStrategy):
             csv_buffer: BytesIO = BytesIO(csv_bytes)
             return pd.read_csv(csv_buffer)
         except S3Error as e:
-            logging.error(f"Failed to read data from MinIO bucket {Config.MINIO_SOURCE_BUCKET_NAME}: {e}")
+            logging.error(f"Failed to read data from MinIO bucket {input_file_location}: {e}")
             raise
 
     def save_data(self, df: pd.DataFrame, output_file_location: str, output_file_name: Path) -> pd.DataFrame:
@@ -60,8 +60,8 @@ class MinioFileStorage(FileStorageStrategy):
                 length=len(csv_bytes),
                 content_type='text/csv'
             )
-            logging.info(f"Saved data to MinIO bucket: {Config.MINIO_DESTINATION_BUCKET_NAME}")
+            logging.info(f"Saved data to MinIO bucket: {output_file_location}")
             return df
         except S3Error as e:
-            logging.error(f"Failed to save data to MinIO bucket {Config.MINIO_DESTINATION_BUCKET_NAME}: {e}")
+            logging.error(f"Failed to save data to MinIO bucket {output_file_location}: {e}")
             raise
