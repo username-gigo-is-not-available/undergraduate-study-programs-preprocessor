@@ -24,12 +24,7 @@ class PipelineStep(FileStorageMixin, DataTransformationMixin):
         return data
 
     def __repr__(self):
-        kwargs_repr = {
-            key: (value.__name__ if callable(value) else value)
-            for key, value in self.kwargs.items()
-        }
-        return (f"PipelineStep(name={self.name!r}, function={self.function.__name__}, "
-                f"args={self.args!r}, kwargs={kwargs_repr!r})")
+        return (f"PipelineStep(name={self.name!r}, function={self.function.__name__}")
 
     def __str__(self):
         return f"{self.name}"

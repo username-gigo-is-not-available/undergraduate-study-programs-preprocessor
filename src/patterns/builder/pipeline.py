@@ -1,23 +1,37 @@
+import logging
+
 import pandas as pd
 
-from src.pipeline.models.enums import DatasetType
-from src.pipeline.models.pipeline import Pipeline
-from src.patterns.builder.pipeline_stage import PipelineStageBuilder
+from src.patterns.builder.stage import PipelineStage
 
 
-class PipelineBuilder:
-    def __init__(self, name: str,
-                 dataset_type: DatasetType,
-                 df: pd.DataFrame | None = None):
+class Pipeline:
+    def __init__(self,
+                 name: str,
+                 stages: list[PipelineStage] | None = None,
+                 data: pd.DataFrame | None = None,
+                 ):
         self.name: str = name
-        self.dataset_type: DatasetType = dataset_type
-        self.stage_builders: list[PipelineStageBuilder] = []
-        self.df: pd.DataFrame | None = df
+        self.stages: list[PipelineStage] = stages if stages is not None else []
+        self.data: pd.DataFrame | None = data.copy() if data is not None else None
 
-    def add_stage(self, stage_builder: 'PipelineStageBuilder') -> 'PipelineBuilder':
-        self.stage_builders.append(stage_builder)
+    def run(self) -> pd.DataFrame:
+        logging.info(f"Pipeline: {repr(self)} started...")
+        for stage in self.stages:
+            self.data = stage.run(self.data)
+        logging.info(f"Pipeline: {repr(self)} finished.")
+        return self.data
+
+    def add_stage(self, stage: PipelineStage) -> 'Pipeline':
+        self.stages.append(stage)
         return self
 
-    def build(self) -> Pipeline:
-        stages = [stage_builder.build() for stage_builder in self.stage_builders]
-        return Pipeline(name=self.name, dataset_type=self.dataset_type, data=self.df, stages=stages)
+    def build(self) -> 'Pipeline':
+        self.stages = [stage.build() for stage in self.stages]
+        return self
+
+    def __repr__(self):
+        return f"Pipeline(name={self.name}, stages={self.stages})"
+
+    def __str__(self):
+        return f"{self.name}"

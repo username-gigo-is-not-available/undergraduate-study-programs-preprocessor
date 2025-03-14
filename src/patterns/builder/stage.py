@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from src.pipeline.models.enums import StageType
-from src.pipeline.models.step import PipelineStep
+from src.patterns.builder.step import PipelineStep
 
 
 class PipelineStage:
@@ -22,8 +22,12 @@ class PipelineStage:
         logging.info(f"Stage: {repr(self)} finished.")
         return data
 
-    def add_step(self, step: PipelineStep) -> None:
+    def add_step(self, step: PipelineStep) -> 'PipelineStage':
         self.steps.append(step)
+        return self
+
+    def build(self) -> 'PipelineStage':
+        return PipelineStage(name=self.name, stage_type=self.stage_type, steps=self.steps)
 
     def __repr__(self):
         return f"PipelineStage(name={self.name}, steps={self.steps})"
