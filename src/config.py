@@ -82,7 +82,7 @@ class Config:
         'study_program_id',
         'course_id',
         'course_type',
-        'course_semester'
+        'course_semester',
         'course_semester_season',
         'course_academic_year',
         'course_level',
