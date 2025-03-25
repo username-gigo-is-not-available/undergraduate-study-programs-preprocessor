@@ -2,7 +2,7 @@ import pandas as pd
 
 from src.field_parsers.clean_fields import clean_prerequisites
 from src.field_parsers.extract_fields import extract_course_prerequisite_type, extract_minimum_number_of_courses_passed, \
-    extract_course_level, extract_course_semester_season, extract_course_academic_year
+    extract_course_level, extract_course_semester_season, extract_course_academic_year, update_course_prerequisite_type
 from src.field_parsers.transform_fields import transform_course_prerequisites
 from src.pipeline.models.enums import StageType, CoursePrerequisiteType
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
@@ -152,6 +152,18 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         )
     )
     .add_stage(
+        PipelineStage(name='update-data', stage_type=StageType.EXTRACTING)
+        .add_step(
+            PipelineStep(
+                name='update-course-prerequisite-type',
+                function=PipelineStep.apply_function,
+                mapping_function=update_course_prerequisite_type,
+                source_columns=['course_prerequisites', 'course_prerequisite_type'],
+                destination_columns='course_prerequisite_type',
+            )
+        )
+    )
+    .add_stage(
         PipelineStage(name='flatten-data', stage_type=StageType.FLATTENING)
         .add_step(
             PipelineStep(
@@ -191,6 +203,5 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
             output_file_name=Config.PREREQUISITES_OUTPUT_FILE_NAME,
             column_order=Config.PREREQUISITES_OUTPUT_COLUMN_ORDER,
             drop_duplicates=True
-
         ))
     )).build()

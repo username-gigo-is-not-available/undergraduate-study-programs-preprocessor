@@ -41,17 +41,24 @@ def extract_course_prerequisite_type(course_prerequisite: str,
 
 
 @cache
+def update_course_prerequisite_type(course_prerequisite: str,
+                                    course_prerequisite_type: CoursePrerequisiteType
+                                    ) -> CoursePrerequisiteType:
+    if course_prerequisite_type == CoursePrerequisiteType.ANY and "|" not in course_prerequisite:
+        return CoursePrerequisiteType.ONE
+    return course_prerequisite_type
+
+
+@cache
 def extract_minimum_number_of_courses_passed(course_prerequisite_type: CoursePrerequisiteType, course_prerequisite: str) -> int:
-    if course_prerequisite_type == CoursePrerequisiteType.TOTAL:
-        return int(re.search(r'(\d+)', course_prerequisite).group()) // Config.ECTS_VALUE
-    return 0
+    return int(re.search(r'(\d+)', course_prerequisite).group()) if course_prerequisite_type == CoursePrerequisiteType.TOTAL else 0
 
 
 @cache
 def extract_professor_name(course_professor: str) -> str:
-    return course_professor.split(' ')[0]
+    return course_professor.split(' ')[0] if course_professor != 'нема' else 'нема'
 
 
 @cache
 def extract_professor_surname(course_professor: str) -> str:
-    return ' '.join(course_professor.split(' ')[1:])
+    return course_professor.split(' ')[1] if course_professor != 'нема' else 'нема'

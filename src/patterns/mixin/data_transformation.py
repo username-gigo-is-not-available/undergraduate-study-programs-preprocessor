@@ -1,4 +1,5 @@
-from functools import wraps
+from concurrent.futures import ProcessPoolExecutor
+from functools import wraps, partial
 from typing import Any, Literal
 
 import pandas as pd
@@ -48,6 +49,26 @@ class DataTransformationMixin:
         )
         return df
 
+    def _match_group(self, group: pd.DataFrame, source_columns: str | list[str],
+                     destination_columns: str | list[str],
+                     mapping_function: callable,
+                     truth_columns: str | list[str] ) -> pd.DataFrame:
+        truth_data = [row.pop() for row in group[truth_columns].values.tolist()]
+        new_group = group.copy()
+        is_invalid = True
+        while is_invalid:
+            new_group[destination_columns] = new_group[source_columns].apply(
+                lambda row: pd.Series(mapping_function(*row[source_columns], tuple(truth_data))), axis=1
+            )
+            invalid_records = [
+                item for items in new_group[new_group.isna().any(axis=1)][truth_columns].to_dict(orient='records')
+                for item in items.values()
+            ]
+            is_invalid = bool(invalid_records)
+            truth_data = [item for item in truth_data if item not in invalid_records]
+            new_group = new_group.dropna()
+        return new_group.dropna()
+
     @wrap_columns
     def apply_matching(self, df: pd.DataFrame,
                        source_columns: str | list[str],
@@ -56,28 +77,23 @@ class DataTransformationMixin:
                        group_by_columns: str | list[str],
                        truth_columns: str | list[str],
                        sort_columns: str | list[str],
-                       sort_order: dict[str,int]
+                       sort_order: dict[str, int]
                        ) -> pd.DataFrame:
 
         updated_rows = []
 
         df_grouped = df.sort_values(by=[sort_columns], key=lambda x: x.map(sort_order)).groupby(group_by_columns)
-        for key, group in df_grouped:
-            truth_data = [row.pop() for row in group[truth_columns].values.tolist()]
-            new_group = group.copy()
-            is_invalid = True
-            while is_invalid:
-                new_group[destination_columns] = new_group[source_columns].apply(
-                    lambda row: pd.Series(mapping_function(*row[source_columns], tuple(truth_data))), axis=1
-                )
-                invalid_records = [
-                    item for items in new_group[new_group.isna().any(axis=1)][truth_columns].to_dict(orient='records')
-                    for item in items.values()
-                ]
-                is_invalid = bool(invalid_records)
-                truth_data = [item for item in truth_data if item not in invalid_records]
-                new_group = new_group.dropna()
-            updated_rows.append(new_group.dropna())
+        groups = [group for _, group in df_grouped]
+        with ProcessPoolExecutor() as executor:
+            partial_match_group = partial(
+                self._match_group,
+                source_columns=source_columns,
+                destination_columns=destination_columns,
+                mapping_function=mapping_function,
+                truth_columns=truth_columns
+            )
+            for group in executor.map(partial_match_group, groups):
+                updated_rows.append(group)
 
         return pd.concat(updated_rows, ignore_index=True)
 
