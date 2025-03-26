@@ -160,9 +160,11 @@ Before running the scraper, make sure to set the following environment variables
 - `CURRICULA_INPUT_DATA_FILE_PATH`: the path to the curricula data file
 - `COURSE_INPUT_DATA_FILE_PATH`: the path to the courses data file
 - `STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME`: the name of the study programs output file
-- `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the curricula output file
-- `COURSE_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
-- `MERGED_DATA_OUTPUT_FILE_NAME`: the name of the merged output file
+- `COURSES_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
+- `PROFESSORS_DATA_OUTPUT_FILE_NAME`: the name of the professors output file
+- `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the study program-course output file
+- `TAUGHT_BY_DATA_OUTPUT_FILE_NAME`: the name of the course-professor output file
+- `PREREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the course-prerequisite output file
 
 ##### If running the application with local storage:
 
