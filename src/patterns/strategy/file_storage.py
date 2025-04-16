@@ -42,7 +42,7 @@ class MinioFileStorage(FileStorageStrategy):
 
     def read_data(self,input_file_location: str, input_file_name: Path) -> pd.DataFrame:
         try:
-            minio_client: Minio = MinioClient().client
+            minio_client: Minio = MinioClient().connect()
             csv_bytes: bytes = minio_client.get_object(input_file_location, str(input_file_name)).read()
             csv_buffer: BytesIO = BytesIO(csv_bytes)
             return pd.read_csv(csv_buffer)
