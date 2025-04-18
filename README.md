@@ -156,6 +156,7 @@ This ETL application will produce the following datasets:
 Before running the scraper, make sure to set the following environment variables:
 
 - `FILE_STORAGE_TYPE`: the type of storage to use (either `LOCAL` or `MINIO`)
+- `MAX_WORKERS`: the number of workers to use for parallel processing
 - `STUDY_PROGRAMS_INPUT_DATA_FILE_PATH`: the path to the study programs data file
 - `CURRICULA_INPUT_DATA_FILE_PATH`: the path to the curricula data file
 - `COURSE_INPUT_DATA_FILE_PATH`: the path to the courses data file

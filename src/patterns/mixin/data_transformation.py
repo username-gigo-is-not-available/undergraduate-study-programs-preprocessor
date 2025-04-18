@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 import pandas as pd
 
+from src.config import Config
+
 
 class DataTransformationMixin:
 
@@ -84,7 +86,7 @@ class DataTransformationMixin:
 
         df_grouped = df.sort_values(by=[sort_columns], key=lambda x: x.map(sort_order)).groupby(group_by_columns)
         groups = [group for _, group in df_grouped]
-        with ProcessPoolExecutor() as executor:
+        with ProcessPoolExecutor(max_workers=Config.MAX_WORKERS) as executor:
             partial_match_group = partial(
                 self._match_group,
                 source_columns=source_columns,
