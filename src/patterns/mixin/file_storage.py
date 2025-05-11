@@ -47,10 +47,13 @@ class FileStorageMixin:
 
     def save_data(self, df: pd.DataFrame, output_file_location: Path | str, output_file_name: Path,
                   column_order: list[str],
-                  drop_duplicates: bool = False) -> pd.DataFrame:
+                  drop_duplicates: bool = False,
+                  drop_na: bool = False) -> pd.DataFrame:
         column_order = [col for col in column_order if col in df.columns]
         df_copy = df.copy()[column_order]
         if drop_duplicates:
             df_copy = df_copy.drop_duplicates()
+        if drop_na:
+            df_copy = df_copy.dropna()
         self.file_storage_strategy.save_data(df_copy, output_file_location, output_file_name)
         return df
