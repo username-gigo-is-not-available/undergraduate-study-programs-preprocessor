@@ -28,9 +28,8 @@ def extract_course_semester_season(course_semester: int) -> CourseSemesterSeason
 
 
 @cache
-def extract_course_prerequisite_type(course_prerequisite: str,
-                                     ) -> CoursePrerequisiteType:
-    if course_prerequisite == 'нема':
+def extract_course_prerequisite_type(course_prerequisite: str) -> CoursePrerequisiteType:
+    if course_prerequisite in ['nan', 'нема']:
         return CoursePrerequisiteType.NONE
     elif any(term in course_prerequisite for term in ['ЕКТС', 'ЕКСТ', 'кредити']):
         return CoursePrerequisiteType.TOTAL
@@ -41,24 +40,16 @@ def extract_course_prerequisite_type(course_prerequisite: str,
 
 
 @cache
-def update_course_prerequisite_type(course_prerequisite: str,
-                                    course_prerequisite_type: CoursePrerequisiteType
-                                    ) -> CoursePrerequisiteType:
-    if course_prerequisite_type == CoursePrerequisiteType.ANY and "|" not in course_prerequisite:
-        return CoursePrerequisiteType.ONE
-    return course_prerequisite_type
-
-
-@cache
 def extract_minimum_number_of_courses_passed(course_prerequisite_type: CoursePrerequisiteType, course_prerequisite: str) -> int:
     return int(re.search(r'(\d+)', course_prerequisite).group()) if course_prerequisite_type == CoursePrerequisiteType.TOTAL else 0
 
 
 @cache
 def extract_professor_name(course_professor: str) -> str:
-    return course_professor.split(' ')[0] if course_professor != 'нема' else 'нема'
+    return course_professor.split(' ')[0] if course_professor not in ['nan', 'нема'] else None
 
 
 @cache
 def extract_professor_surname(course_professor: str) -> str:
-    return course_professor.split(' ')[1] if course_professor != 'нема' else 'нема'
+    parts: list[str] = course_professor.split(' ')
+    return parts[1] if len(parts) > 1 else None
