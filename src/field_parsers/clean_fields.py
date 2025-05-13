@@ -16,16 +16,16 @@ def clean_and_format_field(field: str) -> str:
 def clean_field(field: str) -> str:
     return field
 
-
 @process_multivalued_field
 @cache
-def clean_professor_titles(course_professors: str) -> str:
-    def parse_professor_title(professor_name: str) -> str:
-        for title in Config.PROFESSOR_TITLES:
-            professor_name = professor_name.replace(title, "").strip()
-        return professor_name
+def clean_multivalued_field(field: str) -> str:
+    return field
 
-    return "\n".join(sorted((map(parse_professor_title, str(course_professors).split("\n")))))
+@cache
+def clean_professor_titles(course_professors: str) -> str:
+    for title in Config.PROFESSOR_TITLES:
+        course_professors = course_professors.replace(title, "").strip()
+    return course_professors
 
 
 @process_multivalued_field
