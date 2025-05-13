@@ -1,15 +1,6 @@
 from functools import wraps
 
 
-def replace_nulls(func: callable) -> callable:
-    @wraps(func)
-    def wrapper(*args, **kwargs) -> str:
-        result = func(*args, **kwargs)
-        return result if result != 'nan' else 'нема'
-
-    return wrapper
-
-
 def clean_whitespace(func: callable) -> callable:
     @wraps(func)
     def wrapper(*args, **kwargs) -> str:
@@ -34,13 +25,12 @@ def sentence_case(func: callable) -> callable:
     @wraps(func)
     def wrapper(*args, **kwargs) -> str:
         result: str = str(func(*args, **kwargs))
-        return ''.join([result[0].capitalize(), result[1:]])
+        return result.capitalize()
 
     return wrapper
 
 
 def process_multivalued_field(func: callable) -> callable:
-    @replace_nulls
     @clean_whitespace
     @clean_newlines
     @wraps(func)
