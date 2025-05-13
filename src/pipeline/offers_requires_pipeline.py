@@ -1,41 +1,19 @@
 import pandas as pd
 
+from src.config import Config
 from src.field_parsers.clean_fields import clean_prerequisites
 from src.field_parsers.extract_fields import extract_course_prerequisite_type, extract_minimum_number_of_courses_passed, \
-    extract_course_level, extract_course_semester_season, extract_course_academic_year, update_course_prerequisite_type
+    extract_course_level, extract_course_semester_season, extract_course_academic_year
 from src.field_parsers.transform_fields import transform_course_prerequisites
-from src.pipeline.models.enums import StageType, CoursePrerequisiteType
-from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
-from src.patterns.mixin.file_storage import FileStorageMixin
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.config import Config
+from src.patterns.mixin.file_storage import FileStorageMixin
+from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
+from src.pipeline.models.enums import StageType
 
 
-def build_curriculum_prerequisites_pipeline() -> Pipeline:
-    df_courses: pd.DataFrame = Pipeline(name='course-pipeline').add_stage(
-        PipelineStage(name='load-data', stage_type=StageType.LOADING)
-        .add_step(PipelineStep(
-            name='load-courses-data',
-            function=PipelineStep.read_data,
-            input_file_location=FileStorageMixin.get_output_file_location(),
-            input_file_name=Config.COURSES_OUTPUT_FILE_NAME,
-        )
-        )
-    ).build().run()
-
-    df_study_programs: pd.DataFrame = Pipeline(name='study-program-pipeline').add_stage(
-        PipelineStage(name='load-data', stage_type=StageType.LOADING)
-        .add_step(PipelineStep(
-            name='load-study-programs-data',
-            function=PipelineStep.read_data,
-            input_file_location=FileStorageMixin.get_output_file_location(),
-            input_file_name=Config.STUDY_PROGRAMS_OUTPUT_FILE_NAME,
-        )
-        )
-    ).build().run()
-
+def build_offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='curriculum-prerequisites-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOADING)
@@ -44,7 +22,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
             function=PipelineStep.read_data,
             input_file_location=FileStorageMixin.get_input_file_location(),
             input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
-            column_order=Config.CURRICULUM_PREREQUISITES_INPUT_COLUMN_ORDER
+            column_order=Config.STUDY_PROGRAM_COURSE_INPUT_COLUMN_ORDER
         )
         )
     )
@@ -56,7 +34,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='clean-course-prerequisites',
-                function=PipelineStep.apply_function,
+                function=PipelineStep.apply,
                 mapping_function=clean_prerequisites,
                 source_columns='course_prerequisites',
                 destination_columns='course_prerequisites',
@@ -68,7 +46,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='merge-with-course-data',
-                function=PipelineStep.merge_dataframes,
+                function=PipelineStep.merge,
                 merge_df=df_courses,
                 on=['course_code', 'course_name_mk'],
                 how='inner'
@@ -76,7 +54,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='merge-with-study-program-data',
-                function=PipelineStep.merge_dataframes,
+                function=PipelineStep.merge,
                 merge_df=df_study_programs,
                 on=['study_program_name', 'study_program_duration'],
                 how='inner'
@@ -87,7 +65,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='extract-course-level',
-                function=PipelineStep.apply_function,
+                function=PipelineStep.apply,
                 mapping_function=extract_course_level,
                 source_columns='course_code',
                 destination_columns='course_level',
@@ -96,7 +74,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='extract-course-semester-season',
-                function=PipelineStep.apply_function,
+                function=PipelineStep.apply,
                 mapping_function=extract_course_semester_season,
                 source_columns='course_semester',
                 destination_columns='course_semester_season',
@@ -105,7 +83,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='extract-course-academic-year',
-                function=PipelineStep.apply_function,
+                function=PipelineStep.apply,
                 mapping_function=extract_course_academic_year,
                 source_columns='course_semester',
                 destination_columns='course_academic_year',
@@ -114,7 +92,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='extract-course-prerequisite-type',
-                function=PipelineStep.apply_function,
+                function=PipelineStep.apply,
                 mapping_function=extract_course_prerequisite_type,
                 source_columns='course_prerequisites',
                 destination_columns='course_prerequisite_type',
@@ -123,7 +101,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='extract-minimum-required-number-of-courses',
-                function=PipelineStep.apply_function,
+                function=PipelineStep.apply,
                 mapping_function=extract_minimum_number_of_courses_passed,
                 source_columns=['course_prerequisite_type', 'course_prerequisites'],
                 destination_columns='minimum_required_number_of_courses',
@@ -135,31 +113,11 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='transform-course-prerequisites',
-                function=PipelineStep.apply_matching,
-                mapping_function=transform_course_prerequisites,
+                function=PipelineStep.match,
+                matching_function=transform_course_prerequisites,
                 source_columns=['course_prerequisite_type', 'course_prerequisites', 'course_name_mk'],
                 destination_columns='course_prerequisites',
-                group_by_columns=['study_program_name', 'study_program_duration'],
                 truth_columns='course_name_mk',
-                sort_columns='course_prerequisite_type',
-                sort_order={
-                    val: i for i, val in
-                    enumerate(
-                        [CoursePrerequisiteType.NONE, CoursePrerequisiteType.ONE, CoursePrerequisiteType.ANY, CoursePrerequisiteType.TOTAL]
-                    )
-                }
-            )
-        )
-    )
-    .add_stage(
-        PipelineStage(name='update-data', stage_type=StageType.EXTRACTING)
-        .add_step(
-            PipelineStep(
-                name='update-course-prerequisite-type',
-                function=PipelineStep.apply_function,
-                mapping_function=update_course_prerequisite_type,
-                source_columns=['course_prerequisites', 'course_prerequisite_type'],
-                destination_columns='course_prerequisite_type',
             )
         )
     )
@@ -168,7 +126,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='flatten-course-prerequisites',
-                function=PipelineStep.explode_column,
+                function=PipelineStep.explode,
                 source_columns='course_prerequisites',
                 destination_columns='course_prerequisites',
             )
@@ -176,7 +134,7 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         .add_step(
             PipelineStep(
                 name='map-course-prerequisites',
-                function=PipelineStep.map_values_to_indeces,
+                function=PipelineStep.map,
                 value_column='course_prerequisites',
                 reference_column='course_id',
                 merge_column='course_name_mk',
@@ -186,22 +144,43 @@ def build_curriculum_prerequisites_pipeline() -> Pipeline:
         )
     )
     .add_stage(
+        PipelineStage(name='generate-data', stage_type=StageType.GENERATING)
+        .add_step(
+            PipelineStep(
+                name='generate-offers-id',
+                function=PipelineStep.uuid,
+                source_columns=['study_program_id', 'course_id'],
+                destination_columns='offers_id',
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='generate-requires-id',
+                function=PipelineStep.uuid,
+                source_columns=['course_id', 'course_prerequisite_id', 'course_prerequisite_type'],
+                destination_columns='requires_id',
+            )
+        )
+    )
+    .add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORING)
-        .add_step(PipelineStep(
-            name='store-curricula-data',
-            function=PipelineStep.save_data,
-            output_file_location=FileStorageMixin.get_output_file_location(),
-            output_file_name=Config.CURRICULA_OUTPUT_FILE_NAME,
-            column_order=Config.CURRICULA_OUTPUT_COLUMN_ORDER,
-            drop_duplicates=True
+        .add_step(
+            PipelineStep(
+                name='store-curricula-data',
+                function=PipelineStep.save_data,
+                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_name=Config.OFFERS_OUTPUT_FILE_NAME,
+                column_order=Config.OFFERS_OUTPUT_COLUMN_ORDER,
+                drop_duplicates=True
+            )
         )
-        )
-        .add_step(PipelineStep(
-            name='store-prerequisites-data',
-            function=PipelineStep.save_data,
-            output_file_location=FileStorageMixin.get_output_file_location(),
-            output_file_name=Config.PREREQUISITES_OUTPUT_FILE_NAME,
-            column_order=Config.PREREQUISITES_OUTPUT_COLUMN_ORDER,
-            drop_duplicates=True
-        ))
+        .add_step(
+            PipelineStep(
+                name='store-prerequisites-data',
+                function=PipelineStep.save_data,
+                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_name=Config.REQUIRES_OUTPUT_FILE_NAME,
+                column_order=Config.REQUIRES_OUTPUT_COLUMN_ORDER,
+                drop_duplicates=True
+            ))
     )).build()
