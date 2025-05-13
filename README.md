@@ -8,7 +8,8 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 ## Prerequisites
 
 - Data from
-  the [undergraduate-study-program-scraper](https://github.com/username-gigo-is-not-available/undergraduate-study-programs-scraper) is
+  the [undergraduate-study-program-scraper](https://github.com/username-gigo-is-not-available/undergraduate-study-programs-scraper)
+  is
   required to run this ETL application.
 
 ## Overview
@@ -24,17 +25,19 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 ##### Cleaning Stage
 
-- Clean the `study_program_name` column by removing any leading or trailing whitespaces, as well as occurrences of multiple whitespaces, and
+- Clean the `study_program_name` column by removing any leading or trailing whitespaces, as well as occurrences of
+  multiple whitespaces, and
   converting the text to sentence case
 
 #### Extraction Stage
 
-- Extract `study_program_code` from `study_program_url` and `study_program_duration`. The `study_program_code` is the last part of the
+- Extract `study_program_code` from `study_program_url` and `study_program_duration`. The `study_program_code` is the
+  last part of the
   `study_program_url` concatenated with the `study_program_duration`
 
 ##### Generation Stage
 
-- Generate the `study_program_id` column by indexing column `study_program_code`
+- Generate the `study_program_id` column by hashing `study_program_name` and `study_program_duration`
 
 #### Storing Stage
 
@@ -42,46 +45,72 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   columns: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`,
   `study_program_url`
 
-#### Course-Professor:
+#### Course:
 
 ##### Loading Stage
 
 - Load the courses data (output from the scraper) with the following columns:
-  `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_professors`
+  `course_code`, `course_name_mk`, `course_name_en`, `course_url`
 
 ##### Cleaning Stage
 
-- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple whitespaces
-- Clean the `course_name_en` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as occurrences of
-  multiple whitespaces, and converting the text to sentence case
+- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
+  whitespaces
+- Clean the `course_name_en` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as
+  occurrences of multiple whitespaces, and converting the text to sentence case
+
+##### Generation stage
+
+- Generate the `course_id` column by hashing `course_name_mk`
+
+#### Storing Stage
+
+- Store the cleaned data in CSV files with the following columns:
+  `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`
+
+#### Professor-Teaches:
+
+##### Loading Stage
+
+- Load the courses data (output from the scraper) with the following columns:
+  `course_code`,  `course_professors`
+
+##### Cleaning Stage
+
+- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
+  whitespaces
 - Clean the `course_professors` column by replacing newline characters with commas, removing any leading or
   trailing whitespaces, as well as occurrences of multiple whitespaces and replacing `nulls` with `нема`.
-  Remove titles and degrees from the names of the professors, then concatenate the processed values with the pipe(`|`) separator
+  Remove titles and degrees from the names of the professors, then concatenate the processed values with the pipe(`|`)
+  separator
 
 #### Flattening Stage
 
 - Flatten the `course_professors` column by splitting the values and creating a new row for each professor
 
+##### Cleaning Stage
+
+- Clean the `course_professors` column by removing academic titles
+
 ##### Extraction Stage
 
-- Extract the `professor_name` column from the `course_professors` column by splitting the values and taking the first part
-- Extract the `professor_surname` column from the `course_professors` column by splitting the values and taking the second and remaining
-  parts
+- Extract the `professor_name` column from the `course_professors` column by splitting the values and taking the first
+  part
+- Extract the `professor_surname` column from the `course_professors` column by splitting the values and taking the
+  second and remaining parts
 
 ##### Generation Stage
 
-- Generate the `course_id` column by indexing the column `course_code`
-- Generate the `course_professor_id` column by indexing the column `course_professors` flattened
+- Generate the `professor_id` column by hashing the column `course_professors` flattened
 
 #### Storing Stage
 
 - Store the cleaned data in CSV files with the following columns:
 
-1. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`
-2. Professors: `professor_id`, `professor_name`, `professor_surname`
-3. Course-Professor: `course_id`, `professor_id`
+1. Professors: `professor_id`, `professor_name`, `professor_surname`
+2. Teaches: `teaches_id`, `course_id`, `professor_id`
 
-#### Curriculum-Prerequisite:
+#### Offers-Requires:
 
 ##### Loading Stage
 
@@ -89,8 +118,10 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 ##### Cleaning Stage
 
-- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple whitespaces
-- Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as occurrences of
+- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
+  whitespaces
+- Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
+  as occurrences of
   multiple whitespaces, and converting the text to sentence case
 - Clean the `course_prerequisite`  column by replacing newline characters with commas, removing any leading or
   trailing whitespaces, as well as occurrences of multiple whitespaces and replacing `nulls` with `нема`.
@@ -99,53 +130,64 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 #### Merging Stage
 
 - Merge with the course data on `course_code` and `course_name_mk` columns (from the processed course-professor data)
-- Merge with the study program data on `study_program_name` and `study_program_duration` columns (from the processed study program data)
+- Merge with the study program data on `study_program_name` and `study_program_duration` columns (from the processed
+  study program data)
 
 ##### Extraction Stage
 
-- Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the `course_code`
-- Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is calculated based on the
-  `course_semester` column such that if the `course_semester` is odd, then `course_semester_season` is `WINTER`,
-  otherwise `course_semester_season` is `SUMMER`
-- Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated based on the
-  `course_semester` as round up of the `course_semester` divided by 2
-- Extract the `course_prerequisite_type` column from the `course_prerequisite` column. The `course_prerequisite_type` is determined based on
-  the `course_prerequisite` column such that if the `course_prerequisite` column is `немаѝ, then the `course_prerequisite_type` is `NONE`,
-  if the `course_prerequisite` column contains any of the following terms `ЕКТС` or `кредити`, then the `course_prerequisite_type` is `
-  TOTAL`,
-  if the `course_prerequisite` column contains the term `или`, then the `course_prerequisite_type` is `ANY`,
-  else the `course_prerequisite_type` is `ONE`
-- Extract the `minimum_required_number_of_courses` column from the columns `course_prerequisites` and `course_prerequisite_type`. Calculate
-  the
-  minimum number of subjects that need to be passed in order to enroll in the course based on matching the digits in
-  the `course_prerequisites` divided by the ECTS credits per course (6).
+- Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the
+  `course_code`
+- Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
+  calculated based on the `course_semester` column such that if the `course_semester` is odd, then `course_semester_season`
+  is `WINTER`, otherwise `course_semester_season` is `SUMMER`
+- Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
+  based on the `course_semester` as round up of the `course_semester` divided by 2
+- Extract the `course_prerequisite_type` column from the `course_prerequisite` column. The `course_prerequisite_type` is
+  determined based on the `course_prerequisite` column such that if the `course_prerequisite` column is `нема` or `nan`, then the
+  `course_prerequisite_type` is `NONE`, if the `course_prerequisite` column contains any of the following terms `ЕКТС` 
+  or `кредити`, then the `course_prerequisite_type` is `TOTAL`, if the `course_prerequisite` column contains the term 
+  `или`, then the `course_prerequisite_type` is `ANY`, else the `course_prerequisite_type` is `ONE`
+- Extract the `minimum_required_number_of_courses` column from the columns `course_prerequisites` and
+  `course_prerequisite_type`. Calculate  the minimum number of subjects that need to be passed in order to enroll in 
+  the course based on matching the digits in the `course_prerequisites` divided by the ECTS credits per course (6).
 
 ##### Transformation Stage
 
-- Transform the `course_prerequisite` column by splitting the values and validating the course names per study program and calculating the
-  minimum number
-  of subjects that need to be passed in order to enroll in the course. Remove the courses and their prerequisites that are not valid for the
-  study program
+- Transform the `course_prerequisite` column by splitting the values and validating the course names 
 
 #### Flattening Stage
 
 - Flatten the `course_prerequisite` column by splitting the values and creating a new row for each prerequisite
   if `course_prerequisite_type` is `ANY`
+- Create the `course_prerequisite_id` by self-joining on `course_name_mk` and `course_prerequisites`
 
 ##### Generation Stage
 
-- Generate the `course_prerequisites_course_id` by joining the `course_id` and `course_prerequisites` columns
+- Generate the `offers_id` by hashing the `study_program_id` and `course_id` columns
+- Generate the `requires_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type` columns\
+
+#### Storing Stage
+
+- Store the cleaned data in CSV files with the following columns:
+
+1. Offers: `offers_id`, `study_program_id`, `course_id`, `course_type`, `course_level`, `course_semester`,
+   `course_semester_season`, `course_academic_year`,
+2. Requires: `requires_id`, `course_id`, `course_prerequisite_id`, `course_prerequisite_type`, \
+  `minimum_required_number_of_courses`
 
 ### Results:
 
 This ETL application will produce the following datasets:
 
-1. Study Programs: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
+1. Study Programs: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`,
+   `study_program_url`
 2. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`
 3. Professors: `professor_id`, `professor_name`, `professor_surname`
-4. Course-Professor: `course_id`, `professor_id`
-5. Curricula: `study_program_id`, `course_id`, `course_type`, `course_level`, `course_semester`, `course_semester_season`, `course_academic_year`,
-6. Course-Prerequisite: `course_id`, `course_prerequisite_type`, `course_prerequisites_course_id`, `minimum_required_number_of_courses`
+4. Teaches: `teaches_id`, `course_id`, `professor_id`
+5. Offers:  `offers_id`, `study_program_id`, `course_id`, `course_type`, `course_level`, `course_semester`,
+   `course_semester_season`, `course_academic_year`,
+6. Requires: `requires_id`, `course_id`, `course_prerequisite_type`, `course_prerequisites_course_id`,
+   `minimum_required_number_of_courses`
 
 ## Requirements
 
@@ -163,9 +205,9 @@ Before running the scraper, make sure to set the following environment variables
 - `STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME`: the name of the study programs output file
 - `COURSES_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
 - `PROFESSORS_DATA_OUTPUT_FILE_NAME`: the name of the professors output file
-- `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the study program-course output file
-- `TAUGHT_BY_DATA_OUTPUT_FILE_NAME`: the name of the course-professor output file
-- `PREREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the course-prerequisite output file
+- `OFFERS_DATA_OUTPUT_FILE_NAME`: the name of the offers output file
+- `TEACHES_DATA_OUTPUT_FILE_NAME`: the name of the teaches output file
+- `REQUIRES_DATA_OUTPUT_FILE_NAME`: the name of the requires output file
 
 ##### If running the application with local storage:
 
