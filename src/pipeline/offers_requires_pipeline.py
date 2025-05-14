@@ -13,7 +13,7 @@ from src.pipeline.common_steps import clean_course_code_step, clean_course_name_
 from src.pipeline.models.enums import StageType
 
 
-def build_offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFrame) -> Pipeline:
+def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='curriculum-prerequisites-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOADING)
@@ -183,4 +183,4 @@ def build_offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: 
                 column_order=Config.REQUIRES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
             ))
-    )).build()
+    ))

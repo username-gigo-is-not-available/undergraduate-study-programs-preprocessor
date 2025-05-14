@@ -8,7 +8,7 @@ from src.pipeline.common_steps import clean_course_code_step, clean_course_name_
 from src.pipeline.models.enums import StageType
 
 
-def build_course_pipeline():
+def course_pipeline() -> Pipeline:
     return (Pipeline(name='course-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOADING)
@@ -60,4 +60,4 @@ def build_course_pipeline():
                 drop_duplicates=True,
             )
         )
-    )).build()
+    ))

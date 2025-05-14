@@ -8,7 +8,7 @@ from src.field_parsers.extract_fields import extract_study_program_code
 from src.config import Config
 
 
-def build_study_programs_pipeline() -> Pipeline:
+def study_programs_pipeline() -> Pipeline:
     return (Pipeline(name='study-programs-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOADING)
@@ -61,4 +61,4 @@ def build_study_programs_pipeline() -> Pipeline:
             )
         )
     )
-    ).build()
+    )

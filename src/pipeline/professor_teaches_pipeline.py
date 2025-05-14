@@ -11,7 +11,7 @@ from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
 
 
-def build_professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
+def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='professor-teaches-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOADING)
@@ -139,4 +139,4 @@ def build_professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 drop_duplicates=True
             )
         )
-    )).build()
+    ))
