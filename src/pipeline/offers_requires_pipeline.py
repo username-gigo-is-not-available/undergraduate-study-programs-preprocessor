@@ -22,7 +22,7 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             function=PipelineStep.read_data,
             input_file_location=FileStorageMixin.get_input_file_location(),
             input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
-            column_order=Config.STUDY_PROGRAM_COURSE_INPUT_COLUMN_ORDER
+            column_order=Config.OFFERS_REQUIRES_COLUMN_ORDER
         )
         )
     )

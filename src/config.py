@@ -46,17 +46,6 @@ class Config:
         'course_name_en',
         'course_url',
     ]
-    PROFESSORS_INPUT_COLUMN_ORDER: list[str] = [
-        'course_professors'
-    ]
-    TEACHES_INPUT_COLUMN_ORDER: list[str] = [
-        'course_code',
-        'course_professors'
-    ]
-    PROFESSOR_TEACHES_COLUMN_ORDER: list[str] = [
-        'course_code',
-        'course_professors'
-    ]
     COURSES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('COURSES_DATA_OUTPUT_FILE_NAME'))
     COURSES_OUTPUT_COLUMN_ORDER: list[str] = [
         'course_id',
@@ -65,11 +54,18 @@ class Config:
         'course_name_en',
         'course_url',
     ]
+    PROFESSORS_INPUT_COLUMN_ORDER: list[str] = [
+        'course_professors'
+    ]
     PROFESSORS_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('PROFESSORS_DATA_OUTPUT_FILE_NAME'))
     PROFESSORS_OUTPUT_COLUMN_ORDER: list[str] = [
         'professor_id',
         'professor_name',
         'professor_surname'
+    ]
+    PROFESSOR_TEACHES_COLUMN_ORDER: list[str] = [
+        'course_code',
+        'course_professors'
     ]
     TEACHES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('TEACHES_DATA_OUTPUT_FILE_NAME'))
     TEACHES_OUTPUT_COLUMN_ORDER: list[str] = [
@@ -77,7 +73,7 @@ class Config:
         'course_id',
         'professor_id'
     ]
-    STUDY_PROGRAM_COURSE_INPUT_COLUMN_ORDER: list[str] = [
+    OFFERS_REQUIRES_COLUMN_ORDER: list[str] = [
         'study_program_name',
         'study_program_duration',
         'course_code',
