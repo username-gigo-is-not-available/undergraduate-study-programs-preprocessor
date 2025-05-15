@@ -41,7 +41,7 @@ def extract_course_prerequisite_type(course_prerequisite: str) -> CoursePrerequi
 
 @cache
 def extract_minimum_number_of_courses_passed(course_prerequisite_type: CoursePrerequisiteType, course_prerequisite: str) -> int:
-    return int(re.search(r'(\d+)', course_prerequisite).group()) if course_prerequisite_type == CoursePrerequisiteType.TOTAL else 0
+    return int(re.search(r'(\d+)', course_prerequisite).group()) // Config.ECTS_VALUE if course_prerequisite_type == CoursePrerequisiteType.TOTAL else 0
 
 
 @cache
