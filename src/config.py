@@ -9,8 +9,6 @@ class Config:
     ECTS_VALUE: int = 6
     PROFESSOR_TITLES: list[str] = ["ворн.", "проф.", "д-р", "доц."]
     STUDY_PROGRAM_CODE_REGEX: re.Pattern[str] = re.compile(r'^(.*?)(?=23)')
-    COURSE_CODES_REGEX: re.Pattern[str] = re.compile(r'^F23L[1-3][SW]\d{3}')
-    COURSE_SIMILARITY_THRESHOLD: float = 0.835
 
     ENVIRONMENT_VARIABLES: dict[str, str] = {**dotenv_values('../.env'), **os.environ}
 
