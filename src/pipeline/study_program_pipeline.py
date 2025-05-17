@@ -1,6 +1,5 @@
 from src.pipeline.models.enums import  StageType
 from src.pipeline.common_steps import clean_study_program_name_step
-from src.patterns.mixin.file_storage import FileStorageMixin
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -16,7 +15,7 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='load-study-program-data',
                 function=PipelineStep.read_data,
-                input_file_location=FileStorageMixin.get_input_file_location(),
+                input_file_location=PipelineStep.get_input_file_location(),
                 input_file_name=Config.STUDY_PROGRAMS_INPUT_DATA_FILE_PATH,
                 column_order=Config.STUDY_PROGRAMS_INPUT_COLUMN_ORDER,
             )
@@ -55,7 +54,7 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='store-study-program-data',
                 function=PipelineStep.save_data,
-                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.STUDY_PROGRAMS_OUTPUT_FILE_NAME,
                 column_order=Config.STUDY_PROGRAMS_OUTPUT_COLUMN_ORDER
             )

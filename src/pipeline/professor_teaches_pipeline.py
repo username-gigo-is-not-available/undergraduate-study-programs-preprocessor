@@ -3,7 +3,6 @@ import pandas as pd
 from src.config import Config
 from src.field_parsers.clean_fields import clean_professor_titles, clean_and_format_field, clean_multivalued_field
 from src.field_parsers.extract_fields import extract_professor_name, extract_professor_surname
-from src.patterns.mixin.file_storage import FileStorageMixin
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 from src.patterns.builder.pipeline import Pipeline
@@ -19,7 +18,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='load-professor-teaches-data',
                 function=PipelineStep.read_data,
-                input_file_location=FileStorageMixin.get_input_file_location(),
+                input_file_location=PipelineStep.get_input_file_location(),
                 input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
                 column_order=Config.PROFESSOR_TEACHES_COLUMN_ORDER,
                 drop_duplicates=True,
@@ -122,7 +121,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='store-professor-data',
                 function=PipelineStep.save_data,
-                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.PROFESSORS_OUTPUT_FILE_NAME,
                 column_order=Config.PROFESSORS_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True,
@@ -133,7 +132,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='store-teaches-data',
                 function=PipelineStep.save_data,
-                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.TEACHES_OUTPUT_FILE_NAME,
                 column_order=Config.TEACHES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True

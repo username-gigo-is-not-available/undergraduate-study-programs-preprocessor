@@ -3,7 +3,6 @@ from src.field_parsers.clean_fields import clean_and_format_field
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.mixin.file_storage import FileStorageMixin
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
@@ -16,7 +15,7 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='load-course-data',
                 function=PipelineStep.read_data,
-                input_file_location=FileStorageMixin.get_input_file_location(),
+                input_file_location=PipelineStep.get_input_file_location(),
                 input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
                 column_order=Config.COURSES_INPUT_COLUMN_ORDER,
                 drop_duplicates=True,
@@ -54,7 +53,7 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='store-course-data',
                 function=PipelineStep.save_data,
-                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.COURSES_OUTPUT_FILE_NAME,
                 column_order=Config.COURSES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True,

@@ -8,7 +8,6 @@ from src.field_parsers.transform_fields import transform_course_prerequisites
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.mixin.file_storage import FileStorageMixin
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
 from src.pipeline.models.enums import StageType
 
@@ -20,7 +19,7 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
         .add_step(PipelineStep(
             name='load-curriculum-prerequisites-data',
             function=PipelineStep.read_data,
-            input_file_location=FileStorageMixin.get_input_file_location(),
+            input_file_location=PipelineStep.get_input_file_location(),
             input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
             column_order=Config.OFFERS_REQUIRES_COLUMN_ORDER
         )
@@ -168,7 +167,7 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
-                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.OFFERS_OUTPUT_FILE_NAME,
                 column_order=Config.OFFERS_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
@@ -178,7 +177,7 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='store-prerequisites-data',
                 function=PipelineStep.save_data,
-                output_file_location=FileStorageMixin.get_output_file_location(),
+                output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.REQUIRES_OUTPUT_FILE_NAME,
                 column_order=Config.REQUIRES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
