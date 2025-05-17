@@ -24,7 +24,7 @@ class PipelineStep(FileStorageMixin, DataTransformationMixin):
         return data
 
     def __repr__(self):
-        return (f"PipelineStep(name={self.name!r}, function={self.function.__name__})")
+        return f"PipelineStep(name={self.name!r}, function={self.function.__name__})"
 
     def __str__(self):
         return f"{self.name}"
