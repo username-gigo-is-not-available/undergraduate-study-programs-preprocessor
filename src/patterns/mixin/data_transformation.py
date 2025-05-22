@@ -15,7 +15,7 @@ class DataTransformationMixin:
 
     @staticmethod
     def _func_args_factory(**kwargs) -> dict[str, Any]:
-        for key in ['source_columns', 'destination_columns', 'truth_columns']:
+        for key in ['source_columns', 'destination_columns', 'truth_columns', 'on']:
             if key in kwargs:
                 kwargs[key] = DataTransformationMixin._to_list(kwargs.get(key))
         return kwargs
@@ -93,6 +93,7 @@ class DataTransformationMixin:
 
         return pd.merge(df, result, on=value_column, how=how)
 
+    @wrap_columns
     def merge(self, df: pd.DataFrame, merge_df: pd.DataFrame, on: str | list[str],
               how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
         return pd.merge(df, merge_df, on=on, how=how)
