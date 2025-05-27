@@ -32,8 +32,8 @@ def study_programs_pipeline() -> Pipeline:
                 name='extract-study-program-code',
                 function=PipelineStep.apply,
                 mapping_function=extract_study_program_code,
-                source_columns=['study_program_url', 'study_program_duration'],
-                destination_columns='study_program_code'
+                input_columns=['study_program_url', 'study_program_duration'],
+                output_columns='study_program_code'
             )
         )
     )
@@ -43,8 +43,8 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='generate-study-program-id',
                 function=PipelineStep.uuid,
-                source_columns=['study_program_name', 'study_program_duration'],
-                destination_columns='study_program_id'
+                input_columns=['study_program_name', 'study_program_duration'],
+                output_columns='study_program_id'
             )
         )
     )

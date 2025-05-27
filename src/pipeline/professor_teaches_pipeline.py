@@ -33,8 +33,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='clean-course-professors',
                 function=PipelineStep.apply,
                 mapping_function=clean_multivalued_field,
-                source_columns='course_professors',
-                destination_columns='course_professors',
+                input_columns='course_professors',
+                output_columns='course_professors',
             )
         )
     )
@@ -44,8 +44,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='flatten-course-professors',
                 function=PipelineStep.explode,
-                source_columns='course_professors',
-                destination_columns='course_professors',
+                input_columns='course_professors',
+                output_columns='course_professors',
                 drop_duplicates=True,
             )
         )
@@ -57,8 +57,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='clean-course-professor-titles',
                 function=PipelineStep.apply,
                 mapping_function=clean_professor_titles,
-                source_columns='course_professors',
-                destination_columns='course_professors',
+                input_columns='course_professors',
+                output_columns='course_professors',
             )
         )
 
@@ -70,8 +70,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='extract-professor-name',
                 function=PipelineStep.apply,
                 mapping_function=extract_professor_name,
-                source_columns='course_professors',
-                destination_columns='professor_name',
+                input_columns='course_professors',
+                output_columns='professor_name',
             )
         )
         .add_step(
@@ -79,8 +79,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='extract-professor-surname',
                 function=PipelineStep.apply,
                 mapping_function=extract_professor_surname,
-                source_columns='course_professors',
-                destination_columns='professor_surname',
+                input_columns='course_professors',
+                output_columns='professor_surname',
             )
         )
     )
@@ -102,16 +102,16 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='generate-professors-id',
                 function=PipelineStep.uuid,
-                source_columns=['professor_name', 'professor_surname'],
-                destination_columns='professor_id',
+                input_columns=['professor_name', 'professor_surname'],
+                output_columns='professor_id',
             )
         )
         .add_step(
             PipelineStep(
                 name='generate-teaches-id',
                 function=PipelineStep.uuid,
-                source_columns=['course_id', 'professor_id'],
-                destination_columns='teaches_id',
+                input_columns=['course_id', 'professor_id'],
+                output_columns='teaches_id',
             )
         )
     )

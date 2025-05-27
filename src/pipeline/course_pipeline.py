@@ -31,8 +31,8 @@ def course_pipeline() -> Pipeline:
                 name='clean-course-name-en',
                 function=PipelineStep.apply,
                 mapping_function=clean_and_format_field,
-                source_columns='course_name_en',
-                destination_columns='course_name_en',
+                input_columns='course_name_en',
+                output_columns='course_name_en',
             )
         )
     )
@@ -42,8 +42,8 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='generate-course-id',
                 function=PipelineStep.uuid,
-                source_columns='course_name_mk',
-                destination_columns='course_id',
+                input_columns='course_name_mk',
+                output_columns='course_id',
             )
         )
     )

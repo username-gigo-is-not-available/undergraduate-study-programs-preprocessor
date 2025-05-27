@@ -35,8 +35,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='clean-course-prerequisites',
                 function=PipelineStep.apply,
                 mapping_function=clean_prerequisites,
-                source_columns='course_prerequisites',
-                destination_columns='course_prerequisites',
+                input_columns='course_prerequisites',
+                output_columns='course_prerequisites',
             )
         )
     )
@@ -66,8 +66,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='extract-course-level',
                 function=PipelineStep.apply,
                 mapping_function=extract_course_level,
-                source_columns='course_code',
-                destination_columns='course_level',
+                input_columns='course_code',
+                output_columns='course_level',
             )
         )
         .add_step(
@@ -75,8 +75,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='extract-course-semester-season',
                 function=PipelineStep.apply,
                 mapping_function=extract_course_semester_season,
-                source_columns='course_semester',
-                destination_columns='course_semester_season',
+                input_columns='course_semester',
+                output_columns='course_semester_season',
             )
         )
         .add_step(
@@ -84,8 +84,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='extract-course-academic-year',
                 function=PipelineStep.apply,
                 mapping_function=extract_course_academic_year,
-                source_columns='course_semester',
-                destination_columns='course_academic_year',
+                input_columns='course_semester',
+                output_columns='course_academic_year',
             )
         )
         .add_step(
@@ -93,8 +93,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='extract-course-prerequisite-type',
                 function=PipelineStep.apply,
                 mapping_function=extract_course_prerequisite_type,
-                source_columns='course_prerequisites',
-                destination_columns='course_prerequisite_type',
+                input_columns='course_prerequisites',
+                output_columns='course_prerequisite_type',
             )
         )
         .add_step(
@@ -102,8 +102,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='extract-minimum-required-number-of-courses',
                 function=PipelineStep.apply,
                 mapping_function=extract_minimum_number_of_courses_passed,
-                source_columns=['course_prerequisite_type', 'course_prerequisites'],
-                destination_columns='minimum_required_number_of_courses',
+                input_columns=['course_prerequisite_type', 'course_prerequisites'],
+                output_columns='minimum_required_number_of_courses',
             )
         )
     )
@@ -114,8 +114,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 name='transform-course-prerequisites',
                 function=PipelineStep.match,
                 matching_function=transform_course_prerequisites,
-                source_columns=['course_prerequisite_type', 'course_prerequisites', 'course_name_mk'],
-                destination_columns='course_prerequisites',
+                input_columns=['course_prerequisite_type', 'course_prerequisites', 'course_name_mk'],
+                output_columns='course_prerequisites',
                 truth_columns='course_name_mk',
             )
         )
@@ -126,8 +126,8 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='flatten-course-prerequisites',
                 function=PipelineStep.explode,
-                source_columns='course_prerequisites',
-                destination_columns='course_prerequisites',
+                input_columns='course_prerequisites',
+                output_columns='course_prerequisites',
             )
         )
         .add_step(
@@ -137,7 +137,7 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 value_column='course_prerequisites',
                 reference_column='course_id',
                 merge_column='course_name_mk',
-                destination_column='course_prerequisite_id',
+                output_column='course_prerequisite_id',
                 how='left',
             )
         )
@@ -148,16 +148,16 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='generate-offers-id',
                 function=PipelineStep.uuid,
-                source_columns=['study_program_id', 'course_id'],
-                destination_columns='offers_id',
+                input_columns=['study_program_id', 'course_id'],
+                output_columns='offers_id',
             )
         )
         .add_step(
             PipelineStep(
                 name='generate-requires-id',
                 function=PipelineStep.uuid,
-                source_columns=['course_id', 'course_prerequisite_id', 'course_prerequisite_type'],
-                destination_columns='requires_id',
+                input_columns=['course_id', 'course_prerequisite_id', 'course_prerequisite_type'],
+                output_columns='requires_id',
             )
         )
     )

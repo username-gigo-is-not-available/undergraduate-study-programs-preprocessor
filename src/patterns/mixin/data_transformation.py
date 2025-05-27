@@ -14,68 +14,69 @@ class DataTransformationMixin:
         return []
 
     @staticmethod
-    def _func_args_factory(**kwargs) -> dict[str, Any]:
-        for key in ['source_columns', 'destination_columns', 'truth_columns', 'on']:
+    def _normalize_column_args(**kwargs) -> dict[str, Any]:
+        for key in ['input_columns', 'output_columns', 'truth_columns', 'on']:
             if key in kwargs:
                 kwargs[key] = DataTransformationMixin._to_list(kwargs.get(key))
         return kwargs
 
     @staticmethod
-    def wrap_columns(func: callable) -> callable:
+    def normalize_column_args(func: callable) -> callable:
         @wraps(func)
         def wrapper(*args, **kwargs) -> pd.DataFrame:
-            kwargs = DataTransformationMixin._func_args_factory(**kwargs)
+            kwargs = DataTransformationMixin._normalize_column_args(**kwargs)
             return func(*args, **kwargs)
 
         return wrapper
 
-    @wrap_columns
-    def explode(self, df: pd.DataFrame, source_columns: str | list[str], destination_columns: str | list[str],
+    @normalize_column_args
+    def explode(self, df: pd.DataFrame, input_columns: str | list[str], output_columns: str | list[str],
+                delimiter: str = "|",
                 drop_duplicates: bool = False) -> pd.DataFrame:
-        df[destination_columns] = df[source_columns].map(lambda x: str(x).split("|"))
-        df = df.explode(source_columns)
+        df[output_columns] = df[input_columns].map(lambda x: str(x).split(delimiter))
+        df = df.explode(input_columns)
         if drop_duplicates:
             df = df.drop_duplicates()
         return df
 
-    @wrap_columns
+    @normalize_column_args
     def apply(self, df: pd.DataFrame,
-              source_columns: str | list[str],
-              destination_columns: str | list[str],
+              input_columns: str | list[str],
+              output_columns: str | list[str],
               mapping_function: callable
               ) -> pd.DataFrame:
-        df[destination_columns] = df[source_columns].apply(
+        df[output_columns] = df[input_columns].apply(
             lambda row: pd.Series(mapping_function(*row)), axis=1
         )
         return df
 
 
-    @wrap_columns
+    @normalize_column_args
     def match(self, df: pd.DataFrame,
-              source_columns: str | list[str],
-              destination_columns: str | list[str],
+              input_columns: str | list[str],
+              output_columns: str | list[str],
               matching_function: callable,
               truth_columns: str | list[str],
               ) -> pd.DataFrame:
 
         truth_data: list[str] = [row.pop() for row in df[truth_columns].values.tolist()]
-        df[destination_columns] = df[source_columns].apply(
-            lambda row: pd.Series(matching_function(*row[source_columns], tuple(truth_data))), axis=1
+        df[output_columns] = df[input_columns].apply(
+            lambda row: pd.Series(matching_function(*row[input_columns], tuple(truth_data))), axis=1
         )
         return df
 
-    @wrap_columns
+    @normalize_column_args
     def uuid(self, df: pd.DataFrame,
-             source_columns: str | list[str],
-             destination_columns: str | list[str]) -> pd.DataFrame:
+             input_columns: str | list[str],
+             output_columns: str | list[str]) -> pd.DataFrame:
 
-        df_unique = df[source_columns].dropna().drop_duplicates()
+        df_unique = df[input_columns].dropna().drop_duplicates()
 
-        df_unique[destination_columns] = df_unique.apply(
+        df_unique[output_columns] = df_unique.apply(
             lambda row: pd.Series(uuid.uuid5(uuid.NAMESPACE_DNS, "_".join(str(val) for val in row))), axis=1
         )
 
-        df = df.merge(df_unique, on=source_columns, how='left')
+        df = df.merge(df_unique, on=input_columns, how='left')
 
         return df
 
@@ -83,17 +84,17 @@ class DataTransformationMixin:
             value_column: str,
             reference_column: str,
             merge_column: str,
-            destination_column: str,
+            output_column: str,
             how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
         values_subset = df[value_column].drop_duplicates()
         reference_subset = df[[reference_column, merge_column]].drop_duplicates().rename(
             columns={merge_column: value_column})
         result = pd.merge(reference_subset, values_subset, on=value_column, how=how).rename(
-            columns={reference_column: destination_column})
+            columns={reference_column: output_column})
 
         return pd.merge(df, result, on=value_column, how=how)
 
-    @wrap_columns
+    @normalize_column_args
     def merge(self, df: pd.DataFrame, merge_df: pd.DataFrame, on: str | list[str],
               how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
         return pd.merge(df, merge_df, on=on, how=how)
