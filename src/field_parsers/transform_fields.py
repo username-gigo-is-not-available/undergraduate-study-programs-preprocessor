@@ -1,7 +1,6 @@
 from difflib import SequenceMatcher
 from functools import cache
 
-from src.config import Config
 from src.pipeline.models.enums import CoursePrerequisiteType
 
 @cache
