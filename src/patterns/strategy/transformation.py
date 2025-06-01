@@ -21,7 +21,7 @@ class MatchingStrategy(DataFrameStrategy):
     def get_most_similar_string(arg: str, values: list[str]) -> str:
         similarity = {}
         for value in values:
-            similarity[value] = SequenceMatcher(None, arg, values).ratio()
+            similarity[value] = SequenceMatcher(None, arg, value).ratio()
             if similarity[value] == Config.MAXIMUM_SIMILARITY_RATIO:
                 return value
 
@@ -37,6 +37,7 @@ class CoursePrerequisiteStrategy(MatchingStrategy):
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         @cache
         def match(course_name_mk: str, prerequisite_course_name: str, prerequisite_type: CoursePrerequisiteType, course_names: list[str]) -> str:
+
             if prerequisite_type == CoursePrerequisiteType.ONE:
 
                 course_prerequisite = MatchingStrategy.get_most_similar_string(
@@ -63,7 +64,7 @@ class CoursePrerequisiteStrategy(MatchingStrategy):
                 raise ValueError(f"Invalid course prerequisite type: {prerequisite_type}")
             return course_prerequisite
 
-        courses: list[str] = [row for row in df[self.column].drop_duplicates().values.tolist()]
+        courses: list[str] = [row for row in df[self.truth_column].drop_duplicates().values.tolist()]
         df[self.column] = df.apply(
             lambda row: match(row[self.truth_column], row[self.column], row[self.prerequisite_type_column],
                               tuple(courses)), axis='columns')
