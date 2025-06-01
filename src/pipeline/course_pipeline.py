@@ -1,8 +1,9 @@
 from src.config import Config
-from src.field_parsers.clean_fields import clean_and_format_field
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
+from src.patterns.strategy.sanitization import RemoveExtraDelimitersTransformationStrategy, \
+    CapitalizeSentenceTransformationStrategy
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
@@ -30,9 +31,8 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='clean-course-name-en',
                 function=PipelineStep.apply,
-                mapping_function=clean_and_format_field,
-                input_columns='course_name_en',
-                output_columns='course_name_en',
+                strategy=RemoveExtraDelimitersTransformationStrategy('course_name_en', ' ')
+                .then(CapitalizeSentenceTransformationStrategy('course_name_en'))
             )
         )
     )

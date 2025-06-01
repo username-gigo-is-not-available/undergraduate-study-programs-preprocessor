@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 import pandas as pd
 
+from src.patterns.strategy.data_frame import DataFrameStrategy
+
 
 class DataTransformationMixin:
 
@@ -31,7 +33,7 @@ class DataTransformationMixin:
 
     @normalize_column_args
     def explode(self, df: pd.DataFrame, input_columns: str | list[str], output_columns: str | list[str],
-                delimiter: str = "|",
+                delimiter: str,
                 drop_duplicates: bool = False) -> pd.DataFrame:
         df[output_columns] = df[input_columns].map(lambda x: str(x).split(delimiter))
         df = df.explode(input_columns)
@@ -39,31 +41,9 @@ class DataTransformationMixin:
             df = df.drop_duplicates()
         return df
 
-    @normalize_column_args
-    def apply(self, df: pd.DataFrame,
-              input_columns: str | list[str],
-              output_columns: str | list[str],
-              mapping_function: callable
-              ) -> pd.DataFrame:
-        df[output_columns] = df[input_columns].apply(
-            lambda row: pd.Series(mapping_function(*row)), axis=1
-        )
-        return df
 
-
-    @normalize_column_args
-    def match(self, df: pd.DataFrame,
-              input_columns: str | list[str],
-              output_columns: str | list[str],
-              matching_function: callable,
-              truth_columns: str | list[str],
-              ) -> pd.DataFrame:
-
-        truth_data: list[str] = [row.pop() for row in df[truth_columns].values.tolist()]
-        df[output_columns] = df[input_columns].apply(
-            lambda row: pd.Series(matching_function(*row[input_columns], tuple(truth_data))), axis=1
-        )
-        return df
+    def apply(self, df: pd.DataFrame, strategy: DataFrameStrategy) -> pd.DataFrame:
+        return strategy.run(df)
 
     @normalize_column_args
     def uuid(self, df: pd.DataFrame,
@@ -80,7 +60,7 @@ class DataTransformationMixin:
 
         return df
 
-    def map(self, df: pd.DataFrame,
+    def link(self, df: pd.DataFrame,
             value_column: str,
             reference_column: str,
             merge_column: str,

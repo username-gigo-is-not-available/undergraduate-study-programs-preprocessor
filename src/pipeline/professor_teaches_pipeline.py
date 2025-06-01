@@ -1,13 +1,13 @@
 import pandas as pd
 
 from src.config import Config
-from src.field_parsers.clean_fields import clean_professor_titles, clean_and_format_field, clean_multivalued_field
-from src.field_parsers.extract_fields import extract_professor_name, extract_professor_surname
-from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
-from src.pipeline.models.enums import StageType
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
+from src.patterns.strategy.extraction import ProfessorNameStrategy, ProfessorSurnameStrategy
+from src.patterns.strategy.sanitization import ReplaceValuesTransformationStrategy
+from src.pipeline.common_steps import clean_course_code_step
+from src.pipeline.models.enums import StageType
 
 
 def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
@@ -32,9 +32,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='clean-course-professors',
                 function=PipelineStep.apply,
-                mapping_function=clean_multivalued_field,
-                input_columns='course_professors',
-                output_columns='course_professors',
+                strategy=ReplaceValuesTransformationStrategy('course_professors', Config.PROFESSOR_TITLES, '')
+                .then(ReplaceValuesTransformationStrategy('course_professors', '\n', '|'))
             )
         )
     )
@@ -46,22 +45,10 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.explode,
                 input_columns='course_professors',
                 output_columns='course_professors',
+                delimiter="|",
                 drop_duplicates=True,
             )
         )
-    )
-    .add_stage(
-        PipelineStage(name='clean-data', stage_type=StageType.CLEANING)
-        .add_step(
-            PipelineStep(
-                name='clean-course-professor-titles',
-                function=PipelineStep.apply,
-                mapping_function=clean_professor_titles,
-                input_columns='course_professors',
-                output_columns='course_professors',
-            )
-        )
-
     )
     .add_stage(
         PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
@@ -69,18 +56,14 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='extract-professor-name',
                 function=PipelineStep.apply,
-                mapping_function=extract_professor_name,
-                input_columns='course_professors',
-                output_columns='professor_name',
+                strategy=ProfessorNameStrategy('course_professors', 'professor_name'),
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-professor-surname',
                 function=PipelineStep.apply,
-                mapping_function=extract_professor_surname,
-                input_columns='course_professors',
-                output_columns='professor_surname',
+                strategy=ProfessorSurnameStrategy('course_professors', 'professor_surname'),
             )
         )
     )

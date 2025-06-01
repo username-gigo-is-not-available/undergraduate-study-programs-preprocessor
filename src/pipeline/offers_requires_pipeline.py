@@ -1,13 +1,14 @@
 import pandas as pd
 
 from src.config import Config
-from src.field_parsers.clean_fields import clean_prerequisites
-from src.field_parsers.extract_fields import extract_course_prerequisite_type, extract_minimum_number_of_courses_passed, \
-    extract_course_level, extract_course_semester_season, extract_course_academic_year
-from src.field_parsers.transform_fields import transform_course_prerequisites
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
+from src.patterns.strategy.extraction import CourseLevelStrategy, CourseSemesterSeasonStrategy, \
+    CourseAcademicYearStrategy, CoursePrerequisiteTypeStrategy, MinimumNumberOfCoursesStrategy
+from src.patterns.strategy.sanitization import RemoveExtraDelimitersTransformationStrategy, \
+    ReplaceValuesTransformationStrategy
+from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
 from src.pipeline.models.enums import StageType
 
@@ -34,9 +35,11 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='clean-course-prerequisites',
                 function=PipelineStep.apply,
-                mapping_function=clean_prerequisites,
-                input_columns='course_prerequisites',
-                output_columns='course_prerequisites',
+                strategy=RemoveExtraDelimitersTransformationStrategy('course_prerequisites', ' ')
+                .then(RemoveExtraDelimitersTransformationStrategy('course_prerequisites', '\n')
+                      .then(ReplaceValuesTransformationStrategy('course_prerequisites', ' или ', '|')
+                            )
+                      )
             )
         )
     )
@@ -65,45 +68,36 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='extract-course-level',
                 function=PipelineStep.apply,
-                mapping_function=extract_course_level,
-                input_columns='course_code',
-                output_columns='course_level',
+                strategy=CourseLevelStrategy('course_code', 'course_level')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-course-semester-season',
                 function=PipelineStep.apply,
-                mapping_function=extract_course_semester_season,
-                input_columns='course_semester',
-                output_columns='course_semester_season',
+                strategy=CourseSemesterSeasonStrategy('course_semester', 'course_semester_season')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-course-academic-year',
                 function=PipelineStep.apply,
-                mapping_function=extract_course_academic_year,
-                input_columns='course_semester',
-                output_columns='course_academic_year',
+                strategy=CourseAcademicYearStrategy('course_semester', 'course_academic_year')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-course-prerequisite-type',
                 function=PipelineStep.apply,
-                mapping_function=extract_course_prerequisite_type,
-                input_columns='course_prerequisites',
-                output_columns='course_prerequisite_type',
+                strategy=CoursePrerequisiteTypeStrategy('course_prerequisites', 'course_prerequisite_type')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-minimum-required-number-of-courses',
                 function=PipelineStep.apply,
-                mapping_function=extract_minimum_number_of_courses_passed,
-                input_columns=['course_prerequisite_type', 'course_prerequisites'],
-                output_columns='minimum_required_number_of_courses',
+                strategy=MinimumNumberOfCoursesStrategy('course_prerequisites', 'course_prerequisite_type',
+                                                        'minimum_required_number_of_courses')
             )
         )
     )
@@ -112,11 +106,9 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
         .add_step(
             PipelineStep(
                 name='transform-course-prerequisites',
-                function=PipelineStep.match,
-                matching_function=transform_course_prerequisites,
-                input_columns=['course_prerequisite_type', 'course_prerequisites', 'course_name_mk'],
-                output_columns='course_prerequisites',
-                truth_columns='course_name_mk',
+                function=PipelineStep.apply,
+                strategy=CoursePrerequisiteStrategy('course_prerequisites', 'course_name_mk',
+                                                    'course_prerequisite_type', "|")
             )
         )
     )
@@ -128,12 +120,14 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 function=PipelineStep.explode,
                 input_columns='course_prerequisites',
                 output_columns='course_prerequisites',
+                delimiter="|",
+                drop_duplicates=True,
             )
         )
         .add_step(
             PipelineStep(
-                name='map-course-prerequisites',
-                function=PipelineStep.map,
+                name='link-course-prerequisite-ids',
+                function=PipelineStep.link,
                 value_column='course_prerequisites',
                 reference_column='course_id',
                 merge_column='course_name_mk',

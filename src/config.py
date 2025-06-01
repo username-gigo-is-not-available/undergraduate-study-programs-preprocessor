@@ -7,8 +7,9 @@ from dotenv import dotenv_values
 
 class Config:
     ECTS_VALUE: int = 6
-    PROFESSOR_TITLES: list[str] = ["ворн.", "проф.", "д-р", "доц."]
+    PROFESSOR_TITLES: list[str] = ["ворн. ", "проф. ", "д-р ", "доц. "]
     STUDY_PROGRAM_CODE_REGEX: re.Pattern[str] = re.compile(r'^(.*?)(?=23)')
+    MAXIMUM_SIMILARITY_RATIO: int = 1
 
     ENVIRONMENT_VARIABLES: dict[str, str] = {**dotenv_values('../.env'), **os.environ}
 

@@ -1,9 +1,9 @@
-from src.pipeline.models.enums import  StageType
+from src.patterns.strategy.extraction import StudyProgramCodeStrategy
+from src.pipeline.models.enums import StageType
 from src.pipeline.common_steps import clean_study_program_name_step
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.field_parsers.extract_fields import extract_study_program_code
 from src.config import Config
 
 
@@ -31,9 +31,7 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='extract-study-program-code',
                 function=PipelineStep.apply,
-                mapping_function=extract_study_program_code,
-                input_columns=['study_program_url', 'study_program_duration'],
-                output_columns='study_program_code'
+                strategy=StudyProgramCodeStrategy('study_program_url', 'study_program_duration', 'study_program_code'),
             )
         )
     )

@@ -1,26 +1,22 @@
 from src.patterns.builder.step import PipelineStep
-from src.field_parsers.clean_fields import clean_field, clean_and_format_field
+from src.patterns.strategy.sanitization import RemoveExtraDelimitersTransformationStrategy, \
+    CapitalizeSentenceTransformationStrategy
 
 clean_study_program_name_step: PipelineStep = PipelineStep(
     name='clean-study-program-name',
     function=PipelineStep.apply,
-    mapping_function=clean_field,
-    input_columns='study_program_name',
-    output_columns='study_program_name',
+    strategy=RemoveExtraDelimitersTransformationStrategy('study_program_name', ' ')
 )
 
 clean_course_code_step: PipelineStep = PipelineStep(
     name='clean-course-code',
     function=PipelineStep.apply,
-    mapping_function=clean_field,
-    input_columns='course_code',
-    output_columns='course_code',
+    strategy=RemoveExtraDelimitersTransformationStrategy('course_code', ' ')
 )
 
 clean_course_name_mk_step: PipelineStep = PipelineStep(
     name='clean-course-name-mk',
     function=PipelineStep.apply,
-    mapping_function=clean_and_format_field,
-    input_columns='course_name_mk',
-    output_columns='course_name_mk',
+    strategy=RemoveExtraDelimitersTransformationStrategy('course_name_mk', ' ')
+    .then(CapitalizeSentenceTransformationStrategy('course_name_mk'))
 )
