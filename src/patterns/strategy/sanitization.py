@@ -1,3 +1,4 @@
+import re
 from abc import abstractmethod
 from functools import cache
 
@@ -15,7 +16,7 @@ class SanitizationStrategy(DataFrameStrategy):
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         raise NotImplementedError("Subclasses must implement the apply method.")
 
-class RemoveExtraDelimitersTransformationStrategy(SanitizationStrategy):
+class RemoveExtraDelimitersStrategy(SanitizationStrategy):
     def __init__(self, column: str, delimiter: str) -> None:
         super().__init__(column)
         self.delimiter = delimiter
@@ -27,18 +28,31 @@ class RemoveExtraDelimitersTransformationStrategy(SanitizationStrategy):
         df[self.column] = df[self.column].map(remove)
         return df
 
-class CapitalizeSentenceTransformationStrategy(SanitizationStrategy):
+class PreserveAcronymsSentenceCaseStrategy(SanitizationStrategy):
     def __init__(self, column: str) -> None:
         super().__init__(column)
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         @cache
         def sentence_case(row: str) -> str:
-            return row.capitalize()
+            parts: list[str] = re.split(r'(\s+)', row)
+            result = []
+            first_word = True
+            for part in parts:
+                if part.isspace():
+                    result.append(part)
+                elif first_word:
+                    result.append(part.capitalize())
+                    first_word = False
+                else:
+                    if not all(char.isupper() for char in part):
+                        part = part.lower()
+                    result.append(part)
+            return ''.join(result)
         df[self.column] = df[self.column].map(sentence_case)
         return df
 
-class ReplaceValuesTransformationStrategy(SanitizationStrategy):
+class ReplaceValuesStrategy(SanitizationStrategy):
     def __init__(self, column: str, values: str | list[str], replacement: str) -> None:
         super().__init__(column)
         if isinstance(values, str):

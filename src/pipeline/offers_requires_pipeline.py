@@ -6,8 +6,8 @@ from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
 from src.patterns.strategy.extraction import CourseLevelStrategy, CourseSemesterSeasonStrategy, \
     CourseAcademicYearStrategy, CoursePrerequisiteTypeStrategy, MinimumNumberOfCoursesStrategy
-from src.patterns.strategy.sanitization import RemoveExtraDelimitersTransformationStrategy, \
-    ReplaceValuesTransformationStrategy
+from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
+    ReplaceValuesStrategy
 from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
 from src.pipeline.models.enums import StageType
@@ -35,9 +35,9 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
             PipelineStep(
                 name='clean-course-prerequisites',
                 function=PipelineStep.apply,
-                strategy=RemoveExtraDelimitersTransformationStrategy('course_prerequisites', ' ')
-                .then(RemoveExtraDelimitersTransformationStrategy('course_prerequisites', '\n')
-                      .then(ReplaceValuesTransformationStrategy('course_prerequisites', ' или ', '|')
+                strategy=RemoveExtraDelimitersStrategy('course_prerequisites', ' ')
+                .then(RemoveExtraDelimitersStrategy('course_prerequisites', '\n')
+                      .then(ReplaceValuesStrategy('course_prerequisites', ' или ', '|')
                             )
                       )
             )

@@ -5,7 +5,7 @@ from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
 from src.patterns.strategy.extraction import ProfessorNameStrategy, ProfessorSurnameStrategy
-from src.patterns.strategy.sanitization import ReplaceValuesTransformationStrategy
+from src.patterns.strategy.sanitization import ReplaceValuesStrategy
 from src.pipeline.common_steps import clean_course_code_step
 from src.pipeline.models.enums import StageType
 
@@ -32,8 +32,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='clean-course-professors',
                 function=PipelineStep.apply,
-                strategy=ReplaceValuesTransformationStrategy('course_professors', Config.PROFESSOR_TITLES, '')
-                .then(ReplaceValuesTransformationStrategy('course_professors', '\n', '|'))
+                strategy=ReplaceValuesStrategy('course_professors', Config.PROFESSOR_TITLES, '')
+                .then(ReplaceValuesStrategy('course_professors', '\n', '|'))
             )
         )
     )

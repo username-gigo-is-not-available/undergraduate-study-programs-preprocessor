@@ -17,7 +17,7 @@ class DataTransformationMixin:
 
     @staticmethod
     def _normalize_column_args(**kwargs) -> dict[str, Any]:
-        for key in ['input_columns', 'output_columns', 'truth_columns', 'on']:
+        for key in ['input_columns', 'output_columns', 'on']:
             if key in kwargs:
                 kwargs[key] = DataTransformationMixin._to_list(kwargs.get(key))
         return kwargs

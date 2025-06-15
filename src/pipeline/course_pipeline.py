@@ -2,8 +2,8 @@ from src.config import Config
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.sanitization import RemoveExtraDelimitersTransformationStrategy, \
-    CapitalizeSentenceTransformationStrategy
+from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
+    PreserveAcronymsSentenceCaseStrategy
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
@@ -31,8 +31,8 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='clean-course-name-en',
                 function=PipelineStep.apply,
-                strategy=RemoveExtraDelimitersTransformationStrategy('course_name_en', ' ')
-                .then(CapitalizeSentenceTransformationStrategy('course_name_en'))
+                strategy=RemoveExtraDelimitersStrategy('course_name_en', ' ')
+                .then(PreserveAcronymsSentenceCaseStrategy('course_name_en'))
             )
         )
     )
