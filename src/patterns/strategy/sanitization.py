@@ -36,8 +36,8 @@ class PreserveAcronymsSentenceCaseStrategy(SanitizationStrategy):
         @cache
         def sentence_case(row: str) -> str:
             parts: list[str] = re.split(r'(\s+)', row)
-            result = []
-            first_word = True
+            result: list[str] = []
+            first_word: bool = True
             for part in parts:
                 if part.isspace():
                     result.append(part)
