@@ -6,6 +6,7 @@ clean_study_program_name_step: PipelineStep = PipelineStep(
     name='clean-study-program-name',
     function=PipelineStep.apply,
     strategy=RemoveExtraDelimitersStrategy('study_program_name', ' ')
+    .then(PreserveAcronymsSentenceCaseStrategy('study_program_name'))
 )
 
 clean_course_code_step: PipelineStep = PipelineStep(
