@@ -26,24 +26,21 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 ##### Cleaning Stage
 
 - Clean the `study_program_name` column by removing any leading or trailing whitespaces, as well as occurrences of
-  multiple whitespaces, and
-  converting the text to sentence case
+  multiple whitespaces
 
-#### Extraction Stage
+##### Extraction Stage
 
 - Extract `study_program_code` from `study_program_url` and `study_program_duration`. The `study_program_code` is the
-  last part of the
-  `study_program_url` concatenated with the `study_program_duration`
+  second to last part of the `study_program_url` concatenated with the `study_program_duration`
 
 ##### Generation Stage
 
 - Generate the `study_program_id` column by hashing `study_program_name` and `study_program_duration`
 
-#### Storing Stage
+##### Storing Stage
 
 - Store the cleaned data in a CSV file with the following
-  columns: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`,
-  `study_program_url`
+  columns: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
 
 #### Course:
 
@@ -57,13 +54,13 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
 - Clean the `course_name_en` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as
-  occurrences of multiple whitespaces, and converting the text to sentence case
+  occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
 
 ##### Generation stage
 
 - Generate the `course_id` column by hashing `course_name_mk`
 
-#### Storing Stage
+##### Storing Stage
 
 - Store the cleaned data in CSV files with the following columns:
   `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`
@@ -80,17 +77,12 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
 - Clean the `course_professors` column by replacing newline characters with commas, removing any leading or
-  trailing whitespaces, as well as occurrences of multiple whitespaces and replacing `nulls` with `нема`.
-  Remove titles and degrees from the names of the professors, then concatenate the processed values with the pipe(`|`)
-  separator
+  trailing whitespaces, as well as occurrences of multiple whitespaces. Remove titles and degrees from the names
+  of the professors, then concatenate the processed values with the pipe(`|`) separator
 
-#### Flattening Stage
+##### Flattening Stage
 
 - Flatten the `course_professors` column by splitting the values and creating a new row for each professor
-
-##### Cleaning Stage
-
-- Clean the `course_professors` column by removing academic titles
 
 ##### Extraction Stage
 
@@ -99,11 +91,15 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Extract the `professor_surname` column from the `course_professors` column by splitting the values and taking the
   second and remaining parts
 
+##### Merging Stage
+
+- Merge with course data on `course_code` column (from the processed course data)
+
 ##### Generation Stage
 
 - Generate the `professor_id` column by hashing the column `course_professors` flattened
 
-#### Storing Stage
+##### Storing Stage
 
 - Store the cleaned data in CSV files with the following columns:
 
@@ -121,15 +117,13 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
 - Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
-  as occurrences of
-  multiple whitespaces, and converting the text to sentence case
+  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
 - Clean the `course_prerequisite`  column by replacing newline characters with commas, removing any leading or
-  trailing whitespaces, as well as occurrences of multiple whitespaces and replacing `nulls` with `нема`.
-  Then concatenate the processed values with the pipe(`|`) separator.
+  trailing whitespaces, as well as occurrences of multiple whitespaces. Then concatenate the processed values with the pipe(`|`) separator.
 
 #### Merging Stage
 
-- Merge with the course data on `course_code` and `course_name_mk` columns (from the processed course-professor data)
+- Merge with the course data on `course_code` and `course_name_mk` columns (from the processed professor-teaches data)
 - Merge with the study program data on `study_program_name` and `study_program_duration` columns (from the processed
   study program data)
 
@@ -138,33 +132,42 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the
   `course_code`
 - Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
-  calculated based on the `course_semester` column such that if the `course_semester` is odd, then `course_semester_season`
-  is `WINTER`, otherwise `course_semester_season` is `SUMMER`
+  calculated based on the `course_semester` column such that if the `course_semester` is odd, then
+  `course_semester_season` is `WINTER`, otherwise `course_semester_season` is `SUMMER`
 - Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
   based on the `course_semester` as round up of the `course_semester` divided by 2
 - Extract the `course_prerequisite_type` column from the `course_prerequisite` column. The `course_prerequisite_type` is
-  determined based on the `course_prerequisite` column such that if the `course_prerequisite` column is `нема` or `nan`, then the
-  `course_prerequisite_type` is `NONE`, if the `course_prerequisite` column contains any of the following terms `ЕКТС` 
-  or `кредити`, then the `course_prerequisite_type` is `TOTAL`, if the `course_prerequisite` column contains the term 
+  determined based on the `course_prerequisite` column such that if the `course_prerequisite` column is `нема` or `nan`,
+  then the `course_prerequisite_type` is `NONE`,
+  if the `course_prerequisite` column contains any of the following terms `ЕКТС` or `кредити`, then the 
+  `course_prerequisite_type` is `TOTAL`, if the `course_prerequisite` column contains the term
   `или`, then the `course_prerequisite_type` is `ANY`, else the `course_prerequisite_type` is `ONE`
 - Extract the `minimum_required_number_of_courses` column from the columns `course_prerequisites` and
-  `course_prerequisite_type`. Calculate  the minimum number of subjects that need to be passed in order to enroll in 
-  the course based on matching the digits in the `course_prerequisites` divided by the ECTS credits per course (6).
+  `course_prerequisite_type`. Calculate the minimum number of subjects that need to be passed in order to enroll in
+  the course based on matching the digits in the `course_prerequisites` divided by the ECTS credits per course (`6`).
+  Default value is `0`.
 
 ##### Transformation Stage
 
-- Transform the `course_prerequisite` column by splitting the values and validating the course names 
+- Transform the `course_prerequisite` column by splitting the values and validating the course names.
+  if `course_prerequisite_type` is `NONE`, then `course_prerequisite` is `None`
+  if `course_prerequisite_type` is `ONE`, then `course_prerequisite` is the course with the highest similarity ratio
+  if `course_prerequisite_type` is `ANY`, then `course_prerequisite` are the courses with the highest similarity ratio 
+  concatenated with the pipe(`|`) separator
+  if `course_prerequisite_type` is `TOTAL` then `course_prerequisite` are the all the courses available concatenated with
+  the pipe(`|`) separator
 
 #### Flattening Stage
 
 - Flatten the `course_prerequisite` column by splitting the values and creating a new row for each prerequisite
-  if `course_prerequisite_type` is `ANY`
+  if `course_prerequisite_type` is `ANY` or `TOTAL`
 - Create the `course_prerequisite_id` by self-joining on `course_name_mk` and `course_prerequisites`
 
 ##### Generation Stage
 
 - Generate the `offers_id` by hashing the `study_program_id` and `course_id` columns
-- Generate the `requires_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type` columns\
+- Generate the `requires_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type`
+  columns
 
 #### Storing Stage
 
@@ -173,7 +176,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 1. Offers: `offers_id`, `study_program_id`, `course_id`, `course_type`, `course_level`, `course_semester`,
    `course_semester_season`, `course_academic_year`,
 2. Requires: `requires_id`, `course_id`, `course_prerequisite_id`, `course_prerequisite_type`, \
-  `minimum_required_number_of_courses`
+   `minimum_required_number_of_courses`
 
 ### Results:
 
