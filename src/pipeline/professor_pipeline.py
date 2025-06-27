@@ -19,8 +19,8 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='load-professor-teaches-data',
                 function=PipelineStep.read_data,
                 input_file_location=PipelineStep.get_input_file_location(),
-                input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
-                column_order=Config.PROFESSOR_TEACHES_COLUMN_ORDER,
+                input_file_name=Config.PROFESSORS_INPUT_DATA_FILE_PATH,
+                columns=Config.PROFESSORS_INPUT_COLUMNS,
                 drop_duplicates=True,
             )
         )
@@ -106,7 +106,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.PROFESSORS_OUTPUT_FILE_NAME,
-                column_order=Config.PROFESSORS_OUTPUT_COLUMN_ORDER,
+                columns=Config.PROFESSORS_OUTPUT_COLUMNS,
                 drop_duplicates=True,
                 drop_na=True
             )
@@ -117,7 +117,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.TEACHES_OUTPUT_FILE_NAME,
-                column_order=Config.TEACHES_OUTPUT_COLUMN_ORDER,
+                columns=Config.TEACHES_OUTPUT_COLUMNS,
                 drop_duplicates=True
             )
         )

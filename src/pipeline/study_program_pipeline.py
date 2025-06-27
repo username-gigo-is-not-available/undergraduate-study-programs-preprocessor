@@ -17,7 +17,7 @@ def study_programs_pipeline() -> Pipeline:
                 function=PipelineStep.read_data,
                 input_file_location=PipelineStep.get_input_file_location(),
                 input_file_name=Config.STUDY_PROGRAMS_INPUT_DATA_FILE_PATH,
-                column_order=Config.STUDY_PROGRAMS_INPUT_COLUMN_ORDER,
+                columns=Config.STUDY_PROGRAMS_INPUT_COLUMNS,
             )
         )
     )
@@ -54,7 +54,7 @@ def study_programs_pipeline() -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.STUDY_PROGRAMS_OUTPUT_FILE_NAME,
-                column_order=Config.STUDY_PROGRAMS_OUTPUT_COLUMN_ORDER
+                columns=Config.STUDY_PROGRAMS_OUTPUT_COLUMNS
             )
         )
     )

@@ -23,30 +23,50 @@ class Config:
 
     INPUT_DIRECTORY_PATH = Path(ENVIRONMENT_VARIABLES.get('INPUT_DIRECTORY_PATH', '..'))
     STUDY_PROGRAMS_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('STUDY_PROGRAMS_INPUT_DATA_FILE_PATH'))
-    CURRICULA_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('CURRICULA_INPUT_DATA_FILE_PATH'))
-    COURSES_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('COURSES_INPUT_DATA_FILE_PATH'))
-    OUTPUT_DIRECTORY_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('OUTPUT_DIRECTORY_PATH', '..'))
-    STUDY_PROGRAMS_INPUT_COLUMN_ORDER: list[str] = [
+    STUDY_PROGRAMS_INPUT_COLUMNS: list[str] = [
         'study_program_name',
         'study_program_duration',
         'study_program_url'
     ]
+    CURRICULA_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('CURRICULA_INPUT_DATA_FILE_PATH'))
+    CURRICULA_INPUT_COLUMNS: list[str] = [
+        'study_program_name',
+        'study_program_duration',
+        'course_code',
+        'course_name_mk',
+        'course_type',
+        'course_semester'
+    ]
+    COURSES_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('COURSES_INPUT_DATA_FILE_PATH'))
+    COURSES_INPUT_COLUMNS: list[str] = [
+        'course_code',
+        'course_name_mk',
+        'course_name_en',
+        'course_url',
+    ]
+    PROFESSORS_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('COURSES_INPUT_DATA_FILE_PATH'))
+    PROFESSORS_INPUT_COLUMNS: list[str] = [
+        'course_professors',
+        'course_code'
+    ]
+    REQUISITES_INPUT_DATA_FILE_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('COURSES_INPUT_DATA_FILE_PATH'))
+    REQUISITES_INPUT_COLUMNS: list[str] = [
+        'course_code',
+        'course_name_mk',
+        'course_prerequisites'
+    ]
+
+    OUTPUT_DIRECTORY_PATH: Path = Path(ENVIRONMENT_VARIABLES.get('OUTPUT_DIRECTORY_PATH', '..'))
     STUDY_PROGRAMS_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME'))
-    STUDY_PROGRAMS_OUTPUT_COLUMN_ORDER: list[str] = [
+    STUDY_PROGRAMS_OUTPUT_COLUMNS: list[str] = [
         'study_program_id',
         'study_program_code',
         'study_program_name',
         'study_program_duration',
         'study_program_url'
     ]
-    COURSES_INPUT_COLUMN_ORDER: list[str] = [
-        'course_code',
-        'course_name_mk',
-        'course_name_en',
-        'course_url',
-    ]
     COURSES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('COURSES_DATA_OUTPUT_FILE_NAME'))
-    COURSES_OUTPUT_COLUMN_ORDER: list[str] = [
+    COURSES_OUTPUT_COLUMNS: list[str] = [
         'course_id',
         'course_code',
         'course_name_mk',
@@ -54,57 +74,37 @@ class Config:
         'course_url',
         'course_level'
     ]
-    CURRICULA_DATA_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('CURRICULA_DATA_OUTPUT_FILE_NAME'))
-    CURRICULA_INPUT_COLUMN_ORDER: list[str] = [
-        'study_program_name',
-        'study_program_duration',
-        'course_code',
-        'course_name_mk',
-        'course_type',
-        'course_semester'
-    ]
-    CURRICULA_OUTPUT_COLUMN_ORDER: list[str] = [
+    CURRICULA_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('CURRICULA_DATA_OUTPUT_FILE_NAME'))
+    CURRICULA_OUTPUT_COLUMNS: list[str] = [
         'curriculum_id',
         'course_type',
         'course_semester_season',
         'course_academic_year',
         'course_semester'
     ]
-    PROFESSORS_INPUT_COLUMN_ORDER: list[str] = [
-        'course_professors'
-    ]
     PROFESSORS_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('PROFESSORS_DATA_OUTPUT_FILE_NAME'))
-    PROFESSORS_OUTPUT_COLUMN_ORDER: list[str] = [
+    PROFESSORS_OUTPUT_COLUMNS: list[str] = [
         'professor_id',
         'professor_name',
         'professor_surname'
     ]
-    PROFESSOR_TEACHES_COLUMN_ORDER: list[str] = [
-        'course_code',
-        'course_professors'
-    ]
     TEACHES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('TEACHES_DATA_OUTPUT_FILE_NAME'))
-    TEACHES_OUTPUT_COLUMN_ORDER: list[str] = [
+    TEACHES_OUTPUT_COLUMNS: list[str] = [
         'teaches_id',
         'course_id',
         'professor_id'
     ]
     INCLUDES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('INCLUDES_DATA_OUTPUT_FILE_NAME'))
-    INCLUDES_OUTPUT_COLUMN_ORDER: list[str] = [
+    INCLUDES_OUTPUT_COLUMNS: list[str] = [
         'includes_id',
         'curriculum_id',
         'course_id',
     ]
     OFFERS_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('OFFERS_DATA_OUTPUT_FILE_NAME'))
-    OFFERS_OUTPUT_COLUMN_ORDER: list[str] = [
+    OFFERS_OUTPUT_COLUMNS: list[str] = [
         'offers_id',
         'curriculum_id',
         'study_program_id',
-    ]
-    REQUISITES_INPUT_COLUMN_ORDER: list[str] = [
-        'course_code',
-        'course_name_mk',
-        'course_prerequisites'
     ]
     REQUISITES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('REQUISITES_DATA_OUTPUT_FILE_NAME'))
     REQUISITES_OUTPUT_COLUMN_ORDER: list[str] = [

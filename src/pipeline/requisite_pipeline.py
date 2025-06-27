@@ -21,8 +21,8 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             name='load-course-data',
             function=PipelineStep.read_data,
             input_file_location=PipelineStep.get_input_file_location(),
-            input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
-            column_order=Config.REQUISITES_INPUT_COLUMN_ORDER
+            input_file_name=Config.REQUISITES_INPUT_DATA_FILE_PATH,
+            columns=Config.REQUISITES_INPUT_COLUMNS
         )
         )
     )
@@ -141,7 +141,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.REQUISITES_OUTPUT_FILE_NAME,
-                column_order=Config.REQUISITES_OUTPUT_COLUMN_ORDER,
+                columns=Config.REQUISITES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
             ))
         .add_step(
@@ -150,7 +150,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.PREREQUISITES_OUTPUT_FILE_NAME,
-                column_order=Config.PREREQUISITES_OUTPUT_COLUMN_ORDER,
+                columns=Config.PREREQUISITES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
             )
         )
@@ -160,7 +160,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.POSTREQUISITES_OUTPUT_FILE_NAME,
-                column_order=Config.POSTREQUISITES_OUTPUT_COLUMN_ORDER,
+                columns=Config.POSTREQUISITES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
             )
         )

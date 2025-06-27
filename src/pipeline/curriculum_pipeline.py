@@ -19,7 +19,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 function=PipelineStep.read_data,
                 input_file_location=PipelineStep.get_input_file_location(),
                 input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
-                column_order=Config.CURRICULA_INPUT_COLUMN_ORDER,
+                columns=Config.CURRICULA_INPUT_COLUMNS,
                 drop_duplicates=True,
             )
         )
@@ -100,8 +100,8 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.CURRICULA_DATA_OUTPUT_FILE_NAME,
-                column_order=Config.CURRICULA_OUTPUT_COLUMN_ORDER,
+                output_file_name=Config.CURRICULA_OUTPUT_FILE_NAME,
+                columns=Config.CURRICULA_OUTPUT_COLUMNS,
                 drop_duplicates=True
             )
         )
@@ -111,7 +111,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.OFFERS_OUTPUT_FILE_NAME,
-                column_order=Config.OFFERS_OUTPUT_COLUMN_ORDER,
+                columns=Config.OFFERS_OUTPUT_COLUMNS,
                 drop_duplicates=True
             )
         )
@@ -121,7 +121,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.INCLUDES_OUTPUT_FILE_NAME,
-                column_order=Config.INCLUDES_OUTPUT_COLUMN_ORDER,
+                columns=Config.INCLUDES_OUTPUT_COLUMNS,
                 drop_duplicates=True
             )
         )

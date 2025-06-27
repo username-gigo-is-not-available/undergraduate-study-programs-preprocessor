@@ -19,7 +19,7 @@ def course_pipeline() -> Pipeline:
                 function=PipelineStep.read_data,
                 input_file_location=PipelineStep.get_input_file_location(),
                 input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
-                column_order=Config.COURSES_INPUT_COLUMN_ORDER,
+                columns=Config.COURSES_INPUT_COLUMNS,
                 drop_duplicates=True,
             )
         )
@@ -66,7 +66,7 @@ def course_pipeline() -> Pipeline:
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
                 output_file_name=Config.COURSES_OUTPUT_FILE_NAME,
-                column_order=Config.COURSES_OUTPUT_COLUMN_ORDER,
+                columns=Config.COURSES_OUTPUT_COLUMNS,
                 drop_duplicates=True,
             )
         )
