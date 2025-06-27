@@ -115,12 +115,12 @@ class Config:
     PREREQUISITES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('PREREQUISITES_OUTPUT_FILE_NAME'))
     PREREQUISITES_OUTPUT_COLUMN_ORDER: list[str] = [
         'prerequisite_id',
-        'course_id',
+        'course_prerequisite_id',
         'requisite_id',
     ]
     POSTREQUISITES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('POSTREQUISITES_OUTPUT_FILE_NAME'))
     POSTREQUISITES_OUTPUT_COLUMN_ORDER: list[str] = [
         'postrequisite_id',
-        'course_prerequisite_id',
+        'course_id',
         'requisite_id',
     ]
