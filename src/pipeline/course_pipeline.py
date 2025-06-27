@@ -2,6 +2,7 @@ from src.config import Config
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
+from src.patterns.strategy.extraction import CourseLevelStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     PreserveAcronymsSentenceCaseStrategy
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
@@ -33,6 +34,16 @@ def course_pipeline() -> Pipeline:
                 function=PipelineStep.apply,
                 strategy=RemoveExtraDelimitersStrategy('course_name_en', ' ')
                 .then(PreserveAcronymsSentenceCaseStrategy('course_name_en'))
+            )
+        )
+    )
+    .add_stage(
+        PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
+        .add_step(
+            PipelineStep(
+                name='extract-course-level',
+                function=PipelineStep.apply,
+                strategy=CourseLevelStrategy('course_code', 'course_level')
             )
         )
     )

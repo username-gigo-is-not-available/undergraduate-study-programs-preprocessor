@@ -52,6 +52,23 @@ class Config:
         'course_name_mk',
         'course_name_en',
         'course_url',
+        'course_level'
+    ]
+    CURRICULA_DATA_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('CURRICULA_DATA_OUTPUT_FILE_NAME'))
+    CURRICULA_INPUT_COLUMN_ORDER: list[str] = [
+        'study_program_name',
+        'study_program_duration',
+        'course_code',
+        'course_name_mk',
+        'course_type',
+        'course_semester'
+    ]
+    CURRICULA_OUTPUT_COLUMN_ORDER: list[str] = [
+        'curriculum_id',
+        'course_type',
+        'course_semester_season',
+        'course_academic_year',
+        'course_semester'
     ]
     PROFESSORS_INPUT_COLUMN_ORDER: list[str] = [
         'course_professors'
@@ -72,31 +89,38 @@ class Config:
         'course_id',
         'professor_id'
     ]
-    OFFERS_REQUIRES_COLUMN_ORDER: list[str] = [
-        'study_program_name',
-        'study_program_duration',
-        'course_code',
-        'course_name_mk',
-        'course_type',
-        'course_semester',
-        'course_prerequisites',
+    INCLUDES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('INCLUDES_DATA_OUTPUT_FILE_NAME'))
+    INCLUDES_OUTPUT_COLUMN_ORDER: list[str] = [
+        'includes_id',
+        'curriculum_id',
+        'course_id',
     ]
     OFFERS_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('OFFERS_DATA_OUTPUT_FILE_NAME'))
     OFFERS_OUTPUT_COLUMN_ORDER: list[str] = [
         'offers_id',
+        'curriculum_id',
         'study_program_id',
-        'course_id',
-        'course_type',
-        'course_semester',
-        'course_semester_season',
-        'course_academic_year',
-        'course_level',
     ]
-    REQUIRES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('REQUIRES_DATA_OUTPUT_FILE_NAME'))
-    REQUIRES_OUTPUT_COLUMN_ORDER: list[str] = [
-        'requires_id',
-        'course_id',
+    REQUISITES_INPUT_COLUMN_ORDER: list[str] = [
+        'course_code',
+        'course_name_mk',
+        'course_prerequisites'
+    ]
+    REQUISITES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('REQUISITES_DATA_OUTPUT_FILE_NAME'))
+    REQUISITES_OUTPUT_COLUMN_ORDER: list[str] = [
+        'requisite_id',
         'course_prerequisite_type',
-        'course_prerequisite_id',
         'minimum_required_number_of_courses',
+    ]
+    PREREQUISITES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('PREREQUISITES_OUTPUT_FILE_NAME'))
+    PREREQUISITES_OUTPUT_COLUMN_ORDER: list[str] = [
+        'prerequisite_id',
+        'course_id',
+        'requisite_id',
+    ]
+    POSTREQUISITES_OUTPUT_FILE_NAME: Path = Path(ENVIRONMENT_VARIABLES.get('POSTREQUISITES_OUTPUT_FILE_NAME'))
+    POSTREQUISITES_OUTPUT_COLUMN_ORDER: list[str] = [
+        'postrequisite_id',
+        'course_prerequisite_id',
+        'requisite_id',
     ]

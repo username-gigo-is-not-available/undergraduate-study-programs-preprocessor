@@ -13,22 +13,21 @@ from src.pipeline.common_steps import clean_course_code_step, clean_course_name_
 from src.pipeline.models.enums import StageType
 
 
-def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFrame) -> Pipeline:
-    return (Pipeline(name='curriculum-prerequisites-pipeline')
+def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
+    return (Pipeline(name='requisites-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOADING)
         .add_step(PipelineStep(
-            name='load-curriculum-prerequisites-data',
+            name='load-course-data',
             function=PipelineStep.read_data,
             input_file_location=PipelineStep.get_input_file_location(),
-            input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
-            column_order=Config.OFFERS_REQUIRES_COLUMN_ORDER
+            input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
+            column_order=Config.REQUISITES_INPUT_COLUMN_ORDER
         )
         )
     )
     .add_stage(
         PipelineStage(name='clean-data', stage_type=StageType.CLEANING)
-        .add_step(clean_study_program_name_step)
         .add_step(clean_course_code_step)
         .add_step(clean_course_name_mk_step)
         .add_step(
@@ -53,38 +52,9 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
                 on=['course_code', 'course_name_mk'],
                 how='inner'
             ))
-        .add_step(
-            PipelineStep(
-                name='merge-with-study-program-data',
-                function=PipelineStep.merge,
-                merge_df=df_study_programs,
-                on=['study_program_name', 'study_program_duration'],
-                how='inner'
-            ))
     )
     .add_stage(
         PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
-        .add_step(
-            PipelineStep(
-                name='extract-course-level',
-                function=PipelineStep.apply,
-                strategy=CourseLevelStrategy('course_code', 'course_level')
-            )
-        )
-        .add_step(
-            PipelineStep(
-                name='extract-course-semester-season',
-                function=PipelineStep.apply,
-                strategy=CourseSemesterSeasonStrategy('course_semester', 'course_semester_season')
-            )
-        )
-        .add_step(
-            PipelineStep(
-                name='extract-course-academic-year',
-                function=PipelineStep.apply,
-                strategy=CourseAcademicYearStrategy('course_semester', 'course_academic_year')
-            )
-        )
         .add_step(
             PipelineStep(
                 name='extract-course-prerequisite-type',
@@ -140,18 +110,26 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
         PipelineStage(name='generate-data', stage_type=StageType.GENERATING)
         .add_step(
             PipelineStep(
-                name='generate-offers-id',
+                name='generate-requisite-id',
                 function=PipelineStep.uuid,
-                input_columns=['study_program_id', 'course_id'],
-                output_columns='offers_id',
+                input_columns=['course_id', 'course_prerequisite_id', 'course_prerequisite_type'],
+                output_columns='requisite_id',
             )
         )
         .add_step(
             PipelineStep(
-                name='generate-requires-id',
+                name='generate-prerequisite-id',
                 function=PipelineStep.uuid,
-                input_columns=['course_id', 'course_prerequisite_id', 'course_prerequisite_type'],
-                output_columns='requires_id',
+                input_columns=['requisite_id', 'course_id'],
+                output_columns='postrequisite_id',
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='generate-postrequisite-id',
+                function=PipelineStep.uuid,
+                input_columns=['requisite_id', 'course_prerequisite_id'],
+                output_columns='prerequisite_id',
             )
         )
     )
@@ -159,21 +137,31 @@ def offers_requires_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.Dat
         PipelineStage(name='store-data', stage_type=StageType.STORING)
         .add_step(
             PipelineStep(
-                name='store-curricula-data',
+                name='store-requisites-data',
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.OFFERS_OUTPUT_FILE_NAME,
-                column_order=Config.OFFERS_OUTPUT_COLUMN_ORDER,
+                output_file_name=Config.REQUISITES_OUTPUT_FILE_NAME,
+                column_order=Config.REQUISITES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
-            )
-        )
+            ))
         .add_step(
             PipelineStep(
                 name='store-prerequisites-data',
                 function=PipelineStep.save_data,
                 output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.REQUIRES_OUTPUT_FILE_NAME,
-                column_order=Config.REQUIRES_OUTPUT_COLUMN_ORDER,
+                output_file_name=Config.PREREQUISITES_OUTPUT_FILE_NAME,
+                column_order=Config.PREREQUISITES_OUTPUT_COLUMN_ORDER,
                 drop_duplicates=True
-            ))
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='store-postrequisites-data',
+                function=PipelineStep.save_data,
+                output_file_location=PipelineStep.get_output_file_location(),
+                output_file_name=Config.POSTREQUISITES_OUTPUT_FILE_NAME,
+                column_order=Config.POSTREQUISITES_OUTPUT_COLUMN_ORDER,
+                drop_duplicates=True
+            )
+        )
     ))

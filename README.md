@@ -55,17 +55,23 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   whitespaces
 - Clean the `course_name_en` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well as
   occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
+-
 
-##### Generation stage
+##### Extracting Stage:
+
+- Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the
+  `course_code`
+
+##### Generation Stage
 
 - Generate the `course_id` column by hashing `course_name_mk`
 
 ##### Storing Stage
 
 - Store the cleaned data in CSV files with the following columns:
-  `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`
+  `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
 
-#### Professor-Teaches:
+#### Professor:
 
 ##### Loading Stage
 
@@ -106,11 +112,13 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 1. Professors: `professor_id`, `professor_name`, `professor_surname`
 2. Teaches: `teaches_id`, `course_id`, `professor_id`
 
-#### Offers-Requires:
+#### Curriculum:
 
 ##### Loading Stage
 
-- Load the merged data (output from the scraper)
+- Load the curricula data (output from the scraper) with the following columns:
+  `study_program_name`, `study_program_duration`, `study_program_url`,
+  `course_code`, `course_name_mk`, `course_url`, `course_semester`, `course_type`
 
 ##### Cleaning Stage
 
@@ -118,28 +126,59 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   whitespaces
 - Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
   as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
-- Clean the `course_prerequisite`  column by replacing newline characters with commas, removing any leading or
-  trailing whitespaces, as well as occurrences of multiple whitespaces. Then concatenate the processed values with the pipe(`|`) separator.
 
-#### Merging Stage
+##### Merging Stage
 
-- Merge with the course data on `course_code` and `course_name_mk` columns (from the processed professor-teaches data)
+- Merge with the course data on `course_code` and `course_name_mk` columns (from the processed course data)
 - Merge with the study program data on `study_program_name` and `study_program_duration` columns (from the processed
   study program data)
 
 ##### Extraction Stage
 
-- Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the
-  `course_code`
 - Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
   calculated based on the `course_semester` column such that if the `course_semester` is odd, then
   `course_semester_season` is `WINTER`, otherwise `course_semester_season` is `SUMMER`
 - Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
   based on the `course_semester` as round up of the `course_semester` divided by 2
+
+##### Generation Stage
+
+- Generate the `curriculum_id` by hashing the following columns `study_program_id`, `course_id`, `course_type`,
+  `course_semester`, `course_academic_year`, `course_semester_season`
+- Generate the `offers_id` by hashing the columns `study_program_id` and `curriculum_id`
+- Generate the `includes_id` by hashing the columns `course_id` and `curriculum_id`
+
+##### Storing Stage
+
+- Store the cleaned data in CSV files with the following columns:
+
+1. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
+2. Offers: `offers_id`, `curriculum_id`, `study_program_id`
+3. Includes: `includes_id`, `curriculum_id`, `course_id`
+
+#### Requisites:
+
+##### Loading Stage
+
+- Load the courses data (output from the scraper) with the following columns:
+  `course_code`, `course_name_mk`, `course_prerequisites`
+
+##### Cleaning Stage
+
+- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
+  whitespaces
+- Clean the `course_name_mk` column by removing any leading or trailing whitespaces, as well
+  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
+- Clean the `course_prerequisite`  column by replacing newline characters with commas, removing any leading or
+  trailing whitespaces, as well as occurrences of multiple whitespaces. Then concatenate the processed values with the
+  pipe(`|`) separator.
+
+##### Extracting Stage
+
 - Extract the `course_prerequisite_type` column from the `course_prerequisite` column. The `course_prerequisite_type` is
   determined based on the `course_prerequisite` column such that if the `course_prerequisite` column is `нема` or `nan`,
   then the `course_prerequisite_type` is `NONE`,
-  if the `course_prerequisite` column contains any of the following terms `ЕКТС` or `кредити`, then the 
+  if the `course_prerequisite` column contains any of the following terms `ЕКТС` or `кредити`, then the
   `course_prerequisite_type` is `TOTAL`, if the `course_prerequisite` column contains the term
   `или`, then the `course_prerequisite_type` is `ANY`, else the `course_prerequisite_type` is `ONE`
 - Extract the `minimum_required_number_of_courses` column from the columns `course_prerequisites` and
@@ -152,45 +191,46 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Transform the `course_prerequisite` column by splitting the values and validating the course names.
   if `course_prerequisite_type` is `NONE`, then `course_prerequisite` is `None`
   if `course_prerequisite_type` is `ONE`, then `course_prerequisite` is the course with the highest similarity ratio
-  if `course_prerequisite_type` is `ANY`, then `course_prerequisite` are the courses with the highest similarity ratio 
+  if `course_prerequisite_type` is `ANY`, then `course_prerequisite` are the courses with the highest similarity ratio
   concatenated with the pipe(`|`) separator
-  if `course_prerequisite_type` is `TOTAL` then `course_prerequisite` are the all the courses available concatenated with
+  if `course_prerequisite_type` is `TOTAL` then `course_prerequisite` are the all the courses available concatenated
+  with
   the pipe(`|`) separator
 
-#### Flattening Stage
+##### Flattening Stage
 
 - Flatten the `course_prerequisite` column by splitting the values and creating a new row for each prerequisite
   if `course_prerequisite_type` is `ANY` or `TOTAL`
 - Create the `course_prerequisite_id` by self-joining on `course_name_mk` and `course_prerequisites`
 
-##### Generation Stage
+##### Generating Stage
 
-- Generate the `offers_id` by hashing the `study_program_id` and `course_id` columns
-- Generate the `requires_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type`
+- Generate the `requisite_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type`
   columns
+- Generate the `prerequisite_id` by hashing the columns `course_prerequisite_id` and `requisite_id`
+- Generate the `postrequisite_id` by hashing the columns `course_id` and `requisite_id`
 
-#### Storing Stage
+##### Storing Stage
 
 - Store the cleaned data in CSV files with the following columns:
-
-1. Offers: `offers_id`, `study_program_id`, `course_id`, `course_type`, `course_level`, `course_semester`,
-   `course_semester_season`, `course_academic_year`,
-2. Requires: `requires_id`, `course_id`, `course_prerequisite_id`, `course_prerequisite_type`, \
-   `minimum_required_number_of_courses`
+1. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
+2. Prerequisites: `prerequisite_id`, `requisite_id`, `course_prerequisite_id`
+3. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
 
 ### Results:
 
 This ETL application will produce the following datasets:
 
-1. Study Programs: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`,
-   `study_program_url`
-2. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`
+1. Study Programs: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
+2. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
 3. Professors: `professor_id`, `professor_name`, `professor_surname`
 4. Teaches: `teaches_id`, `course_id`, `professor_id`
-5. Offers:  `offers_id`, `study_program_id`, `course_id`, `course_type`, `course_level`, `course_semester`,
-   `course_semester_season`, `course_academic_year`,
-6. Requires: `requires_id`, `course_id`, `course_prerequisite_type`, `course_prerequisites_course_id`,
-   `minimum_required_number_of_courses`
+5. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
+6. Offers: `offers_id`, `curriculum_id`, `study_program_id`
+7. Includes: `includes_id`, `curriculum_id`, `course_id`
+8. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
+9. Prerequisites: `prerequisite_id`, `requisite_id`, `course_prerequisite_id`
+10. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
 
 ## Requirements
 
@@ -207,9 +247,13 @@ Before running the scraper, make sure to set the following environment variables
 - `STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME`: the name of the study programs output file
 - `COURSES_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
 - `PROFESSORS_DATA_OUTPUT_FILE_NAME`: the name of the professors output file
-- `OFFERS_DATA_OUTPUT_FILE_NAME`: the name of the offers output file
 - `TEACHES_DATA_OUTPUT_FILE_NAME`: the name of the teaches output file
-- `REQUIRES_DATA_OUTPUT_FILE_NAME`: the name of the requires output file
+- `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the curricula output file
+- `OFFERS_DATA_OUTPUT_FILE_NAME`: the name of the offers output file
+- `INCLUDES_DATA_OUTPUT_FILE_NAME`: the name of the includes output file
+- `REQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the requisites output file
+- `PREREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the prerequisites output file
+- `POSTREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the postrequisites output file
 
 ##### If running the application with local storage:
 
