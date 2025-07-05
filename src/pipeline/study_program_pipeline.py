@@ -7,7 +7,7 @@ from src.pipeline.common_steps import clean_study_program_name_step
 from src.pipeline.models.enums import StageType
 
 
-def study_programs_pipeline(study_programs_dataset_configuration: DatasetConfiguration) -> Pipeline:
+def study_programs_pipeline() -> Pipeline:
     return (Pipeline(name='study-programs-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOAD)
@@ -15,7 +15,7 @@ def study_programs_pipeline(study_programs_dataset_configuration: DatasetConfigu
             PipelineStep(
                 name='load-study-program-data',
                 function=PipelineStep.read_data,
-                configuration=study_programs_dataset_configuration
+                configuration=DatasetConfiguration.STUDY_PROGRAMS
             )
         )
     )
@@ -50,7 +50,7 @@ def study_programs_pipeline(study_programs_dataset_configuration: DatasetConfigu
             PipelineStep(
                 name='store-study-program-data',
                 function=PipelineStep.save_data,
-                configuration=study_programs_dataset_configuration
+                configuration=DatasetConfiguration.STUDY_PROGRAMS
             )
         )
     )

@@ -9,7 +9,7 @@ from src.pipeline.common_steps import clean_course_code_step, clean_course_name_
 from src.pipeline.models.enums import StageType
 
 
-def course_pipeline(courses_dataset_configuration: DatasetConfiguration) -> Pipeline:
+def course_pipeline() -> Pipeline:
     return (Pipeline(name='course-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOAD)
@@ -17,7 +17,7 @@ def course_pipeline(courses_dataset_configuration: DatasetConfiguration) -> Pipe
             PipelineStep(
                 name='load-course-data',
                 function=PipelineStep.read_data,
-                configuration=courses_dataset_configuration,
+                configuration=DatasetConfiguration.COURSES,
             )
         )
     )
@@ -61,7 +61,7 @@ def course_pipeline(courses_dataset_configuration: DatasetConfiguration) -> Pipe
             PipelineStep(
                 name='store-course-data',
                 function=PipelineStep.save_data,
-                configuration=courses_dataset_configuration
+                configuration=DatasetConfiguration.COURSES,
             )
         )
     ))

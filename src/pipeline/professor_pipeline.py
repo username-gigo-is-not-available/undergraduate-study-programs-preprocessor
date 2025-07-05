@@ -10,10 +10,7 @@ from src.pipeline.common_steps import clean_course_code_step
 from src.pipeline.models.enums import StageType
 
 
-def professor_pipeline(
-        professors_dataset_configuration: DatasetConfiguration,
-        teaches_dataset_configuration: DatasetConfiguration,
-        df_courses: pd.DataFrame) -> Pipeline:
+def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='professor-teaches-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOAD)
@@ -21,7 +18,7 @@ def professor_pipeline(
             PipelineStep(
                 name='load-professor-teaches-data',
                 function=PipelineStep.read_data,
-                configuration=professors_dataset_configuration,
+                configuration=DatasetConfiguration.PROFESSORS,
             )
         )
     )
@@ -104,14 +101,14 @@ def professor_pipeline(
             PipelineStep(
                 name='store-professor-data',
                 function=PipelineStep.save_data,
-                configuration=professors_dataset_configuration
+                configuration=DatasetConfiguration.PROFESSORS,
             )
         )
         .add_step(
             PipelineStep(
                 name='store-teaches-data',
                 function=PipelineStep.save_data,
-                configuration=teaches_dataset_configuration
+                configuration=DatasetConfiguration.TEACHES,
             )
         )
     ))

@@ -8,6 +8,7 @@ from src.pipeline.models.enums import DatasetType
 
 ENVIRONMENT_VARIABLES: dict[str, str] = {**dotenv_values('../.env'), **os.environ}
 
+
 class ApplicationConfiguration:
     ECTS_VALUE: int = 6
     PROFESSOR_TITLES: list[str] = ["ворн. ", "проф. ", "д-р ", "доц. "]
@@ -16,7 +17,6 @@ class ApplicationConfiguration:
 
 
 class StorageConfiguration:
-
     FILE_STORAGE_TYPE: str = ENVIRONMENT_VARIABLES.get("FILE_STORAGE_TYPE")
     MINIO_ENDPOINT_URL: str = ENVIRONMENT_VARIABLES.get("MINIO_ENDPOINT_URL")
     MINIO_ACCESS_KEY: str = ENVIRONMENT_VARIABLES.get("MINIO_ACCESS_KEY")
@@ -34,13 +34,13 @@ class StorageConfiguration:
         OUTPUT_DIRECTORY_PATH if FILE_STORAGE_TYPE == "LOCAL" else MINIO_DESTINATION_BUCKET_NAME
     )
 
+
 class DatasetIOConfiguration:
     def __init__(self, file_name: str | Path):
         self.file_name = file_name
 
 
 class DatasetPathConfiguration:
-
     STUDY_PROGRAMS_INPUT = Path(ENVIRONMENT_VARIABLES.get("STUDY_PROGRAMS_DATA_INPUT_FILE_NAME"))
     STUDY_PROGRAMS_OUTPUT = Path(ENVIRONMENT_VARIABLES.get("STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME"))
 
@@ -69,7 +69,19 @@ class DatasetTransformationConfiguration:
         self.drop_duplicates = drop_duplicates
         self.drop_na = drop_na
 
+
 class DatasetConfiguration:
+    STUDY_PROGRAMS: "DatasetConfiguration"
+    COURSES: "DatasetConfiguration"
+    PROFESSORS: "DatasetConfiguration"
+    CURRICULA: "DatasetConfiguration"
+    REQUISITES: "DatasetConfiguration"
+    OFFERS: "DatasetConfiguration"
+    INCLUDES: "DatasetConfiguration"
+    PREREQUISITES: "DatasetConfiguration"
+    POSTREQUISITES: "DatasetConfiguration"
+    TEACHES: "DatasetConfiguration"
+
 
     def __init__(self,
                  dataset: DatasetType,
@@ -84,117 +96,118 @@ class DatasetConfiguration:
         self.input_transformation_config = input_transformation_config
         self.output_transformation_config = output_transformation_config
 
-    @staticmethod
-    def initialize() -> dict[DatasetType, "DatasetConfiguration"]:
-        return {
-            DatasetType.STUDY_PROGRAMS: DatasetConfiguration(
-                dataset=DatasetType.STUDY_PROGRAMS,
-                input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.STUDY_PROGRAMS_INPUT),
-                input_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "study_program_name", "study_program_duration", "study_program_url"
-                ]),
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.STUDY_PROGRAMS_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "study_program_id", "study_program_code", "study_program_name",
-                    "study_program_duration", "study_program_url"
-                ])
-            ),
-            DatasetType.COURSES: DatasetConfiguration(
-                dataset=DatasetType.COURSES,
-                input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.COURSES_INPUT),
-                input_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "course_code", "course_name_mk", "course_name_en", "course_url"
-                ]),
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.COURSES_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "course_id", "course_code", "course_name_mk", "course_name_en",
-                    "course_url", "course_level"
-                ])
-            ),
-            DatasetType.PROFESSORS: DatasetConfiguration(
-                dataset=DatasetType.PROFESSORS,
-                input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PROFESSORS_INPUT),
-                input_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "course_professors", "course_code"
-                ]),
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PROFESSORS_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "professor_id", "professor_name", "professor_surname"
-                ],
-                drop_na=True,
-                )
-            ),
-            DatasetType.CURRICULA: DatasetConfiguration(
-                dataset=DatasetType.CURRICULA,
-                input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.CURRICULA_INPUT),
-                input_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "study_program_name", "study_program_duration", "course_code",
-                    "course_name_mk", "course_type", "course_semester"
-                ]),
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.CURRICULA_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "curriculum_id", "course_type", "course_semester_season",
-                    "course_academic_year", "course_semester"
-                ])
-            ),
-            DatasetType.REQUISITES: DatasetConfiguration(
-                dataset=DatasetType.REQUISITES,
-                input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.REQUISITES_INPUT),
-                input_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "course_code", "course_name_mk", "course_prerequisites"
-                ]),
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.REQUISITES_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "requisite_id", "course_prerequisite_type", "minimum_required_number_of_courses"
-                ],
-                drop_na=True)
-            ),
-            DatasetType.OFFERS: DatasetConfiguration(
-                dataset=DatasetType.OFFERS,
-                input_io_config=None,
-                input_transformation_config=None,
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.OFFERS_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "offers_id", "curriculum_id", "study_program_id"
-                ])
-            ),
-            DatasetType.INCLUDES: DatasetConfiguration(
-                dataset=DatasetType.INCLUDES,
-                input_io_config=None,
-                input_transformation_config=None,
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.INCLUDES_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "includes_id", "curriculum_id", "study_program_id"
-                ])
-            ),
-            DatasetType.PREREQUISITES: DatasetConfiguration(
-                dataset=DatasetType.PREREQUISITES,
-                input_io_config=None,
-                input_transformation_config=None,
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PREREQUISITES_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "prerequisite_id", "course_prerequisite_id", "requisite_id"
-                ],
-                drop_na=True)
-            ),
-            DatasetType.POSTREQUISITES: DatasetConfiguration(
-                dataset=DatasetType.POSTREQUISITES,
-                input_io_config=None,
-                input_transformation_config=None,
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.POSTREQUISITES_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "postrequisite_id", "course_id", "requisite_id"
-                ],
-                drop_na=True)
-            ),
-            DatasetType.TEACHES: DatasetConfiguration(
-                dataset=DatasetType.TEACHES,
-                input_io_config=None,
-                input_transformation_config=None,
-                output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.TEACHES_OUTPUT),
-                output_transformation_config=DatasetTransformationConfiguration(columns=[
-                    "teaches_id", "course_id", "professor_id"
-                ],
-                drop_na=True)
-            )
-        }
+
+DatasetConfiguration.STUDY_PROGRAMS = DatasetConfiguration(
+    dataset=DatasetType.STUDY_PROGRAMS,
+    input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.STUDY_PROGRAMS_INPUT),
+    input_transformation_config=DatasetTransformationConfiguration(columns=[
+        "study_program_name", "study_program_duration", "study_program_url"
+    ]),
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.STUDY_PROGRAMS_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "study_program_id", "study_program_code", "study_program_name",
+        "study_program_duration", "study_program_url"
+    ])
+)
+
+DatasetConfiguration.COURSES = DatasetConfiguration(
+    dataset=DatasetType.COURSES,
+    input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.COURSES_INPUT),
+    input_transformation_config=DatasetTransformationConfiguration(columns=[
+        "course_code", "course_name_mk", "course_name_en", "course_url"
+    ]),
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.COURSES_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "course_id", "course_code", "course_name_mk", "course_name_en",
+        "course_url", "course_level"
+    ])
+)
+
+DatasetConfiguration.PROFESSORS = DatasetConfiguration(
+    dataset=DatasetType.PROFESSORS,
+    input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PROFESSORS_INPUT),
+    input_transformation_config=DatasetTransformationConfiguration(columns=[
+        "course_professors", "course_code"
+    ]),
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PROFESSORS_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "professor_id", "professor_name", "professor_surname"
+    ],
+        drop_na=True,
+    )
+)
+
+DatasetConfiguration.CURRICULA = DatasetConfiguration(
+    dataset=DatasetType.CURRICULA,
+    input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.CURRICULA_INPUT),
+    input_transformation_config=DatasetTransformationConfiguration(columns=[
+        "study_program_name", "study_program_duration", "course_code",
+        "course_name_mk", "course_type", "course_semester"
+    ]),
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.CURRICULA_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "curriculum_id", "course_type", "course_semester_season",
+        "course_academic_year", "course_semester"
+    ])
+)
+
+DatasetConfiguration.REQUISITES = DatasetConfiguration(
+    dataset=DatasetType.REQUISITES,
+    input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.REQUISITES_INPUT),
+    input_transformation_config=DatasetTransformationConfiguration(columns=[
+        "course_code", "course_name_mk", "course_prerequisites"
+    ]),
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.REQUISITES_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "requisite_id", "course_prerequisite_type", "minimum_required_number_of_courses"
+    ],
+        drop_na=True)
+)
+DatasetConfiguration.OFFERS = DatasetConfiguration(
+    dataset=DatasetType.OFFERS,
+    input_io_config=None,
+    input_transformation_config=None,
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.OFFERS_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "offers_id", "curriculum_id", "study_program_id"
+    ])
+)
+DatasetConfiguration.INCLUDES = DatasetConfiguration(
+    dataset=DatasetType.INCLUDES,
+    input_io_config=None,
+    input_transformation_config=None,
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.INCLUDES_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "includes_id", "curriculum_id", "study_program_id"
+    ])
+)
+DatasetConfiguration.PREREQUISITES = DatasetConfiguration(
+    dataset=DatasetType.PREREQUISITES,
+    input_io_config=None,
+    input_transformation_config=None,
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PREREQUISITES_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "prerequisite_id", "course_prerequisite_id", "requisite_id"
+    ],
+        drop_na=True)
+)
+DatasetConfiguration.POSTREQUISITES = DatasetConfiguration(
+    dataset=DatasetType.POSTREQUISITES,
+    input_io_config=None,
+    input_transformation_config=None,
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.POSTREQUISITES_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "postrequisite_id", "course_id", "requisite_id"
+    ],
+        drop_na=True)
+)
+DatasetConfiguration.TEACHES = DatasetConfiguration(
+    dataset=DatasetType.TEACHES,
+    input_io_config=None,
+    input_transformation_config=None,
+    output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.TEACHES_OUTPUT),
+    output_transformation_config=DatasetTransformationConfiguration(columns=[
+        "teaches_id", "course_id", "professor_id"
+    ],
+        drop_na=True)
+)

@@ -18,18 +18,13 @@ logging.basicConfig(level=logging.INFO)
 def main() -> None:
     logging.info("Starting...")
     start: float = time.perf_counter()
-    datasets: dict[DatasetType, DatasetConfiguration] = DatasetConfiguration.initialize()
-    df_study_programs: pd.DataFrame = study_programs_pipeline(datasets[DatasetType.STUDY_PROGRAMS]).build().run()
-    df_courses: pd.DataFrame = course_pipeline(datasets[DatasetType.COURSES]).build().run()
-    professor_pipeline(datasets[DatasetType.PROFESSORS], datasets[DatasetType.TEACHES], df_courses).build().run()
-    curriculum_pipeline(datasets[DatasetType.CURRICULA], datasets[DatasetType.OFFERS], datasets[DatasetType.INCLUDES],
-        df_study_programs, df_courses).build().run()
-    requisite_pipeline(
-        datasets[DatasetType.REQUISITES],
-        datasets[DatasetType.PREREQUISITES],
-        datasets[DatasetType.POSTREQUISITES],
-        df_courses).build().run()
+    df_study_programs: pd.DataFrame = study_programs_pipeline().build().run()
+    df_courses: pd.DataFrame = course_pipeline().build().run()
+    professor_pipeline(df_courses).build().run()
+    curriculum_pipeline(df_study_programs, df_courses).build().run()
+    requisite_pipeline(df_courses).build().run()
     logging.info(f"Time taken: {time.perf_counter() - start:.2f} seconds")
+
 
 if __name__ == '__main__':
     main()

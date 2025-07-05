@@ -9,11 +9,7 @@ from src.pipeline.common_steps import clean_study_program_name_step, clean_cours
 from src.pipeline.models.enums import StageType
 
 
-def curriculum_pipeline(curricula_dataset_configuration: DatasetConfiguration,
-                        offers_dataset_configuration: DatasetConfiguration,
-                        includes_dataset_configuration: DatasetConfiguration,
-                        df_study_programs: pd.DataFrame,
-                        df_courses: pd.DataFrame) -> Pipeline:
+def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='curriculum-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOAD)
@@ -21,7 +17,7 @@ def curriculum_pipeline(curricula_dataset_configuration: DatasetConfiguration,
             PipelineStep(
                 name='load-curriculum-data',
                 function=PipelineStep.read_data,
-                configuration=curricula_dataset_configuration
+                configuration=DatasetConfiguration.COURSES
             )
         )
     )
@@ -100,21 +96,21 @@ def curriculum_pipeline(curricula_dataset_configuration: DatasetConfiguration,
             PipelineStep(
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
-                configuration=curricula_dataset_configuration
+                configuration=DatasetConfiguration.COURSES
             )
         )
         .add_step(
             PipelineStep(
                 name='store-offers-data',
                 function=PipelineStep.save_data,
-                configuration=offers_dataset_configuration
+                configuration=DatasetConfiguration.OFFERS
             )
         )
         .add_step(
             PipelineStep(
                 name='store-includes-data',
                 function=PipelineStep.save_data,
-                configuration=includes_dataset_configuration
+                configuration=DatasetConfiguration.INCLUDES
             )
         )
     ))

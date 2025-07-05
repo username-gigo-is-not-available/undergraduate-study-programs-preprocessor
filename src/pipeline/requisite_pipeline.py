@@ -12,18 +12,14 @@ from src.pipeline.common_steps import clean_course_code_step, clean_course_name_
 from src.pipeline.models.enums import StageType
 
 
-def requisite_pipeline(
-        requisite_dataset_configuration: DatasetConfiguration,
-        prerequisite_dataset_configuration: DatasetConfiguration,
-        postrequisite_dataset_configuration: DatasetConfiguration,
-        df_courses: pd.DataFrame) -> Pipeline:
+def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='requisites-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOAD)
         .add_step(PipelineStep(
             name='load-course-data',
             function=PipelineStep.read_data,
-            configuration=requisite_dataset_configuration
+            configuration=DatasetConfiguration.REQUISITES
         )
         )
     )
@@ -140,20 +136,20 @@ def requisite_pipeline(
             PipelineStep(
                 name='store-requisites-data',
                 function=PipelineStep.save_data,
-                configuration=requisite_dataset_configuration
+                configuration=DatasetConfiguration.REQUISITES
             ))
         .add_step(
             PipelineStep(
                 name='store-prerequisites-data',
                 function=PipelineStep.save_data,
-                configuration=prerequisite_dataset_configuration
+                configuration=DatasetConfiguration.PREREQUISITES
             )
         )
         .add_step(
             PipelineStep(
                 name='store-postrequisites-data',
                 function=PipelineStep.save_data,
-                configuration=postrequisite_dataset_configuration
+                configuration=DatasetConfiguration.POSTREQUISITES
             )
         )
     ))
