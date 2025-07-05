@@ -17,7 +17,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='load-curriculum-data',
                 function=PipelineStep.read_data,
-                configuration=DatasetConfiguration.COURSES
+                configuration=DatasetConfiguration.CURRICULA
             )
         )
     )
@@ -96,7 +96,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.COURSES
+                configuration=DatasetConfiguration.CURRICULA
             )
         )
         .add_step(

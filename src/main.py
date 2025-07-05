@@ -1,13 +1,10 @@
 import logging
 import time
-from pathlib import Path
 
 import pandas as pd
 
-from src.configurations import DatasetConfiguration
 from src.pipeline.course_pipeline import course_pipeline
 from src.pipeline.curriculum_pipeline import curriculum_pipeline
-from src.pipeline.models.enums import DatasetType
 from src.pipeline.professor_pipeline import professor_pipeline
 from src.pipeline.requisite_pipeline import requisite_pipeline
 from src.pipeline.study_program_pipeline import study_programs_pipeline
