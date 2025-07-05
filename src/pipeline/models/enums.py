@@ -7,14 +7,15 @@ class UpperStrEnum(StrEnum):
 
 
 class StageType(UpperStrEnum):
-    LOADING: str = auto()
-    CLEANING: str = auto()
-    EXTRACTING: str = auto()
-    TRANSFORMING: str = auto()
-    GENERATING: str = auto()
-    FLATTENING: str = auto()
-    MERGING: str = auto()
-    STORING: str = auto()
+    LOAD: str = auto()
+    SELECT: str = auto()
+    CLEAN: str = auto()
+    EXTRACT: str = auto()
+    TRANSFORM: str = auto()
+    GENERATE: str = auto()
+    FLATTEN: str = auto()
+    MERGE: str = auto()
+    STORE: str = auto()
 
 
 class CoursePrerequisiteType(UpperStrEnum):
@@ -27,3 +28,15 @@ class CoursePrerequisiteType(UpperStrEnum):
 class CourseSemesterSeasonType(UpperStrEnum):
     WINTER: str = auto()
     SUMMER: str = auto()
+
+class DatasetType(UpperStrEnum):
+    STUDY_PROGRAMS: str = auto()
+    COURSES: str = auto()
+    PROFESSORS: str = auto()
+    CURRICULA: str = auto()
+    REQUISITES: str = auto()
+    OFFERS: str = auto()
+    INCLUDES: str = auto()
+    PREREQUISITES: str = auto()
+    POSTREQUISITES: str = auto()
+    TEACHES: str = auto()

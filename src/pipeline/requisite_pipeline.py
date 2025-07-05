@@ -1,33 +1,34 @@
 import pandas as pd
 
-from src.config import Config
+from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import CourseLevelStrategy, CourseSemesterSeasonStrategy, \
-    CourseAcademicYearStrategy, CoursePrerequisiteTypeStrategy, MinimumNumberOfCoursesStrategy
+from src.patterns.strategy.extraction import CoursePrerequisiteTypeStrategy, MinimumNumberOfCoursesStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
 from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
-from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step, clean_study_program_name_step
+from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
 
-def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
+def requisite_pipeline(
+        requisite_dataset_configuration: DatasetConfiguration,
+        prerequisite_dataset_configuration: DatasetConfiguration,
+        postrequisite_dataset_configuration: DatasetConfiguration,
+        df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='requisites-pipeline')
     .add_stage(
-        PipelineStage(name='load-data', stage_type=StageType.LOADING)
+        PipelineStage(name='load-data', stage_type=StageType.LOAD)
         .add_step(PipelineStep(
             name='load-course-data',
             function=PipelineStep.read_data,
-            input_file_location=PipelineStep.get_input_file_location(),
-            input_file_name=Config.REQUISITES_INPUT_DATA_FILE_PATH,
-            columns=Config.REQUISITES_INPUT_COLUMNS
+            configuration=requisite_dataset_configuration
         )
         )
     )
     .add_stage(
-        PipelineStage(name='clean-data', stage_type=StageType.CLEANING)
+        PipelineStage(name='clean-data', stage_type=StageType.CLEAN)
         .add_step(clean_course_code_step)
         .add_step(clean_course_name_mk_step)
         .add_step(
@@ -43,7 +44,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='merge-data', stage_type=StageType.MERGING)
+        PipelineStage(name='merge-data', stage_type=StageType.MERGE)
         .add_step(
             PipelineStep(
                 name='merge-with-course-data',
@@ -54,7 +55,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             ))
     )
     .add_stage(
-        PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
+        PipelineStage(name='extract-data', stage_type=StageType.EXTRACT)
         .add_step(
             PipelineStep(
                 name='extract-course-prerequisite-type',
@@ -72,7 +73,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='transform-data', stage_type=StageType.TRANSFORMING)
+        PipelineStage(name='transform-data', stage_type=StageType.TRANSFORM)
         .add_step(
             PipelineStep(
                 name='transform-course-prerequisites',
@@ -83,7 +84,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='flatten-data', stage_type=StageType.FLATTENING)
+        PipelineStage(name='flatten-data', stage_type=StageType.FLATTEN)
         .add_step(
             PipelineStep(
                 name='flatten-course-prerequisites',
@@ -107,7 +108,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='generate-data', stage_type=StageType.GENERATING)
+        PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
         .add_step(
             PipelineStep(
                 name='generate-requisite-id',
@@ -134,34 +135,25 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='store-data', stage_type=StageType.STORING)
+        PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(
                 name='store-requisites-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.REQUISITES_OUTPUT_FILE_NAME,
-                columns=Config.REQUISITES_OUTPUT_COLUMN_ORDER,
-                drop_duplicates=True
+                configuration=requisite_dataset_configuration
             ))
         .add_step(
             PipelineStep(
                 name='store-prerequisites-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.PREREQUISITES_OUTPUT_FILE_NAME,
-                columns=Config.PREREQUISITES_OUTPUT_COLUMN_ORDER,
-                drop_duplicates=True
+                configuration=prerequisite_dataset_configuration
             )
         )
         .add_step(
             PipelineStep(
                 name='store-postrequisites-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.POSTREQUISITES_OUTPUT_FILE_NAME,
-                columns=Config.POSTREQUISITES_OUTPUT_COLUMN_ORDER,
-                drop_duplicates=True
+                configuration=postrequisite_dataset_configuration
             )
         )
     ))

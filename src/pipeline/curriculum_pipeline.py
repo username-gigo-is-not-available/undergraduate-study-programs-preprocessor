@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.config import Config
+from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -9,29 +9,30 @@ from src.pipeline.common_steps import clean_study_program_name_step, clean_cours
 from src.pipeline.models.enums import StageType
 
 
-def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFrame) -> Pipeline:
+def curriculum_pipeline(curricula_dataset_configuration: DatasetConfiguration,
+                        offers_dataset_configuration: DatasetConfiguration,
+                        includes_dataset_configuration: DatasetConfiguration,
+                        df_study_programs: pd.DataFrame,
+                        df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='curriculum-pipeline')
     .add_stage(
-        PipelineStage(name='load-data', stage_type=StageType.LOADING)
+        PipelineStage(name='load-data', stage_type=StageType.LOAD)
         .add_step(
             PipelineStep(
                 name='load-curriculum-data',
                 function=PipelineStep.read_data,
-                input_file_location=PipelineStep.get_input_file_location(),
-                input_file_name=Config.CURRICULA_INPUT_DATA_FILE_PATH,
-                columns=Config.CURRICULA_INPUT_COLUMNS,
-                drop_duplicates=True,
+                configuration=curricula_dataset_configuration
             )
         )
     )
     .add_stage(
-        PipelineStage(name='clean-data', stage_type=StageType.CLEANING)
+        PipelineStage(name='clean-data', stage_type=StageType.CLEAN)
         .add_step(clean_study_program_name_step)
         .add_step(clean_course_code_step)
         .add_step(clean_course_name_mk_step)
     )
     .add_stage(
-        PipelineStage(name='merge-data', stage_type=StageType.MERGING)
+        PipelineStage(name='merge-data', stage_type=StageType.MERGE)
         .add_step(
             PipelineStep(
                 name='merge-with-course-data',
@@ -50,7 +51,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             ))
     )
     .add_stage(
-        PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
+        PipelineStage(name='extract-data', stage_type=StageType.EXTRACT)
         .add_step(
             PipelineStep(
                 name='extract-course-semester-season',
@@ -67,7 +68,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
         )
     )
     .add_stage(
-        PipelineStage(name='generate-data', stage_type=StageType.GENERATING)
+        PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
         .add_step(
             PipelineStep(
                 name='generate-curriculum-id',
@@ -94,35 +95,26 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
         )
     )
     .add_stage(
-        PipelineStage(name='store-data', stage_type=StageType.STORING)
+        PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.CURRICULA_OUTPUT_FILE_NAME,
-                columns=Config.CURRICULA_OUTPUT_COLUMNS,
-                drop_duplicates=True
+                configuration=curricula_dataset_configuration
             )
         )
         .add_step(
             PipelineStep(
                 name='store-offers-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.OFFERS_OUTPUT_FILE_NAME,
-                columns=Config.OFFERS_OUTPUT_COLUMNS,
-                drop_duplicates=True
+                configuration=offers_dataset_configuration
             )
         )
         .add_step(
             PipelineStep(
                 name='store-includes-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.INCLUDES_OUTPUT_FILE_NAME,
-                columns=Config.INCLUDES_OUTPUT_COLUMNS,
-                drop_duplicates=True
+                configuration=includes_dataset_configuration
             )
         )
     ))

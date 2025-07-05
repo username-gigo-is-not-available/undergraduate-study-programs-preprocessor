@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.config import Config
+from src.configurations import DatasetConfiguration, ApplicationConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -10,35 +10,35 @@ from src.pipeline.common_steps import clean_course_code_step
 from src.pipeline.models.enums import StageType
 
 
-def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
+def professor_pipeline(
+        professors_dataset_configuration: DatasetConfiguration,
+        teaches_dataset_configuration: DatasetConfiguration,
+        df_courses: pd.DataFrame) -> Pipeline:
     return (Pipeline(name='professor-teaches-pipeline')
     .add_stage(
-        PipelineStage(name='load-data', stage_type=StageType.LOADING)
+        PipelineStage(name='load-data', stage_type=StageType.LOAD)
         .add_step(
             PipelineStep(
                 name='load-professor-teaches-data',
                 function=PipelineStep.read_data,
-                input_file_location=PipelineStep.get_input_file_location(),
-                input_file_name=Config.PROFESSORS_INPUT_DATA_FILE_PATH,
-                columns=Config.PROFESSORS_INPUT_COLUMNS,
-                drop_duplicates=True,
+                configuration=professors_dataset_configuration,
             )
         )
     )
     .add_stage(
-        PipelineStage(name='clean-data', stage_type=StageType.CLEANING)
+        PipelineStage(name='clean-data', stage_type=StageType.CLEAN)
         .add_step(clean_course_code_step)
         .add_step(
             PipelineStep(
                 name='clean-course-professors',
                 function=PipelineStep.apply,
-                strategy=ReplaceValuesStrategy('course_professors', Config.PROFESSOR_TITLES, '')
+                strategy=ReplaceValuesStrategy('course_professors', ApplicationConfiguration.PROFESSOR_TITLES, '')
                 .then(ReplaceValuesStrategy('course_professors', '\n', '|'))
             )
         )
     )
     .add_stage(
-        PipelineStage(name='transform-data', stage_type=StageType.TRANSFORMING)
+        PipelineStage(name='transform-data', stage_type=StageType.TRANSFORM)
         .add_step(
             PipelineStep(
                 name='flatten-course-professors',
@@ -51,7 +51,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
+        PipelineStage(name='extract-data', stage_type=StageType.EXTRACT)
         .add_step(
             PipelineStep(
                 name='extract-professor-name',
@@ -68,7 +68,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='merge-data', stage_type=StageType.MERGING)
+        PipelineStage(name='merge-data', stage_type=StageType.MERGE)
         .add_step(
             PipelineStep(
                 name='merge-with-course-data',
@@ -80,7 +80,7 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='generate-data', stage_type=StageType.GENERATING)
+        PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
         .add_step(
             PipelineStep(
                 name='generate-professors-id',
@@ -99,26 +99,19 @@ def professor_teaches_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='store-data', stage_type=StageType.STORING)
+        PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(
                 name='store-professor-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.PROFESSORS_OUTPUT_FILE_NAME,
-                columns=Config.PROFESSORS_OUTPUT_COLUMNS,
-                drop_duplicates=True,
-                drop_na=True
+                configuration=professors_dataset_configuration
             )
         )
         .add_step(
             PipelineStep(
                 name='store-teaches-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.TEACHES_OUTPUT_FILE_NAME,
-                columns=Config.TEACHES_OUTPUT_COLUMNS,
-                drop_duplicates=True
+                configuration=teaches_dataset_configuration
             )
         )
     ))

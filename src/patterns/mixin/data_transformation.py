@@ -17,7 +17,7 @@ class DataTransformationMixin:
 
     @staticmethod
     def _normalize_column_args(**kwargs) -> dict[str, Any]:
-        for key in ['input_columns', 'output_columns', 'on']:
+        for key in ['columns', 'input_columns', 'output_columns', 'on']:
             if key in kwargs:
                 kwargs[key] = DataTransformationMixin._to_list(kwargs.get(key))
         return kwargs
@@ -41,7 +41,6 @@ class DataTransformationMixin:
             df = df.drop_duplicates()
         return df
 
-
     def apply(self, df: pd.DataFrame, strategy: DataFrameStrategy) -> pd.DataFrame:
         return strategy.run(df)
 
@@ -61,11 +60,11 @@ class DataTransformationMixin:
         return df
 
     def link(self, df: pd.DataFrame,
-            value_column: str,
-            reference_column: str,
-            merge_column: str,
-            output_column: str,
-            how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
+             value_column: str,
+             reference_column: str,
+             merge_column: str,
+             output_column: str,
+             how: Literal["left", "right", "inner", "outer", "cross"]) -> pd.DataFrame:
         values_subset = df[value_column].drop_duplicates()
         reference_subset = df[[reference_column, merge_column]].drop_duplicates().rename(
             columns={merge_column: value_column})
