@@ -64,4 +64,5 @@ def course_pipeline() -> Pipeline:
                 configuration=DatasetConfiguration.COURSES,
             )
         )
-    ))
+    )
+    )
