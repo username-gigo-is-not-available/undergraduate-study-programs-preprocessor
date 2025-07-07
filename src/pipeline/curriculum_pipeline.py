@@ -15,30 +15,31 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                         df_requisites: pd.DataFrame) -> Pipeline:
     def merge_with_requisites_stage(df_requisites: pd.DataFrame) -> PipelineStage:
         return (
-        PipelineStage(
-            name='merge-data',
-            stage_type=StageType.MERGE
-        ).add_step(
-            PipelineStep(
-                name='merge-with-requisites-data',
-                function=PipelineStep.merge,
-                merge_df=df_requisites,
-                on='course_id',
-                how='left'
+            PipelineStage(
+                name='merge-data',
+                stage_type=StageType.MERGE
+            ).add_step(
+                PipelineStep(
+                    name='merge-with-requisites-data',
+                    function=PipelineStep.merge,
+                    merge_df=df_requisites,
+                    on='course_id',
+                    how='left'
+                )
+            )
+            .add_step(
+                PipelineStep(
+                    name='look-up-prerequisite-study-program-id',
+                    function=PipelineStep.look_up,
+                    left_on=['study_program_id', 'prerequisite_course_id'],
+                    right_on=['study_program_id', 'course_id'],
+                    columns=['study_program_id', 'course_id'],
+                    how='left',
+                    prefix='prerequisite_'
+                )
             )
         )
-        .add_step(
-            PipelineStep(
-                name='look-up-prerequisite-study-program-id',
-                function=PipelineStep.look_up,
-                left_on=['study_program_id', 'prerequisite_course_id'],
-                right_on=['study_program_id', 'course_id'],
-                columns=['study_program_id', 'course_id'],
-                how='left',
-                prefix='prerequisite_'
-            )
-        )
-    )
+
     def filter_invalid_curricula_stage() -> PipelineStage:
         return (
             PipelineStage(
@@ -88,9 +89,9 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                     )
                 )
             )
-    )
+        )
 
-    pipeline: Pipeline =  (Pipeline(name='curriculum-pipeline')
+    pipeline: Pipeline = (Pipeline(name='curriculum-pipeline')
     .add_stage(
         PipelineStage(name='load-data', stage_type=StageType.LOAD)
         .add_step(
@@ -145,7 +146,33 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             )
         )
     )
-    .add_stage(
+    ).build()
+
+    pipeline.add_stage(merge_with_requisites_stage(df_requisites))
+    pipeline.add_stage(filter_invalid_curricula_stage())
+    pipeline.add_stage(
+        PipelineStage(
+            name='select-data',
+            stage_type=StageType.SELECT
+        )
+        .add_step(
+            PipelineStep(
+                name='select-curricula-data',
+                function=PipelineStep.select,
+                columns=list(
+                    (
+                        set(
+                            DatasetConfiguration.CURRICULA.output_transformation_config.columns
+                        ).difference({'curriculum_id'})
+                    ).union({'course_id', 'study_program_id'})
+                ),
+                drop_duplicates=True
+            )
+        )
+    )
+    pipeline.add_stage(merge_with_requisites_stage(df_requisites))
+    pipeline.add_stage(filter_invalid_curricula_stage())
+    pipeline.add_stage(
         PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
         .add_step(
             PipelineStep(
@@ -173,26 +200,6 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             )
         )
     )
-    ).build()
-
-    pipeline.add_stage(merge_with_requisites_stage(df_requisites))
-    pipeline.add_stage(filter_invalid_curricula_stage())
-    pipeline.add_stage(
-        PipelineStage(
-            name='select-data',
-            stage_type=StageType.SELECT
-        )
-        .add_step(
-            PipelineStep(
-                name='select-curricula-data',
-                function=PipelineStep.select,
-                columns=DatasetConfiguration.CURRICULA.output_transformation_config.columns + ['course_id', 'study_program_id'],
-                drop_duplicates=True
-            )
-        )
-    )
-    pipeline.add_stage(merge_with_requisites_stage(df_requisites))
-    pipeline.add_stage(filter_invalid_curricula_stage())
     pipeline.add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
