@@ -1,4 +1,4 @@
-from enum import StrEnum, Enum, auto
+from enum import StrEnum, auto
 
 
 class UpperStrEnum(StrEnum):
@@ -10,6 +10,7 @@ class StageType(UpperStrEnum):
     LOAD: str = auto()
     SELECT: str = auto()
     CLEAN: str = auto()
+    FILTER: str = auto()
     EXTRACT: str = auto()
     TRANSFORM: str = auto()
     GENERATE: str = auto()
@@ -23,7 +24,6 @@ class CoursePrerequisiteType(UpperStrEnum):
     ONE: str = auto()
     ANY: str = auto()
     TOTAL: str = auto()
-
 
 class CourseSemesterSeasonType(UpperStrEnum):
     WINTER: str = auto()
