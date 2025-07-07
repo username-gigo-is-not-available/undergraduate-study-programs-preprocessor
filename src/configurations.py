@@ -64,7 +64,7 @@ class DatasetPathConfiguration:
 
 
 class DatasetTransformationConfiguration:
-    def __init__(self, columns: list[str], drop_duplicates: bool = False, drop_na: bool = False):
+    def __init__(self, columns: list[str], drop_duplicates: bool = True, drop_na: bool = False):
         self.columns = columns
         self.drop_duplicates = drop_duplicates
         self.drop_na = drop_na
@@ -155,7 +155,7 @@ DatasetConfiguration.REQUISITES = DatasetConfiguration(
     dataset=DatasetType.REQUISITES,
     input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.REQUISITES_INPUT),
     input_transformation_config=DatasetTransformationConfiguration(columns=[
-        "course_code", "course_name_mk", "course_prerequisites"
+         "course_prerequisites", "course_code"
     ]),
     output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.REQUISITES_OUTPUT),
     output_transformation_config=DatasetTransformationConfiguration(columns=[
@@ -187,7 +187,7 @@ DatasetConfiguration.PREREQUISITES = DatasetConfiguration(
     input_transformation_config=None,
     output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PREREQUISITES_OUTPUT),
     output_transformation_config=DatasetTransformationConfiguration(columns=[
-        "prerequisite_id", "course_prerequisite_id", "requisite_id"
+        "prerequisite_id", "prerequisite_course_id", "requisite_id"
     ],
         drop_na=True)
 )

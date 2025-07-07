@@ -26,7 +26,6 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
     .add_stage(
         PipelineStage(name='clean-data', stage_type=StageType.CLEAN)
         .add_step(clean_course_code_step)
-        .add_step(clean_course_name_mk_step)
         .add_step(
             PipelineStep(
                 name='clean-course-prerequisites',
@@ -46,7 +45,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='merge-with-course-data',
                 function=PipelineStep.merge,
                 merge_df=df_courses,
-                on=['course_code', 'course_name_mk'],
+                on='course_code',
                 how='inner'
             ))
     )
@@ -93,13 +92,12 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
         .add_step(
             PipelineStep(
-                name='link-course-prerequisite-ids',
-                function=PipelineStep.link,
-                value_column='course_prerequisites',
-                reference_column='course_id',
-                merge_column='course_name_mk',
-                output_column='course_prerequisite_id',
-                how='left',
+                name='look-up-course-prerequisite-id',
+                function=PipelineStep.look_up,
+                left_on='course_prerequisites',
+                right_on='course_name_mk',
+                columns=['course_name_mk', 'course_id'],
+                prefix='prerequisite_'
             )
         )
     )
@@ -109,7 +107,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='generate-requisite-id',
                 function=PipelineStep.uuid,
-                input_columns=['course_id', 'course_prerequisite_id', 'course_prerequisite_type'],
+                input_columns=['course_id', 'prerequisite_course_id', 'course_prerequisite_type'],
                 output_columns='requisite_id',
             )
         )
@@ -125,7 +123,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='generate-postrequisite-id',
                 function=PipelineStep.uuid,
-                input_columns=['requisite_id', 'course_prerequisite_id'],
+                input_columns=['requisite_id', 'prerequisite_course_id'],
                 output_columns='prerequisite_id',
             )
         )

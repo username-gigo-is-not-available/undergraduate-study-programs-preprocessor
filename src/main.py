@@ -18,8 +18,8 @@ def main() -> None:
     df_study_programs: pd.DataFrame = study_programs_pipeline().build().run()
     df_courses: pd.DataFrame = course_pipeline().build().run()
     professor_pipeline(df_courses).build().run()
-    curriculum_pipeline(df_study_programs, df_courses).build().run()
-    requisite_pipeline(df_courses).build().run()
+    df_requisites: pd.DataFrame = requisite_pipeline(df_courses).build().run()
+    curriculum_pipeline(df_study_programs, df_courses, df_requisites).build().run()
     logging.info(f"Time taken: {time.perf_counter() - start:.2f} seconds")
 
 
