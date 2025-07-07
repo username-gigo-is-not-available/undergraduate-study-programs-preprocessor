@@ -150,7 +150,8 @@ DatasetConfiguration.PROFESSORS = DatasetConfiguration(
     input_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PROFESSORS_INPUT),
     input_transformation_config=DatasetTransformationConfiguration(
         columns=[
-            "course_professors", "course_code"
+            "course_professors",
+            "course_code"
         ]
     ),
     output_io_config=DatasetIOConfiguration(DatasetPathConfiguration.PROFESSORS_OUTPUT),
