@@ -8,7 +8,7 @@ from src.patterns.strategy.extraction import CoursePrerequisiteTypeStrategy, Min
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
 from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
-from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
+from src.pipeline.common_steps import clean_course_code_step
 from src.pipeline.models.enums import StageType
 
 

@@ -112,66 +112,25 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 1. Professors: `professor_id`, `professor_name`, `professor_surname`
 2. Teaches: `teaches_id`, `course_id`, `professor_id`
 
-#### Curriculum:
-
-##### Load
-
-- Load the curricula data (output from the scraper) with the following columns:
-  `study_program_name`, `study_program_duration`, `study_program_url`,
-  `course_code`, `course_name_mk`, `course_url`, `course_semester`, `course_type`
-
-##### Clean
-
-- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
-  whitespaces
-- Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
-  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
-
-##### Merge
-
-- Merge with the course data on `course_code` and `course_name_mk` columns (from the processed course data)
-- Merge with the study program data on `study_program_name` and `study_program_duration` columns (from the processed
-  study program data)
-
-##### Extract
-
-- Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
-  calculated based on the `course_semester` column such that if the `course_semester` is odd, then
-  `course_semester_season` is `WINTER`, otherwise `course_semester_season` is `SUMMER`
-- Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
-  based on the `course_semester` as round up of the `course_semester` divided by 2
-
-##### Generate
-
-- Generate the `curriculum_id` by hashing the following columns `study_program_id`, `course_id`, `course_type`,
-  `course_semester`, `course_academic_year`, `course_semester_season`
-- Generate the `offers_id` by hashing the columns `study_program_id` and `curriculum_id`
-- Generate the `includes_id` by hashing the columns `course_id` and `curriculum_id`
-
-##### Store
-
-- Store the cleaned data in CSV files with the following columns:
-
-1. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
-2. Offers: `offers_id`, `curriculum_id`, `study_program_id`
-3. Includes: `includes_id`, `curriculum_id`, `course_id`
-
 #### Requisites:
 
 ##### Load
 
 - Load the courses data (output from the scraper) with the following columns:
-  `course_code`, `course_name_mk`, `course_prerequisites`
+  `course_code`, `course_prerequisites`
 
 ##### Clean
 
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
-- Clean the `course_name_mk` column by removing any leading or trailing whitespaces, as well
-  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
 - Clean the `course_prerequisite`  column by replacing newline characters with commas, removing any leading or
   trailing whitespaces, as well as occurrences of multiple whitespaces. Then concatenate the processed values with the
   pipe(`|`) separator.
+
+
+##### Merge
+
+- Merge with course data on `course_code` column
 
 ##### Extract
 
@@ -201,21 +160,100 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 - Flatten the `course_prerequisite` column by splitting the values and creating a new row for each prerequisite
   if `course_prerequisite_type` is `ANY` or `TOTAL`
-- Create the `course_prerequisite_id` by self-joining on `course_name_mk` and `course_prerequisites`
+- Create the `prerequisite_course_id` by self-joining on `course_name_mk` and `course_prerequisites`
 
 ##### Generate
 
-- Generate the `requisite_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type`
+- Generate the `requisite_id` by hashing the `course_id`, `prerequisite_course_id` and `course_prerequisite_type`
   columns
-- Generate the `prerequisite_id` by hashing the columns `course_prerequisite_id` and `requisite_id`
+- Generate the `prerequisite_id` by hashing the columns `prerequisite_course_id` and `requisite_id`
 - Generate the `postrequisite_id` by hashing the columns `course_id` and `requisite_id`
 
 ##### Store
 
 - Store the cleaned data in CSV files with the following columns:
 1. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
-2. Prerequisites: `prerequisite_id`, `requisite_id`, `course_prerequisite_id`
+2. Prerequisites: `prerequisite_id`, `requisite_id`, `prerequisite_course_id`
 3. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
+
+#### Curriculum:
+
+##### Load
+
+- Load the curricula data (output from the scraper) with the following columns:
+  `study_program_name`, `study_program_duration`, `course_code`, `course_name_mk`, `course_semester`, `course_type`
+
+##### Clean
+
+- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
+  whitespaces
+- Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
+  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
+
+##### Merge
+
+- Merge with course data on `course_code` and `course_name_mk` columns 
+- Merge with study program data on `study_program_name` and `study_program_duration` columns 
+
+##### Extract
+
+- Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
+  calculated based on the `course_semester` column such that if the `course_semester` is odd, then
+  `course_semester_season` is `WINTER`, otherwise `course_semester_season` is `SUMMER`
+- Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
+  based on the `course_semester` as round up of the `course_semester` divided by 2
+
+##### Generate
+
+- Generate the `curriculum_id` by hashing the following columns `study_program_id`, `course_id`, `course_type`,
+  `course_semester`, `course_academic_year`, `course_semester_season`
+- Generate the `offers_id` by hashing the columns `study_program_id` and `curriculum_id`
+- Generate the `includes_id` by hashing the columns `course_id` and `curriculum_id`
+
+##### Merge (Invalidate prerequisites, depth = 1)
+
+- Merge left with requisites data on `course_id` column
+- Self merge left with selected columns `study_program_id`, `course_id` left, 
+ left_on `study_program_id`, `prerequisite_course_id`, right_on `study_program_id`, `course_id`,
+ prefix the right dataframe with `prerequisite_`
+
+##### Filter (Invalidate prerequisites, depth = 1)
+
+- If `course_prerequisite_type` is `ONE`, then remove if the required course is not offered (`prerequisite_study_program_id` is `None`).
+- If `course_prerequisite_type` is `ANY`, then group by (`study_program_id`, `course_id_parent`) and remove the row for the prerequisite that is not
+  offered (`prerequisite_study_program_id` is `None` for the whole group).
+- If `course_prerequisite_type` is `TOTAL`, then group by (`study_program_id`, `course_id_parent`) and remove if the count of offered prerequisites for the group
+  is below the specified threshold (`minimum_required_number_of_courses`).
+
+##### Select
+
+- Select only the relevant columns for invalidating curricula: 
+  `study_program_id`, `course_id`, `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`,
+  `course_academic_year`
+
+##### Merge (Invalidate prerequisites, depth = 2)
+
+- Merge left with requisites data on `course_id` column
+- Self merge left with selected columns `study_program_id`, `course_id` left, 
+ left_on `study_program_id`, `prerequisite_course_id`, right_on `study_program_id`, `course_id`,
+ prefix the right dataframe with `prerequisite_`
+
+##### Filter (Invalidate prerequisites, depth = 2)
+
+- If `course_prerequisite_type` is `ONE`, then remove if the required course is not offered (`prerequisite_study_program_id` is `None`).
+- If `course_prerequisite_type` is `ANY`, then group by (`study_program_id`, `course_id_parent`) and remove the row for the prerequisite that is not
+  offered (`prerequisite_study_program_id` is `None` for the whole group).
+- If `course_prerequisite_type` is `TOTAL`, then group by (`study_program_id`, `course_id_parent`) and remove if the count of offered prerequisites for the group
+  is below the specified threshold (`minimum_required_number_of_courses`).
+
+##### Store
+
+- Store the cleaned data in CSV files with the following columns:
+
+1. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
+2. Offers: `offers_id`, `curriculum_id`, `study_program_id`
+3. Includes: `includes_id`, `curriculum_id`, `course_id`
+
 
 ### Results:
 
@@ -229,7 +267,7 @@ This ETL application will produce the following datasets:
 6. Offers: `offers_id`, `curriculum_id`, `study_program_id`
 7. Includes: `includes_id`, `curriculum_id`, `course_id`
 8. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
-9. Prerequisites: `prerequisite_id`, `requisite_id`, `course_prerequisite_id`
+9. Prerequisites: `prerequisite_id`, `requisite_id`, `prerequisite_course_id`
 10. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
 
 ## Requirements
