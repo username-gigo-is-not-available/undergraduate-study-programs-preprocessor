@@ -238,7 +238,7 @@ DatasetConfiguration.INCLUDES = DatasetConfiguration(
         [
             "includes_id",
             "curriculum_id",
-            "study_program_id"
+            "course_id"
         ]
     )
 )
