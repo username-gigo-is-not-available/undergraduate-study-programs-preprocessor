@@ -27,13 +27,6 @@ class StorageConfiguration:
     INPUT_DIRECTORY_PATH = Path(ENVIRONMENT_VARIABLES.get("INPUT_DIRECTORY_PATH", ".."))
     OUTPUT_DIRECTORY_PATH = Path(ENVIRONMENT_VARIABLES.get("OUTPUT_DIRECTORY_PATH", ".."))
 
-    INPUT_FILE_LOCATION: str | Path = (
-        INPUT_DIRECTORY_PATH if FILE_STORAGE_TYPE == "LOCAL" else MINIO_SOURCE_BUCKET_NAME
-    )
-    OUTPUT_FILE_LOCATION: str | Path = (
-        OUTPUT_DIRECTORY_PATH if FILE_STORAGE_TYPE == "LOCAL" else MINIO_DESTINATION_BUCKET_NAME
-    )
-
 
 class DatasetIOConfiguration:
     def __init__(self, file_name: str | Path):

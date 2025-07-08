@@ -24,7 +24,7 @@ class FileStorageMixin:
 
 
     def read_data(self, configuration: DatasetConfiguration) -> pd.DataFrame:
-        df: pd.DataFrame = self.file_storage_strategy.read_data(StorageConfiguration.INPUT_FILE_LOCATION, configuration.input_io_config.file_name)
+        df: pd.DataFrame = self.file_storage_strategy.read_data(configuration.input_io_config.file_name)
         if configuration.input_transformation_config.columns:
             df = df[configuration.input_transformation_config.columns]
         if configuration.input_transformation_config.drop_duplicates:
@@ -40,5 +40,5 @@ class FileStorageMixin:
             df_copy = df_copy.drop_duplicates()
         if configuration.output_transformation_config.drop_na:
             df_copy = df_copy.dropna()
-        self.file_storage_strategy.save_data(df_copy, StorageConfiguration.OUTPUT_FILE_LOCATION, configuration.output_io_config.file_name)
+        self.file_storage_strategy.save_data(df_copy, configuration.output_io_config.file_name)
         return df
