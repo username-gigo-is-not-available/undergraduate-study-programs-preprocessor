@@ -41,8 +41,9 @@ class LocalFileStorage(FileStorageStrategy):
 
 class MinioFileStorage(FileStorageStrategy):
 
-    def read_data(self, input_file_name: str) -> pd.DataFrame:
+    def read_data(self, input_file_name: Path) -> pd.DataFrame:
         try:
+            input_file_name: str = str(input_file_name)
             minio_client: Minio = MinioClient().connect()
             csv_bytes: bytes = minio_client.get_object(StorageConfiguration.MINIO_SOURCE_BUCKET_NAME, input_file_name).read()
             csv_buffer: BytesIO = BytesIO(csv_bytes)
@@ -53,6 +54,7 @@ class MinioFileStorage(FileStorageStrategy):
 
     def save_data(self, df: pd.DataFrame, output_file_name: str) -> pd.DataFrame:
         try:
+            output_file_name: str = str(output_file_name)
             minio_client: Minio = MinioClient().client
             csv_bytes: bytes = df.to_csv(index=False).encode('utf-8')
             csv_buffer: BytesIO = BytesIO(csv_bytes)
