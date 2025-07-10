@@ -3,7 +3,7 @@ from functools import cache
 
 import pandas as pd
 
-from src.config import Config
+from src.configurations import StorageConfiguration, ApplicationConfiguration
 from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.pipeline.models.enums import CourseSemesterSeasonType, CoursePrerequisiteType
 
@@ -30,7 +30,7 @@ class StudyProgramCodeStrategy(ExtractionStrategy):
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         def extract(url: str, duration: int) -> str:
             prefix: str = re.match(
-                Config.STUDY_PROGRAM_CODE_REGEX, url.split('/')[-2]).group()
+                ApplicationConfiguration.STUDY_PROGRAM_CODE_REGEX, url.split('/')[-2]).group()
             return f"{prefix}{duration}"
 
         df[self.output_column] = df.apply(
@@ -114,7 +114,7 @@ class MinimumNumberOfCoursesStrategy(ExtractionStrategy):
         @cache
         def extract(prerequisite: str, prerequisite_type: CoursePrerequisiteType) -> int:
             if prerequisite_type == CoursePrerequisiteType.TOTAL:
-                return int(re.search(r'(\d+)', prerequisite).group()) // Config.ECTS_VALUE
+                return int(re.search(r'(\d+)', prerequisite).group()) // ApplicationConfiguration.ECTS_VALUE
             return 0
 
         df[self.output_column] = df.apply(

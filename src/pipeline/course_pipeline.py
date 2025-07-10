@@ -1,4 +1,4 @@
-from src.config import Config
+from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -12,20 +12,17 @@ from src.pipeline.models.enums import StageType
 def course_pipeline() -> Pipeline:
     return (Pipeline(name='course-pipeline')
     .add_stage(
-        PipelineStage(name='load-data', stage_type=StageType.LOADING)
+        PipelineStage(name='load-data', stage_type=StageType.LOAD)
         .add_step(
             PipelineStep(
                 name='load-course-data',
                 function=PipelineStep.read_data,
-                input_file_location=PipelineStep.get_input_file_location(),
-                input_file_name=Config.COURSES_INPUT_DATA_FILE_PATH,
-                columns=Config.COURSES_INPUT_COLUMNS,
-                drop_duplicates=True,
+                configuration=DatasetConfiguration.COURSES,
             )
         )
     )
     .add_stage(
-        PipelineStage(name='clean-data', stage_type=StageType.CLEANING)
+        PipelineStage(name='clean-data', stage_type=StageType.CLEAN)
         .add_step(clean_course_code_step)
         .add_step(clean_course_name_mk_step)
         .add_step(
@@ -38,7 +35,7 @@ def course_pipeline() -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='extract-data', stage_type=StageType.EXTRACTING)
+        PipelineStage(name='extract-data', stage_type=StageType.EXTRACT)
         .add_step(
             PipelineStep(
                 name='extract-course-level',
@@ -48,7 +45,7 @@ def course_pipeline() -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='generate-data', stage_type=StageType.GENERATING)
+        PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
         .add_step(
             PipelineStep(
                 name='generate-course-id',
@@ -59,15 +56,13 @@ def course_pipeline() -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='store-data', stage_type=StageType.STORING)
+        PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(
                 name='store-course-data',
                 function=PipelineStep.save_data,
-                output_file_location=PipelineStep.get_output_file_location(),
-                output_file_name=Config.COURSES_OUTPUT_FILE_NAME,
-                columns=Config.COURSES_OUTPUT_COLUMNS,
-                drop_duplicates=True,
+                configuration=DatasetConfiguration.COURSES,
             )
         )
-    ))
+    )
+    )

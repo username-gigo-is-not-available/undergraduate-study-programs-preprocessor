@@ -18,38 +18,38 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 #### Study Program:
 
-##### Loading Stage
+##### Load
 
 - Load the study programs data (output from the scraper) with the following columns:
   `study_program_name`, `study_program_url`, `study_program_duration`
 
-##### Cleaning Stage
+##### Clean
 
 - Clean the `study_program_name` column by removing any leading or trailing whitespaces, as well as occurrences of
   multiple whitespaces
 
-##### Extraction Stage
+##### Extract
 
 - Extract `study_program_code` from `study_program_url` and `study_program_duration`. The `study_program_code` is the
   second to last part of the `study_program_url` concatenated with the `study_program_duration`
 
-##### Generation Stage
+##### Generate
 
 - Generate the `study_program_id` column by hashing `study_program_name` and `study_program_duration`
 
-##### Storing Stage
+##### Store
 
 - Store the cleaned data in a CSV file with the following
   columns: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
 
 #### Course:
 
-##### Loading Stage
+##### Load
 
 - Load the courses data (output from the scraper) with the following columns:
   `course_code`, `course_name_mk`, `course_name_en`, `course_url`
 
-##### Cleaning Stage
+##### Clean
 
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
@@ -57,28 +57,28 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
 -
 
-##### Extracting Stage:
+##### Extract:
 
 - Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the
   `course_code`
 
-##### Generation Stage
+##### Generate
 
 - Generate the `course_id` column by hashing `course_name_mk`
 
-##### Storing Stage
+##### Store
 
 - Store the cleaned data in CSV files with the following columns:
   `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
 
 #### Professor:
 
-##### Loading Stage
+##### Load
 
 - Load the courses data (output from the scraper) with the following columns:
   `course_code`,  `course_professors`
 
-##### Cleaning Stage
+##### Clean
 
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
@@ -86,94 +86,53 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   trailing whitespaces, as well as occurrences of multiple whitespaces. Remove titles and degrees from the names
   of the professors, then concatenate the processed values with the pipe(`|`) separator
 
-##### Flattening Stage
+##### Flatten
 
 - Flatten the `course_professors` column by splitting the values and creating a new row for each professor
 
-##### Extraction Stage
+##### Extract
 
 - Extract the `professor_name` column from the `course_professors` column by splitting the values and taking the first
   part
 - Extract the `professor_surname` column from the `course_professors` column by splitting the values and taking the
   second and remaining parts
 
-##### Merging Stage
+##### Merge
 
 - Merge with course data on `course_code` column (from the processed course data)
 
-##### Generation Stage
+##### Generate
 
 - Generate the `professor_id` column by hashing the column `course_professors` flattened
 
-##### Storing Stage
+##### Store
 
 - Store the cleaned data in CSV files with the following columns:
 
 1. Professors: `professor_id`, `professor_name`, `professor_surname`
 2. Teaches: `teaches_id`, `course_id`, `professor_id`
 
-#### Curriculum:
-
-##### Loading Stage
-
-- Load the curricula data (output from the scraper) with the following columns:
-  `study_program_name`, `study_program_duration`, `study_program_url`,
-  `course_code`, `course_name_mk`, `course_url`, `course_semester`, `course_type`
-
-##### Cleaning Stage
-
-- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
-  whitespaces
-- Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
-  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
-
-##### Merging Stage
-
-- Merge with the course data on `course_code` and `course_name_mk` columns (from the processed course data)
-- Merge with the study program data on `study_program_name` and `study_program_duration` columns (from the processed
-  study program data)
-
-##### Extraction Stage
-
-- Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
-  calculated based on the `course_semester` column such that if the `course_semester` is odd, then
-  `course_semester_season` is `WINTER`, otherwise `course_semester_season` is `SUMMER`
-- Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
-  based on the `course_semester` as round up of the `course_semester` divided by 2
-
-##### Generation Stage
-
-- Generate the `curriculum_id` by hashing the following columns `study_program_id`, `course_id`, `course_type`,
-  `course_semester`, `course_academic_year`, `course_semester_season`
-- Generate the `offers_id` by hashing the columns `study_program_id` and `curriculum_id`
-- Generate the `includes_id` by hashing the columns `course_id` and `curriculum_id`
-
-##### Storing Stage
-
-- Store the cleaned data in CSV files with the following columns:
-
-1. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
-2. Offers: `offers_id`, `curriculum_id`, `study_program_id`
-3. Includes: `includes_id`, `curriculum_id`, `course_id`
-
 #### Requisites:
 
-##### Loading Stage
+##### Load
 
 - Load the courses data (output from the scraper) with the following columns:
-  `course_code`, `course_name_mk`, `course_prerequisites`
+  `course_code`, `course_prerequisites`
 
-##### Cleaning Stage
+##### Clean
 
 - Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
   whitespaces
-- Clean the `course_name_mk` column by removing any leading or trailing whitespaces, as well
-  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
 - Clean the `course_prerequisite`  column by replacing newline characters with commas, removing any leading or
   trailing whitespaces, as well as occurrences of multiple whitespaces. Then concatenate the processed values with the
   pipe(`|`) separator.
 
-##### Extracting Stage
+
+##### Merge
+
+- Merge with course data on `course_code` column
+
+##### Extract
 
 - Extract the `course_prerequisite_type` column from the `course_prerequisite` column. The `course_prerequisite_type` is
   determined based on the `course_prerequisite` column such that if the `course_prerequisite` column is `нема` or `nan`,
@@ -186,7 +145,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   the course based on matching the digits in the `course_prerequisites` divided by the ECTS credits per course (`6`).
   Default value is `0`.
 
-##### Transformation Stage
+##### Transform
 
 - Transform the `course_prerequisite` column by splitting the values and validating the course names.
   if `course_prerequisite_type` is `NONE`, then `course_prerequisite` is `None`
@@ -197,25 +156,104 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   with
   the pipe(`|`) separator
 
-##### Flattening Stage
+##### Flatten
 
 - Flatten the `course_prerequisite` column by splitting the values and creating a new row for each prerequisite
   if `course_prerequisite_type` is `ANY` or `TOTAL`
-- Create the `course_prerequisite_id` by self-joining on `course_name_mk` and `course_prerequisites`
+- Create the `prerequisite_course_id` by self-joining on `course_name_mk` and `course_prerequisites`
 
-##### Generating Stage
+##### Generate
 
-- Generate the `requisite_id` by hashing the `course_id`, `course_prerequisite_id` and `course_prerequisite_type`
+- Generate the `requisite_id` by hashing the `course_id`, `prerequisite_course_id` and `course_prerequisite_type`
   columns
-- Generate the `prerequisite_id` by hashing the columns `course_prerequisite_id` and `requisite_id`
+- Generate the `prerequisite_id` by hashing the columns `prerequisite_course_id` and `requisite_id`
 - Generate the `postrequisite_id` by hashing the columns `course_id` and `requisite_id`
 
-##### Storing Stage
+##### Store
 
 - Store the cleaned data in CSV files with the following columns:
 1. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
-2. Prerequisites: `prerequisite_id`, `requisite_id`, `course_prerequisite_id`
+2. Prerequisites: `prerequisite_id`, `requisite_id`, `prerequisite_course_id`
 3. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
+
+#### Curriculum:
+
+##### Load
+
+- Load the curricula data (output from the scraper) with the following columns:
+  `study_program_name`, `study_program_duration`, `course_code`, `course_name_mk`, `course_semester`, `course_type`
+
+##### Clean
+
+- Clean the `course_code` column by removing any leading or trailing whitespaces, as well as occurrences of multiple
+  whitespaces
+- Clean the `study_program_name` and `course_name_mk` columns by removing any leading or trailing whitespaces, as well
+  as occurrences of multiple whitespaces, and converting the text to sentence case while preserving acronyms
+
+##### Merge
+
+- Merge with course data on `course_code` and `course_name_mk` columns 
+- Merge with study program data on `study_program_name` and `study_program_duration` columns 
+
+##### Extract
+
+- Extract the `course_semester_season` column from the `course_semester` column. The `course_semester_season` is
+  calculated based on the `course_semester` column such that if the `course_semester` is odd, then
+  `course_semester_season` is `WINTER`, otherwise `course_semester_season` is `SUMMER`
+- Extract the `course_academic_year` column from the `course_semester` column. The `course_academic_year` is calculated
+  based on the `course_semester` as round up of the `course_semester` divided by 2
+
+##### Generate
+
+- Generate the `curriculum_id` by hashing the following columns `study_program_id`, `course_id`, `course_type`,
+  `course_semester`, `course_academic_year`, `course_semester_season`
+- Generate the `offers_id` by hashing the columns `study_program_id` and `curriculum_id`
+- Generate the `includes_id` by hashing the columns `course_id` and `curriculum_id`
+
+##### Merge (Invalidate prerequisites, depth = 1)
+
+- Merge left with requisites data on `course_id` column
+- Self merge left with selected columns `study_program_id`, `course_id` left, 
+ left_on `study_program_id`, `prerequisite_course_id`, right_on `study_program_id`, `course_id`,
+ prefix the right dataframe with `prerequisite_`
+
+##### Filter (Invalidate prerequisites, depth = 1)
+
+- If `course_prerequisite_type` is `ONE`, then remove if the required course is not offered (`prerequisite_study_program_id` is `None`).
+- If `course_prerequisite_type` is `ANY`, then group by (`study_program_id`, `course_id_parent`) and remove the row for the prerequisite that is not
+  offered (`prerequisite_study_program_id` is `None` for the whole group).
+- If `course_prerequisite_type` is `TOTAL`, then group by (`study_program_id`, `course_id_parent`) and remove if the count of offered prerequisites for the group
+  is below the specified threshold (`minimum_required_number_of_courses`).
+
+##### Select
+
+- Select only the relevant columns for invalidating curricula: 
+  `study_program_id`, `course_id`, `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`,
+  `course_academic_year`
+
+##### Merge (Invalidate prerequisites, depth = 2)
+
+- Merge left with requisites data on `course_id` column
+- Self merge left with selected columns `study_program_id`, `course_id` left, 
+ left_on `study_program_id`, `prerequisite_course_id`, right_on `study_program_id`, `course_id`,
+ prefix the right dataframe with `prerequisite_`
+
+##### Filter (Invalidate prerequisites, depth = 2)
+
+- If `course_prerequisite_type` is `ONE`, then remove if the required course is not offered (`prerequisite_study_program_id` is `None`).
+- If `course_prerequisite_type` is `ANY`, then group by (`study_program_id`, `course_id_parent`) and remove the row for the prerequisite that is not
+  offered (`prerequisite_study_program_id` is `None` for the whole group).
+- If `course_prerequisite_type` is `TOTAL`, then group by (`study_program_id`, `course_id_parent`) and remove if the count of offered prerequisites for the group
+  is below the specified threshold (`minimum_required_number_of_courses`).
+
+##### Store
+
+- Store the cleaned data in CSV files with the following columns:
+
+1. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
+2. Offers: `offers_id`, `curriculum_id`, `study_program_id`
+3. Includes: `includes_id`, `curriculum_id`, `course_id`
+
 
 ### Results:
 
@@ -229,7 +267,7 @@ This ETL application will produce the following datasets:
 6. Offers: `offers_id`, `curriculum_id`, `study_program_id`
 7. Includes: `includes_id`, `curriculum_id`, `course_id`
 8. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
-9. Prerequisites: `prerequisite_id`, `requisite_id`, `course_prerequisite_id`
+9. Prerequisites: `prerequisite_id`, `requisite_id`, `prerequisite_course_id`
 10. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
 
 ## Requirements
@@ -241,9 +279,10 @@ This ETL application will produce the following datasets:
 Before running the scraper, make sure to set the following environment variables:
 
 - `FILE_STORAGE_TYPE`: the type of storage to use (either `LOCAL` or `MINIO`)
-- `STUDY_PROGRAMS_INPUT_DATA_FILE_PATH`: the path to the study programs data file
-- `CURRICULA_INPUT_DATA_FILE_PATH`: the path to the curricula data file
-- `COURSE_INPUT_DATA_FILE_PATH`: the path to the courses data file
+- `STUDY_PROGRAMS_DATA_INPUT_FILE_PATH`: the path to the study programs data file
+- `CURRICULA_DATA_INPUT_FILE_PATH`: the path to the curricula data file
+- `COURSE_DATA_INPUT_FILE_PATH`: the path to the courses data file
+
 - `STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME`: the name of the study programs output file
 - `COURSES_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
 - `PROFESSORS_DATA_OUTPUT_FILE_NAME`: the name of the professors output file
@@ -255,12 +294,12 @@ Before running the scraper, make sure to set the following environment variables
 - `PREREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the prerequisites output file
 - `POSTREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the postrequisites output file
 
-##### If running the application with local storage:
+#### If running the application with local storage:
 
 - `INPUT_DIRECTORY_PATH`: the path to the directory where the input files are stored
 - `OUTPUT_DIRECTORY_PATH`: the path to the directory where the output files will be saved
 
-##### If running the application with MinIO:
+#### If running the application with MinIO:
 
 - `MINIO_ENDPOINT_URL`: the endpoint of the MinIO server
 - `MINIO_ACCESS_KEY`: the access key of the MinIO server

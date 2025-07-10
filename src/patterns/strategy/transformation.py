@@ -2,7 +2,7 @@ from difflib import SequenceMatcher
 from functools import cache
 import pandas as pd
 
-from src.config import Config
+from src.configurations import StorageConfiguration, ApplicationConfiguration
 from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.pipeline.models.enums import CoursePrerequisiteType
 
@@ -22,7 +22,7 @@ class MatchingStrategy(DataFrameStrategy):
         similarity = {}
         for value in values:
             similarity[value] = SequenceMatcher(None, arg, value).ratio()
-            if similarity[value] == Config.MAXIMUM_SIMILARITY_RATIO:
+            if similarity[value] == ApplicationConfiguration.MAXIMUM_SIMILARITY_RATIO:
                 return value
 
         return max(similarity, key=lambda k: similarity[k]) if similarity else None

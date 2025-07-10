@@ -1,12 +1,12 @@
 from minio import Minio
 
-from src.config import Config
+from src.configurations import StorageConfiguration
 
 
 class MinioClient:
-    MINIO_ENDPOINT_URL: str = Config.MINIO_ENDPOINT_URL
-    MINIO_ACCESS_KEY: str = Config.MINIO_ACCESS_KEY
-    MINIO_SECRET_KEY: str = Config.MINIO_SECRET_KEY
+    MINIO_ENDPOINT_URL: str = StorageConfiguration.MINIO_ENDPOINT_URL
+    MINIO_ACCESS_KEY: str = StorageConfiguration.MINIO_ACCESS_KEY
+    MINIO_SECRET_KEY: str = StorageConfiguration.MINIO_SECRET_KEY
     _instance: 'MinioClient' = None
 
     def __new__(cls, *args, **kwargs):

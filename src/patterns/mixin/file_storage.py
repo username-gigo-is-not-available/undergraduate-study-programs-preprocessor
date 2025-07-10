@@ -4,56 +4,41 @@ import pandas as pd
 from minio import Minio
 
 from src.clients import MinioClient
-from src.config import Config
+from src.configurations import StorageConfiguration, DatasetConfiguration
 from src.patterns.strategy.file_storage import LocalFileStorage, MinioFileStorage
 
 
 class FileStorageMixin:
     def __init__(self):
-        if Config.FILE_STORAGE_TYPE == 'LOCAL':
-            if not Config.OUTPUT_DIRECTORY_PATH.exists():
-                Config.OUTPUT_DIRECTORY_PATH.mkdir(parents=True)
+        if StorageConfiguration.FILE_STORAGE_TYPE == 'LOCAL':
+            if not StorageConfiguration.OUTPUT_DIRECTORY_PATH.exists():
+                StorageConfiguration.OUTPUT_DIRECTORY_PATH.mkdir(parents=True)
             self.file_storage_strategy = LocalFileStorage()
-        elif Config.FILE_STORAGE_TYPE == 'MINIO':
+        elif StorageConfiguration.FILE_STORAGE_TYPE == 'MINIO':
             minio_client: Minio = MinioClient().connect()
-            if not minio_client.bucket_exists(Config.MINIO_DESTINATION_BUCKET_NAME):
-                minio_client.make_bucket(Config.MINIO_DESTINATION_BUCKET_NAME)
+            if not minio_client.bucket_exists(StorageConfiguration.MINIO_DESTINATION_BUCKET_NAME):
+                minio_client.make_bucket(StorageConfiguration.MINIO_DESTINATION_BUCKET_NAME)
             self.file_storage_strategy = MinioFileStorage()
         else:
-            raise ValueError(f"Unsupported storage type: {Config.FILE_STORAGE_TYPE}")
+            raise ValueError(f"Unsupported storage type: {StorageConfiguration.FILE_STORAGE_TYPE}")
 
-    @classmethod
-    def get_input_file_location(cls) -> str | None | Path:
-        if Config.FILE_STORAGE_TYPE == 'LOCAL':
-            return Config.INPUT_DIRECTORY_PATH
-        elif Config.FILE_STORAGE_TYPE == 'MINIO':
-            return Config.MINIO_SOURCE_BUCKET_NAME
 
-    @classmethod
-    def get_output_file_location(cls) -> str | None | Path:
-        if Config.FILE_STORAGE_TYPE == 'LOCAL':
-            return Config.OUTPUT_DIRECTORY_PATH
-        elif Config.FILE_STORAGE_TYPE == 'MINIO':
-            return Config.MINIO_DESTINATION_BUCKET_NAME
-
-    def read_data(self, input_file_location: Path | str, input_file_name: Path, columns: list[str] = None,
-                  drop_duplicates: bool = False) -> pd.DataFrame:
-        df: pd.DataFrame = self.file_storage_strategy.read_data(input_file_location, input_file_name)
-        if columns:
-            df = df[columns]
-        if drop_duplicates:
+    def read_data(self, configuration: DatasetConfiguration) -> pd.DataFrame:
+        df: pd.DataFrame = self.file_storage_strategy.read_data(configuration.input_io_config.file_name)
+        if configuration.input_transformation_config.columns:
+            df = df[configuration.input_transformation_config.columns]
+        if configuration.input_transformation_config.drop_duplicates:
             df = df.drop_duplicates()
+        if configuration.input_transformation_config.drop_na:
+            df = df.dropna()
         return df
 
-    def save_data(self, df: pd.DataFrame, output_file_location: Path | str, output_file_name: Path,
-                  columns: list[str],
-                  drop_duplicates: bool = False,
-                  drop_na: bool = False) -> pd.DataFrame:
-        columns = [col for col in columns if col in df.columns]
-        df_copy = df.copy()[columns]
-        if drop_duplicates:
+    def save_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
+        columns: list[str] = [col for col in configuration.output_transformation_config.columns if col in df.columns]
+        df_copy: pd.DataFrame = df.copy()[columns]
+        if configuration.output_transformation_config.drop_duplicates:
             df_copy = df_copy.drop_duplicates()
-        if drop_na:
+        if configuration.output_transformation_config.drop_na:
             df_copy = df_copy.dropna()
-        self.file_storage_strategy.save_data(df_copy, output_file_location, output_file_name)
+        self.file_storage_strategy.save_data(df_copy, configuration.output_io_config.file_name)
         return df
