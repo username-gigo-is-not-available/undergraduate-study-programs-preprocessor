@@ -113,18 +113,18 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
         .add_step(
             PipelineStep(
-                name='generate-prerequisite-id',
+                name='generate-requires-id',
                 function=PipelineStep.uuid,
                 input_columns=['requisite_id', 'course_id'],
-                output_columns='postrequisite_id',
+                output_columns='requires_id',
             )
         )
         .add_step(
             PipelineStep(
-                name='generate-postrequisite-id',
+                name='generate-satisfies-id',
                 function=PipelineStep.uuid,
                 input_columns=['requisite_id', 'prerequisite_course_id'],
-                output_columns='prerequisite_id',
+                output_columns='satisfies_id',
             )
         )
     )
@@ -138,16 +138,16 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             ))
         .add_step(
             PipelineStep(
-                name='store-prerequisites-data',
+                name='store-requires-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.PREREQUISITES
+                configuration=DatasetConfiguration.REQUIRES
             )
         )
         .add_step(
             PipelineStep(
-                name='store-postrequisites-data',
+                name='store-satisfies-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.POSTREQUISITES
+                configuration=DatasetConfiguration.SATISFIES
             )
         )
     ))

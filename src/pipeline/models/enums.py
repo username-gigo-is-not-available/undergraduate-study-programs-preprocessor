@@ -37,6 +37,6 @@ class DatasetType(UpperStrEnum):
     REQUISITES: str = auto()
     OFFERS: str = auto()
     INCLUDES: str = auto()
-    PREREQUISITES: str = auto()
-    POSTREQUISITES: str = auto()
+    REQUIRES: str = auto()
+    SATISFIES: str = auto()
     TEACHES: str = auto()

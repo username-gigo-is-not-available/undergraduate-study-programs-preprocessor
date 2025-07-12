@@ -166,15 +166,15 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 - Generate the `requisite_id` by hashing the `course_id`, `prerequisite_course_id` and `course_prerequisite_type`
   columns
-- Generate the `prerequisite_id` by hashing the columns `prerequisite_course_id` and `requisite_id`
-- Generate the `postrequisite_id` by hashing the columns `course_id` and `requisite_id`
+- Generate the `requires_id` by hashing the columns `course_id` and `requisite_id`
+- Generate the `satisfies_id` by hashing the columns `prerequisite_course_id` and `requisite_id`
 
 ##### Store
 
 - Store the cleaned data in CSV files with the following columns:
 1. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
-2. Prerequisites: `prerequisite_id`, `requisite_id`, `prerequisite_course_id`
-3. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
+2. Requires: `requires_id`, `requisite_id`, `course_id`
+3. Satisfies: `satisfies_id`, `requisite_id`, `prerequisite_course_id`
 
 #### Curriculum:
 
@@ -210,14 +210,14 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Generate the `offers_id` by hashing the columns `study_program_id` and `curriculum_id`
 - Generate the `includes_id` by hashing the columns `course_id` and `curriculum_id`
 
-##### Merge (Invalidate prerequisites, depth = 1)
+##### Merge (Invalidate offers, depth = 1)
 
 - Merge left with requisites data on `course_id` column
 - Self merge left with selected columns `study_program_id`, `course_id` left, 
  left_on `study_program_id`, `prerequisite_course_id`, right_on `study_program_id`, `course_id`,
  prefix the right dataframe with `prerequisite_`
 
-##### Filter (Invalidate prerequisites, depth = 1)
+##### Filter (Invalidate offers, depth = 1)
 
 - If `course_prerequisite_type` is `ONE`, then remove if the required course is not offered (`prerequisite_study_program_id` is `None`).
 - If `course_prerequisite_type` is `ANY`, then group by (`study_program_id`, `course_id_parent`) and remove the row for the prerequisite that is not
@@ -231,14 +231,14 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   `study_program_id`, `course_id`, `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`,
   `course_academic_year`
 
-##### Merge (Invalidate prerequisites, depth = 2)
+##### Merge (Invalidate offers, depth = 2)
 
 - Merge left with requisites data on `course_id` column
 - Self merge left with selected columns `study_program_id`, `course_id` left, 
  left_on `study_program_id`, `prerequisite_course_id`, right_on `study_program_id`, `course_id`,
  prefix the right dataframe with `prerequisite_`
 
-##### Filter (Invalidate prerequisites, depth = 2)
+##### Filter (Invalidate offers, depth = 2)
 
 - If `course_prerequisite_type` is `ONE`, then remove if the required course is not offered (`prerequisite_study_program_id` is `None`).
 - If `course_prerequisite_type` is `ANY`, then group by (`study_program_id`, `course_id_parent`) and remove the row for the prerequisite that is not
@@ -267,8 +267,8 @@ This ETL application will produce the following datasets:
 6. Offers: `offers_id`, `curriculum_id`, `study_program_id`
 7. Includes: `includes_id`, `curriculum_id`, `course_id`
 8. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
-9. Prerequisites: `prerequisite_id`, `requisite_id`, `prerequisite_course_id`
-10. Postrequisites: `postrequisite_id`, `requisite_id`, `course_id`
+9. Requires: `requires_id`, `requisite_id`, `course_id`
+10. Satisfies: `satisfies_id`, `requisite_id`, `prerequisite_course_id`
 
 ## Requirements
 
@@ -291,8 +291,8 @@ Before running the scraper, make sure to set the following environment variables
 - `OFFERS_DATA_OUTPUT_FILE_NAME`: the name of the offers output file
 - `INCLUDES_DATA_OUTPUT_FILE_NAME`: the name of the includes output file
 - `REQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the requisites output file
-- `PREREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the prerequisites output file
-- `POSTREQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the postrequisites output file
+- `REQUIRES_DATA_OUTPUT_FILE_NAME`: the name of the requires output file
+- `SATISFIES_DATA_OUTPUT_FILE_NAME`: the name of the satisfies output file
 
 #### If running the application with local storage:
 
