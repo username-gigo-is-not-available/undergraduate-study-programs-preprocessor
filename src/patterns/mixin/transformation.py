@@ -4,11 +4,14 @@ from typing import Any, Literal
 
 import pandas as pd
 
+from src.configurations import DatasetIOConfiguration, DatasetConfiguration
+from src.patterns.mixin.storage import StorageMixin
+from src.patterns.mixin.validation import SchemaValidationMixin
 from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.patterns.strategy.filtering import FilteringStrategy
 
 
-class DataTransformationMixin:
+class DataTransformationMixin(StorageMixin, SchemaValidationMixin):
 
     @staticmethod
     def _to_list(value: str | list[str]) -> list[str]:
@@ -50,7 +53,8 @@ class DataTransformationMixin:
         new_merge_df: pd.DataFrame = merge_df.rename(columns={
             col: f"{prefix}{col}" for col in duplicate_columns
         })
-        new_right_on: list[str] = [f"{prefix}{col}" if col in duplicate_columns else col for col in right_on] if right_on else None
+        new_right_on: list[str] = [f"{prefix}{col}" if col in duplicate_columns else col for col in
+                                   right_on] if right_on else None
 
         return new_merge_df, new_right_on
 
@@ -136,3 +140,30 @@ class DataTransformationMixin:
         lookup: pd.DataFrame = pd.DataFrame(df[columns]).drop_duplicates()
         lookup, right_on = self._apply_prefix(df, lookup, on, left_on, right_on, prefix)
         return pd.merge(df, lookup, left_on=left_on, right_on=right_on, how=how)
+
+    def apply_io_configuration(self, df: pd.DataFrame, configuration: DatasetIOConfiguration) -> pd.DataFrame:
+        if configuration.columns:
+            df = df[configuration.columns]
+        if configuration.drop_duplicates:
+            df = df.drop_duplicates()
+        if configuration.drop_na:
+            df = df.dropna()
+        return df
+
+    def read_data(self, configuration: DatasetConfiguration) -> pd.DataFrame:
+        df: pd.DataFrame = self.storage_strategy.read_data(configuration.input_io_configuration.file_name)
+        return self.apply_io_configuration(df, configuration.input_io_configuration)
+
+    def validate_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
+        schema: dict = self.storage_strategy.load_schema(configuration.schema_configuration.file_name)
+        df_copy = df.copy()
+        df_copy = self.apply_io_configuration(df_copy, configuration.output_io_configuration)
+        super().validate_data(df_copy, schema)
+        return df
+
+    def save_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
+        df_copy: pd.DataFrame = df.copy()
+        df_copy = self.apply_io_configuration(df_copy, configuration.output_io_configuration)
+        self.storage_strategy.save_data(df_copy, configuration.output_io_configuration.file_name,
+                                        configuration.schema_configuration.file_name)
+        return df

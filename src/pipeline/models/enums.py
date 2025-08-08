@@ -16,6 +16,7 @@ class StageType(UpperStrEnum):
     GENERATE: str = auto()
     FLATTEN: str = auto()
     MERGE: str = auto()
+    VALIDATE = auto()
     STORE: str = auto()
 
 

@@ -162,7 +162,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 columns=list(
                     (
                         set(
-                            DatasetConfiguration.CURRICULA.output_transformation_config.columns
+                            DatasetConfiguration.CURRICULA.output_io_configuration.columns
                         ).difference({'curriculum_id'})
                     ).union({'course_id', 'study_program_id'})
                 ),
@@ -197,6 +197,30 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 function=PipelineStep.uuid,
                 input_columns=['curriculum_id', 'course_id'],
                 output_columns='includes_id',
+            )
+        )
+    )
+    pipeline.add_stage(
+        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
+        .add_step(
+            PipelineStep(
+                name='validate-curriculum-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.CURRICULA,
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='validate-offers-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.OFFERS,
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='validate-includes-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.INCLUDES,
             )
         )
     )

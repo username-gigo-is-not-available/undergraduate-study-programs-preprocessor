@@ -1,0 +1,36 @@
+{
+  "type": "record",
+  "name": "Requisite",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Contains the details about a requisite",
+  "fields": [
+    {
+      "name": "requisite_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the requisite"
+    },
+    {
+      "name": "course_prerequisite_type",
+      "type": {
+        "type": "enum",
+        "name": "CoursePrerequisiteType",
+        "symbols": [
+          "ONE",
+          "ANY",
+          "TOTAL"
+        ],
+        "doc": "The type of prerequisite logic: ONE (exactly one), ANY (at least one), or TOTAL (at least N)."
+      },
+      "doc": "The logical type of prerequisite condition required for enrollment."
+    },
+    {
+      "name": "minimum_required_number_of_courses",
+      "type": "int",
+      "doc": "Minimum number of prerequisite courses that must be passed to satisfy the condition (range: [0, 34])."
+    }
+  ]
+}
+

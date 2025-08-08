@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "Teaches",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Represents the association between a professor and a specific course it teaches.",
+  "fields": [
+    {
+      "name": "teaches_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the offer linking the study program and curriculum."
+    },
+    {
+      "name": "professor_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the professor teaching the course."
+    },
+    {
+      "name": "course_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the course taught by the professor."
+    }
+  ]
+}

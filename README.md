@@ -37,9 +37,13 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 - Generate the `study_program_id` column by hashing `study_program_name` and `study_program_duration`
 
+##### Validate
+
+- Validate the study program data against the schema `study_program.avsc`
+
 ##### Store
 
-- Store the cleaned data in a CSV file with the following
+- Store the cleaned data in a file with the following
   columns: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
 
 #### Course:
@@ -66,9 +70,13 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 - Generate the `course_id` column by hashing `course_name_mk`
 
+##### Validate
+
+- Validate the course data against the schema `course.avsc`
+
 ##### Store
 
-- Store the cleaned data in CSV files with the following columns:
+- Store the cleaned data in AVRO files with the following columns:
   `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
 
 #### Professor:
@@ -105,9 +113,14 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 - Generate the `professor_id` column by hashing the column `course_professors` flattened
 
+##### Validate
+
+- Validate the professor data against the schema `professor.avsc`
+- Validate the teaches data against the schema `teaches.avsc`
+
 ##### Store
 
-- Store the cleaned data in CSV files with the following columns:
+- Store the cleaned data in AVRO files with the following columns:
 
 1. Professors: `professor_id`, `professor_name`, `professor_surname`
 2. Teaches: `teaches_id`, `course_id`, `professor_id`
@@ -169,9 +182,16 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Generate the `requires_id` by hashing the columns `course_id` and `requisite_id`
 - Generate the `satisfies_id` by hashing the columns `prerequisite_course_id` and `requisite_id`
 
+##### Validate
+
+- Validate the requisite data against the schema `requisite.avsc`
+- Validate the requires data against the schema `requires.avsc`
+- Validate the satisfies data against the schema `satisfies.avsc`
+
+
 ##### Store
 
-- Store the cleaned data in CSV files with the following columns:
+- Store the cleaned data in AVRO files with the following columns:
 1. Requisites: `requisite_id`, `course_prerequisite_type`, `minimum_required_number_of_courses`
 2. Requires: `requires_id`, `requisite_id`, `course_id`
 3. Satisfies: `satisfies_id`, `requisite_id`, `prerequisite_course_id`
@@ -246,9 +266,15 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - If `course_prerequisite_type` is `TOTAL`, then group by (`study_program_id`, `course_id_parent`) and remove if the count of offered prerequisites for the group
   is below the specified threshold (`minimum_required_number_of_courses`).
 
+##### Validate
+
+- Validate the curricula data against the schema `curriculum.avsc`
+- Validate the offers data against the schema `offers.avsc`
+- Validate the includes data against the schema `includes.avsc`
+
 ##### Store
 
-- Store the cleaned data in CSV files with the following columns:
+- Store the cleaned data in AVRO files with the following columns:
 
 1. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
 2. Offers: `offers_id`, `curriculum_id`, `study_program_id`
@@ -276,7 +302,7 @@ This ETL application will produce the following datasets:
 
 ## Environment Variables
 
-Before running the scraper, make sure to set the following environment variables:
+Before running the application, make sure to set the following environment variables:
 
 - `FILE_STORAGE_TYPE`: the type of storage to use (either `LOCAL` or `MINIO`)
 - `STUDY_PROGRAMS_DATA_INPUT_FILE_PATH`: the path to the study programs data file
@@ -284,15 +310,26 @@ Before running the scraper, make sure to set the following environment variables
 - `COURSE_DATA_INPUT_FILE_PATH`: the path to the courses data file
 
 - `STUDY_PROGRAMS_DATA_OUTPUT_FILE_NAME`: the name of the study programs output file
-- `COURSES_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
-- `PROFESSORS_DATA_OUTPUT_FILE_NAME`: the name of the professors output file
-- `TEACHES_DATA_OUTPUT_FILE_NAME`: the name of the teaches output file
 - `CURRICULA_DATA_OUTPUT_FILE_NAME`: the name of the curricula output file
+- `COURSES_DATA_OUTPUT_FILE_NAME`: the name of the courses output file
+- `REQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the requisites output file
+- `PROFESSORS_DATA_OUTPUT_FILE_NAME`: the name of the professors output file
 - `OFFERS_DATA_OUTPUT_FILE_NAME`: the name of the offers output file
 - `INCLUDES_DATA_OUTPUT_FILE_NAME`: the name of the includes output file
-- `REQUISITES_DATA_OUTPUT_FILE_NAME`: the name of the requisites output file
 - `REQUIRES_DATA_OUTPUT_FILE_NAME`: the name of the requires output file
 - `SATISFIES_DATA_OUTPUT_FILE_NAME`: the name of the satisfies output file
+- `TEACHES_DATA_OUTPUT_FILE_NAME`: the name of the teaches output file
+
+- `STUDY_PROGRAMS_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `StudyProgram` record is stored
+- `CURRICULA_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Curriculum` record is stored
+- `COURSES_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Course` record is stored
+- `REQUISITES_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Requisite` record is stored
+- `PROFESSORS_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Professor` record is stored
+- `OFFERS_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Offers` record is stored
+- `INCLUDES_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Includes` record is stored
+- `REQUIRES_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Requires` record is stored
+- `SATISFIES_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Satisfies` record is stored
+- `TEACHES_SCHEMA_FILE_NAME`: the name of the file where the avro schema for the `Teaches` record is stored
 
 #### If running the application with local storage:
 
@@ -304,8 +341,10 @@ Before running the scraper, make sure to set the following environment variables
 - `MINIO_ENDPOINT_URL`: the endpoint of the MinIO server
 - `MINIO_ACCESS_KEY`: the access key of the MinIO server
 - `MINIO_SECRET_KEY`: the secret key of the MinIO server
-- `MINIO_SOURCE_BUCKET_NAME`: the name of the bucket where the input files are stored
-- `MINIO_DESTINATION_BUCKET_NAME`: the name of the bucket where the output files will be saved
+- `MINIO_INPUT_DATA_BUCKET_NAME`: the name of the bucket where the input files are stored
+- `MINIO_OUTPUT_DATA_BUCKET_NAME`: the name of the bucket where the output data files will be saved
+- `MINIO_SCHEMA_BUCKET_NAME`: the name of the bucket where the schema files are stored
+
 
 ## Installation
 
