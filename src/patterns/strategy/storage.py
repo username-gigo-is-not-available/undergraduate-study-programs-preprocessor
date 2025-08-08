@@ -48,6 +48,7 @@ class LocalStorage(StorageStrategy):
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         path: Path = StorageConfiguration.INPUT_DATA_DIRECTORY_PATH / input_file_name
         try:
+            logging.info(f"Reading data from local storage {path}")
             with open(path, "rb") as f:
                 records: list[dict[str, Any]] = list(reader(f))
             return pd.DataFrame(records)
@@ -61,6 +62,7 @@ class LocalStorage(StorageStrategy):
     def save_data(self, df: pd.DataFrame, output_file_name: Path, schema_file_name: Path) -> pd.DataFrame:
         path: Path = StorageConfiguration.OUTPUT_DATA_DIRECTORY_PATH / output_file_name
         try:
+            logging.info(f"Saving data to local storage {path}")
             schema: dict =  self.load_schema(schema_file_name)
             buffer: BytesIO = self.serialize(df, schema)
             with open(path, "wb") as f:
@@ -97,6 +99,7 @@ class MinioStorage(StorageStrategy):
             minio: Minio = MinioClient().connect()
             data: bytes = minio.get_object(StorageConfiguration.MINIO_INPUT_DATA_BUCKET_NAME, input_file_name).read()
             buffer: BytesIO = BytesIO(data)
+            logging.info(f"Reading data from MinIO bucket: {StorageConfiguration.MINIO_INPUT_DATA_BUCKET_NAME}/{input_file_name}")
             return pd.DataFrame(list(reader(buffer)))
         except S3Error as e:
             logging.error(
@@ -116,7 +119,7 @@ class MinioStorage(StorageStrategy):
                 length=buffer.getbuffer().nbytes,
                 content_type='application/avro'
             )
-            logging.info(f"Saved data to MinIO bucket: {StorageConfiguration.MINIO_OUTPUT_DATA_BUCKET_NAME}")
+            logging.info(f"Saved data to MinIO bucket: {StorageConfiguration.MINIO_OUTPUT_DATA_BUCKET_NAME}/{output_file_name}")
             return df
         except S3Error as e:
             logging.error(

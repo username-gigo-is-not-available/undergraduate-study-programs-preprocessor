@@ -27,6 +27,7 @@ class StorageMixin:
     def read_data(self, configuration: DatasetConfiguration) -> pd.DataFrame:
         df: pd.DataFrame = self.storage_strategy.read_data(configuration.input_io_configuration.file_name)
         return df
+
     def save_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
         self.storage_strategy.save_data(df, configuration.output_io_configuration.file_name,
                                         configuration.schema_configuration.file_name)
