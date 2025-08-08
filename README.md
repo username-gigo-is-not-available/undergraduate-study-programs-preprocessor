@@ -1,4 +1,4 @@
-# FCSE-Skopje 2023 Undergraduate Study Programs preprocessor
+# FCSE-Skopje 2023 Undergraduate Study Programs Preprocessor
 
 The preprocessor application is used to transform the study programs and related courses from
 the [Faculty of Computer Science and Engineering](https://finki.ukim.mk) at
