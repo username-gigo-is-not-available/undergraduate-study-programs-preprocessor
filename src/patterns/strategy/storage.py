@@ -95,11 +95,11 @@ class MinioStorage(StorageStrategy):
 
     def read_data(self, input_file_name: Path) -> pd.DataFrame:
         try:
+            logging.info(f"Reading data from MinIO bucket: {StorageConfiguration.MINIO_INPUT_DATA_BUCKET_NAME}/{input_file_name}")
             input_file_name: str = str(input_file_name)
             minio: Minio = MinioClient().connect()
             data: bytes = minio.get_object(StorageConfiguration.MINIO_INPUT_DATA_BUCKET_NAME, input_file_name).read()
             buffer: BytesIO = BytesIO(data)
-            logging.info(f"Reading data from MinIO bucket: {StorageConfiguration.MINIO_INPUT_DATA_BUCKET_NAME}/{input_file_name}")
             return pd.DataFrame(list(reader(buffer)))
         except S3Error as e:
             logging.error(
