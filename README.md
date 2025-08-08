@@ -333,8 +333,8 @@ Before running the application, make sure to set the following environment varia
 
 #### If running the application with local storage:
 
-- `INPUT_DIRECTORY_PATH`: the path to the directory where the input files are stored
-- `OUTPUT_DIRECTORY_PATH`: the path to the directory where the output files will be saved
+- `INPUT_DATA_DIRECTORY_PATH`: the path to the directory where the input files are stored
+- `OUTPUT_DATA_DIRECTORY_PATH`: the path to the directory where the output files will be saved
 
 #### If running the application with MinIO:
 
