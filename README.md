@@ -1,6 +1,6 @@
-# FCSE-Skopje 2023 Undergraduate Study Programs ETL
+# FCSE-Skopje 2023 Undergraduate Study Programs preprocessor
 
-The ETL application is used to transform the study programs and related courses from
+The preprocessor application is used to transform the study programs and related courses from
 the [Faculty of Computer Science and Engineering](https://finki.ukim.mk) at
 the [Ss. Cyril and Methodius University in Skopje](https://www.ukim.edu.mk).
 which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-studii).
@@ -10,7 +10,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 - Data from
   the [undergraduate-study-program-scraper](https://github.com/username-gigo-is-not-available/undergraduate-study-programs-scraper)
   is
-  required to run this ETL application.
+  required to run this application.
 
 ## Overview
 
@@ -283,7 +283,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 ### Results:
 
-This ETL application will produce the following datasets:
+This preprocessor will produce the following datasets:
 
 1. Study Programs: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
 2. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
