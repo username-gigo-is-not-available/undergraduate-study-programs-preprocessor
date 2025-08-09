@@ -67,7 +67,7 @@ class PathConfiguration:
 class DatasetIOConfiguration:
     def __init__(self, file_name: str | Path,
                  columns: list[str] | None = None,
-                 drop_duplicates: bool = False,
+                 drop_duplicates: bool = True,
                  drop_na: bool = False):
         self.file_name = file_name
         self.columns = columns
