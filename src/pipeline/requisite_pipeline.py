@@ -113,18 +113,42 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
         .add_step(
             PipelineStep(
-                name='generate-prerequisite-id',
+                name='generate-requires-id',
                 function=PipelineStep.uuid,
                 input_columns=['requisite_id', 'course_id'],
-                output_columns='postrequisite_id',
+                output_columns='requires_id',
             )
         )
         .add_step(
             PipelineStep(
-                name='generate-postrequisite-id',
+                name='generate-satisfies-id',
                 function=PipelineStep.uuid,
                 input_columns=['requisite_id', 'prerequisite_course_id'],
-                output_columns='prerequisite_id',
+                output_columns='satisfies_id',
+            )
+        )
+    )
+    .add_stage(
+        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
+        .add_step(
+            PipelineStep(
+                name='validate-requisite-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.REQUISITES,
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='validate-requires-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.REQUIRES,
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='validate-satisfy-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.SATISFIES,
             )
         )
     )
@@ -138,16 +162,16 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             ))
         .add_step(
             PipelineStep(
-                name='store-prerequisites-data',
+                name='store-requires-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.PREREQUISITES
+                configuration=DatasetConfiguration.REQUIRES
             )
         )
         .add_step(
             PipelineStep(
-                name='store-postrequisites-data',
+                name='store-satisfies-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.POSTREQUISITES
+                configuration=DatasetConfiguration.SATISFIES
             )
         )
     ))

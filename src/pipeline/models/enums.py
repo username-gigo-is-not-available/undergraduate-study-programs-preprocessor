@@ -16,6 +16,7 @@ class StageType(UpperStrEnum):
     GENERATE: str = auto()
     FLATTEN: str = auto()
     MERGE: str = auto()
+    VALIDATE = auto()
     STORE: str = auto()
 
 
@@ -37,6 +38,6 @@ class DatasetType(UpperStrEnum):
     REQUISITES: str = auto()
     OFFERS: str = auto()
     INCLUDES: str = auto()
-    PREREQUISITES: str = auto()
-    POSTREQUISITES: str = auto()
+    REQUIRES: str = auto()
+    SATISFIES: str = auto()
     TEACHES: str = auto()

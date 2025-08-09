@@ -2,11 +2,10 @@ import logging
 
 import pandas as pd
 
-from src.patterns.mixin.file_storage import FileStorageMixin
-from src.patterns.mixin.data_transformation import DataTransformationMixin
+from src.patterns.mixin.transformation import DataTransformationMixin
 
 
-class PipelineStep(FileStorageMixin, DataTransformationMixin):
+class PipelineStep(DataTransformationMixin):
     def __init__(self, name: str, function: callable, *args, **kwargs):
         super().__init__()
         self.name: str = name

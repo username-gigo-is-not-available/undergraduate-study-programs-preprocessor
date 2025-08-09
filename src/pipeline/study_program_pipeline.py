@@ -45,6 +45,16 @@ def study_programs_pipeline() -> Pipeline:
         )
     )
     .add_stage(
+        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
+        .add_step(
+            PipelineStep(
+                name='validate-study-program-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.STUDY_PROGRAMS,
+            )
+        )
+    )
+    .add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(

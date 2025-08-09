@@ -1,0 +1,53 @@
+{
+  "type": "record",
+  "name": "Curriculum",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Contains the details about a curriculum",
+  "fields": [
+    {
+      "name": "curriculum_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the curriculum"
+    },
+    {
+      "name": "course_type",
+      "type": {
+        "type": "enum",
+        "name": "CourseType",
+        "symbols": [
+          "MANDATORY",
+          "ELECTIVE"
+        ],
+        "doc": "The type of the course: MANDATORY or ELECTIVE."
+      },
+      "doc": "The type of the course."
+    },
+    {
+      "name": "course_semester_season",
+      "type": {
+        "type": "enum",
+        "name": "CourseSemesterSeason",
+        "symbols": [
+          "WINTER",
+          "SUMMER"
+        ],
+        "doc": "The season of the course semester: WINTER or SUMMER, depending on the course semester"
+      },
+      "doc": "The semester season of the semester."
+    },
+    {
+      "name": "course_semester",
+      "type": "int",
+      "doc": "The semester the course is offered in (range: [1, 8]), depending on the study program duration)"
+    },
+    {
+      "name": "course_academic_year",
+      "type": "int",
+      "doc": "The academic year the course is offered in (range: [1, 4]), depending on the study program duration and course semester)"
+    }
+  ]
+}
+

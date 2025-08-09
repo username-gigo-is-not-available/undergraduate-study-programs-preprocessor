@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "Professor",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Details about an individual professor",
+  "fields": [
+    {
+      "name": "professor_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the professor"
+    },
+    {
+      "name": "professor_name",
+      "type": "string",
+      "doc": "The name of the professor"
+    },
+    {
+      "name": "professor_surname",
+      "type": "string",
+      "doc": "The surname of the professor"
+    }
+  ]
+}
+

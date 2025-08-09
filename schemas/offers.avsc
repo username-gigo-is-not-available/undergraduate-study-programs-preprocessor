@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "Offers",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Represents the association between a study program and a specific curriculum  it offers.",
+  "fields": [
+    {
+      "name": "offers_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the offer linking the study program and curriculum."
+    },
+    {
+      "name": "study_program_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the study program offering the curriculum."
+    },
+    {
+      "name": "curriculum_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the curriculum offered by the study program."
+    }
+  ]
+}

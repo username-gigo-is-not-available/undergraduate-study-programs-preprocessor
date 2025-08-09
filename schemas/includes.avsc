@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "Includes",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Represents the association between a curriculum and a specific course it includes.",
+  "fields": [
+    {
+      "name": "includes_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the include relationship between the curriculum and the course."
+    },
+    {
+      "name": "curriculum_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the curriculum in which the course is included."
+    },
+    {
+      "name": "course_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the course that is included by the curriculum."
+    }
+  ]
+}

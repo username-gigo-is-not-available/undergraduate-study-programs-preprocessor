@@ -96,6 +96,23 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
+        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
+        .add_step(
+            PipelineStep(
+                name='validate-professor-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.PROFESSORS,
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='validate-teaches-schema',
+                function=PipelineStep.validate_data,
+                configuration=DatasetConfiguration.TEACHES,
+            )
+        )
+    )
+    .add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(

@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "Requires",
+  "namespace": "undergraduate_study_program_bi_preprocessor",
+  "doc": "Represents the association between a course and a specific requisite it depends on.",
+  "fields": [
+    {
+      "name": "requires_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Universally unique identifier (UUID) of the relationship linking the course to its requisite."
+    },
+    {
+      "name": "course_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the course that requires the requisite."
+    },
+    {
+      "name": "requisite_id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Identifier of the requisite that is required by the course."
+    }
+  ]
+}
