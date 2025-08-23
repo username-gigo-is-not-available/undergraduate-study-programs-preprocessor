@@ -14,6 +14,7 @@ class ApplicationConfiguration:
     PROFESSOR_TITLES: list[str] = ["ворн. ", "проф. ", "д-р ", "доц. "]
     STUDY_PROGRAM_CODE_REGEX: re.Pattern[str] = re.compile(r'^(.*?)(?=23)')
     MAXIMUM_SIMILARITY_RATIO: int = 1
+    MINIMUM_SIMILARITY_RATIO: float = 0.75
 
 
 class StorageConfiguration:
@@ -178,7 +179,7 @@ DatasetConfiguration.REQUISITES = DatasetConfiguration(
                                                   columns=
                                                   [
                                                       "course_prerequisites",
-                                                      "course_code"
+                                                      "course_name_mk"
                                                   ]
                                                   ),
     output_io_configuration=DatasetIOConfiguration(PathConfiguration.REQUISITES_OUTPUT_DATA,

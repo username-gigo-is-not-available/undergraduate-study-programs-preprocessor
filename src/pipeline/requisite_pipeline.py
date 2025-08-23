@@ -8,7 +8,7 @@ from src.patterns.strategy.extraction import CoursePrerequisiteTypeStrategy, Min
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
 from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
-from src.pipeline.common_steps import clean_course_code_step
+from src.pipeline.common_steps import clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
 
@@ -25,29 +25,18 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
     )
     .add_stage(
         PipelineStage(name='clean-data', stage_type=StageType.CLEAN)
-        .add_step(clean_course_code_step)
+        .add_step(clean_course_name_mk_step)
         .add_step(
             PipelineStep(
                 name='clean-course-prerequisites',
                 function=PipelineStep.apply,
-                strategy=RemoveExtraDelimitersStrategy('course_prerequisites', ' ')
-                .then(RemoveExtraDelimitersStrategy('course_prerequisites', '\n')
-                      .then(ReplaceValuesStrategy('course_prerequisites', ' или ', '|')
+                strategy=RemoveExtraDelimitersStrategy(column='course_prerequisites', delimiter=' ')
+                .then(RemoveExtraDelimitersStrategy(column='course_prerequisites', delimiter='\n')
+                      .then(ReplaceValuesStrategy(column='course_prerequisites', values=' или ', replacement='|')
                             )
                       )
             )
         )
-    )
-    .add_stage(
-        PipelineStage(name='merge-data', stage_type=StageType.MERGE)
-        .add_step(
-            PipelineStep(
-                name='merge-with-course-data',
-                function=PipelineStep.merge,
-                merge_df=df_courses,
-                on='course_code',
-                how='inner'
-            ))
     )
     .add_stage(
         PipelineStage(name='extract-data', stage_type=StageType.EXTRACT)
@@ -55,15 +44,17 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='extract-course-prerequisite-type',
                 function=PipelineStep.apply,
-                strategy=CoursePrerequisiteTypeStrategy('course_prerequisites', 'course_prerequisite_type')
+                strategy=CoursePrerequisiteTypeStrategy(prerequisite_column='course_prerequisites',
+                                                        output_column='course_prerequisite_type')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-minimum-required-number-of-courses',
                 function=PipelineStep.apply,
-                strategy=MinimumNumberOfCoursesStrategy('course_prerequisites', 'course_prerequisite_type',
-                                                        'minimum_required_number_of_courses')
+                strategy=MinimumNumberOfCoursesStrategy(prerequisite_column='course_prerequisites',
+                                                        prerequisite_type_column='course_prerequisite_type',
+                                                        output_column='minimum_required_number_of_courses')
             )
         )
     )
@@ -73,8 +64,12 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='transform-course-prerequisites',
                 function=PipelineStep.apply,
-                strategy=CoursePrerequisiteStrategy('course_prerequisites', 'course_name_mk',
-                                                    'course_prerequisite_type', "|")
+                strategy=CoursePrerequisiteStrategy(column='course_prerequisites',
+                                                    course_name_mk_column='course_name_mk',
+                                                    prerequisite_type_column='course_prerequisite_type',
+                                                    values=[row for row in df_courses[
+                                                        'course_name_mk'].drop_duplicates().values.tolist()],
+                                                    delimiter="|")
             )
         )
     )

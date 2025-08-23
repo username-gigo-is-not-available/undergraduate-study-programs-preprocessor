@@ -1,5 +1,7 @@
 from difflib import SequenceMatcher
 from functools import cache
+from typing import Any
+
 import pandas as pd
 
 from src.configurations import StorageConfiguration, ApplicationConfiguration
@@ -9,46 +11,57 @@ from src.pipeline.models.enums import CoursePrerequisiteType
 
 class MatchingStrategy(DataFrameStrategy):
 
-    def __init__(self, column: str, truth_column: str) -> None:
+    def __init__(self, column: str, values: list[str]) -> None:
         super().__init__()
         self.column = column
-        self.truth_column = truth_column
+        self.values = values
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        raise NotImplementedError("Subclasses must implement the apply method.")
+        @cache
+        def match(row: str | None, values: list[str]) -> str | None:
+            if row:
+                return MatchingStrategy.get_most_similar_string(row, values)
+            return None
+
+        df[self.column] = df.apply(
+            lambda row: match(row[self.column], tuple(self.values)), axis='columns')
+        return df
 
     @staticmethod
     def get_most_similar_string(arg: str, values: list[str]) -> str:
         similarity = {}
         for value in values:
-            similarity[value] = SequenceMatcher(None, arg, value).ratio()
-            if similarity[value] == ApplicationConfiguration.MAXIMUM_SIMILARITY_RATIO:
+            ratio: float = SequenceMatcher(None, arg, value).ratio()
+            if ratio == ApplicationConfiguration.MAXIMUM_SIMILARITY_RATIO:
                 return value
+            if ratio >= ApplicationConfiguration.MINIMUM_SIMILARITY_RATIO:
+                similarity[value] = ratio
 
         return max(similarity, key=lambda k: similarity[k]) if similarity else None
 
 
 class CoursePrerequisiteStrategy(MatchingStrategy):
-    def __init__(self, column: str, truth_column: str, prerequisite_type_column: str, delimiter: str) -> None:
-        super().__init__(column, truth_column)
+    def __init__(self, column: str, course_name_mk_column: str, prerequisite_type_column: str, values: list[str], delimiter: str) -> None:
+        super().__init__(column, values)
+        self.course_name_mk_column = course_name_mk_column
         self.prerequisite_type_column = prerequisite_type_column
         self.delimiter = delimiter
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         @cache
-        def match(course_name_mk: str, prerequisite_course_name: str, prerequisite_type: CoursePrerequisiteType, course_names: list[str]) -> str:
+        def match(prerequisite_course_name_mk: str, course_name_mk: str, prerequisite_type: CoursePrerequisiteType, course_names: list[str]) -> str:
 
             if prerequisite_type == CoursePrerequisiteType.ONE:
 
-                course_prerequisite = MatchingStrategy.get_most_similar_string(
-                    prerequisite_course_name.strip(),
+                course_prerequisite = super().get_most_similar_string(
+                    prerequisite_course_name_mk.strip(),
                     course_names
                 )
 
             elif prerequisite_type == CoursePrerequisiteType.ANY:
                 course_prerequisites_list = [
-                    MatchingStrategy.get_most_similar_string(course.strip(), course_names)
-                    for course in prerequisite_course_name.split(self.delimiter)
+                    super().get_most_similar_string(course.strip(), course_names)
+                    for course in prerequisite_course_name_mk.split(self.delimiter)
                 ]
 
                 course_prerequisite = self.delimiter.join(
@@ -64,8 +77,7 @@ class CoursePrerequisiteStrategy(MatchingStrategy):
                 raise ValueError(f"Invalid course prerequisite type: {prerequisite_type}")
             return course_prerequisite
 
-        courses: list[str] = [row for row in df[self.truth_column].drop_duplicates().values.tolist()]
         df[self.column] = df.apply(
-            lambda row: match(row[self.truth_column], row[self.column], row[self.prerequisite_type_column],
-                              tuple(courses)), axis='columns')
+            lambda row: match(row[self.column], row[self.course_name_mk_column], row[self.prerequisite_type_column],
+                              tuple(self.values)), axis='columns')
         return df
