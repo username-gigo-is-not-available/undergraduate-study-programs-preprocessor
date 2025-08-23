@@ -29,8 +29,8 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='clean-course-professors',
                 function=PipelineStep.apply,
-                strategy=ReplaceValuesStrategy('course_professors', ApplicationConfiguration.PROFESSOR_TITLES, '')
-                .then(ReplaceValuesStrategy('course_professors', '\n', '|'))
+                strategy=ReplaceValuesStrategy(column='course_professors', values=ApplicationConfiguration.PROFESSOR_TITLES, replacement='')
+                .then(ReplaceValuesStrategy(column='course_professors', values='\n', replacement='|'))
             )
         )
     )
@@ -53,14 +53,14 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='extract-professor-name',
                 function=PipelineStep.apply,
-                strategy=ProfessorNameStrategy('course_professors', 'professor_name'),
+                strategy=ProfessorNameStrategy(full_name_column='course_professors', output_column='professor_name'),
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-professor-surname',
                 function=PipelineStep.apply,
-                strategy=ProfessorSurnameStrategy('course_professors', 'professor_surname'),
+                strategy=ProfessorSurnameStrategy(full_name_column='course_professors', output_column='professor_surname'),
             )
         )
     )

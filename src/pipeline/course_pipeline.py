@@ -29,8 +29,8 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='clean-course-name-en',
                 function=PipelineStep.apply,
-                strategy=RemoveExtraDelimitersStrategy('course_name_en', ' ')
-                .then(PreserveAcronymsSentenceCaseStrategy('course_name_en'))
+                strategy=RemoveExtraDelimitersStrategy(column='course_name_en', delimiter=' ')
+                .then(PreserveAcronymsSentenceCaseStrategy(column='course_name_en'))
             )
         )
     )
@@ -40,7 +40,7 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='extract-course-level',
                 function=PipelineStep.apply,
-                strategy=CourseLevelStrategy('course_code', 'course_level')
+                strategy=CourseLevelStrategy(code_column='course_code', output_column='course_level')
             )
         )
     )

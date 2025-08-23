@@ -29,7 +29,9 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='extract-study-program-code',
                 function=PipelineStep.apply,
-                strategy=StudyProgramCodeStrategy('study_program_url', 'study_program_duration', 'study_program_code'),
+                strategy=StudyProgramCodeStrategy(url_column='study_program_url',
+                                                  duration_column='study_program_duration',
+                                                  output_column='study_program_code'),
             )
         )
     )

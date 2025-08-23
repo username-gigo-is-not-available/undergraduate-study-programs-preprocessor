@@ -135,14 +135,14 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='extract-course-semester-season',
                 function=PipelineStep.apply,
-                strategy=CourseSemesterSeasonStrategy('course_semester', 'course_semester_season')
+                strategy=CourseSemesterSeasonStrategy(semester_column='course_semester', output_column='course_semester_season')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-course-academic-year',
                 function=PipelineStep.apply,
-                strategy=CourseAcademicYearStrategy('course_semester', 'course_academic_year')
+                strategy=CourseAcademicYearStrategy(semester_column='course_semester', output_column='course_academic_year')
             )
         )
     )
