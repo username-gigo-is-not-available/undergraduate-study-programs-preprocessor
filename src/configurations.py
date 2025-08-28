@@ -166,6 +166,7 @@ DatasetConfiguration.COURSES = DatasetConfiguration(
                                                        "course_code",
                                                        "course_name_mk",
                                                        "course_name_en",
+                                                       "course_abbreviation",
                                                        "course_url",
                                                        "course_level"
                                                    ]

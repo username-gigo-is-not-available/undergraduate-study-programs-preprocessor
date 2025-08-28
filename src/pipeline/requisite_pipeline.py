@@ -4,7 +4,7 @@ from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import CoursePrerequisiteTypeStrategy, MinimumNumberOfCoursesStrategy
+from src.patterns.strategy.extraction import CoursePrerequisiteTypeExtractionStrategy, MinimumNumberOfCoursesExtractionStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
 from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
@@ -44,17 +44,17 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='extract-course-prerequisite-type',
                 function=PipelineStep.apply,
-                strategy=CoursePrerequisiteTypeStrategy(prerequisite_column='course_prerequisites',
-                                                        output_column='course_prerequisite_type')
+                strategy=CoursePrerequisiteTypeExtractionStrategy(prerequisite_column='course_prerequisites',
+                                                                  output_column='course_prerequisite_type')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-minimum-required-number-of-courses',
                 function=PipelineStep.apply,
-                strategy=MinimumNumberOfCoursesStrategy(prerequisite_column='course_prerequisites',
-                                                        prerequisite_type_column='course_prerequisite_type',
-                                                        output_column='minimum_required_number_of_courses')
+                strategy=MinimumNumberOfCoursesExtractionStrategy(prerequisite_column='course_prerequisites',
+                                                                  prerequisite_type_column='course_prerequisite_type',
+                                                                  output_column='minimum_required_number_of_courses')
             )
         )
     )
@@ -83,6 +83,14 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 output_columns='course_prerequisites',
                 delimiter="|",
                 drop_duplicates=True,
+            )
+        )
+        .add_step(
+            PipelineStep(
+                name='merge-with-course-data',
+                function=PipelineStep.merge,
+                on='course_name_mk',
+                merge_df=df_courses
             )
         )
         .add_step(

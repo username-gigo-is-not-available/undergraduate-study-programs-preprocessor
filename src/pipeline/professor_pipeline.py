@@ -4,7 +4,7 @@ from src.configurations import DatasetConfiguration, ApplicationConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import ProfessorNameStrategy, ProfessorSurnameStrategy
+from src.patterns.strategy.extraction import ProfessorNameExtractionStrategy, ProfessorSurnameExtractionStrategy
 from src.patterns.strategy.sanitization import ReplaceValuesStrategy
 from src.pipeline.common_steps import clean_course_code_step
 from src.pipeline.models.enums import StageType
@@ -53,14 +53,14 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='extract-professor-name',
                 function=PipelineStep.apply,
-                strategy=ProfessorNameStrategy(full_name_column='course_professors', output_column='professor_name'),
+                strategy=ProfessorNameExtractionStrategy(full_name_column='course_professors', output_column='professor_name'),
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-professor-surname',
                 function=PipelineStep.apply,
-                strategy=ProfessorSurnameStrategy(full_name_column='course_professors', output_column='professor_surname'),
+                strategy=ProfessorSurnameExtractionStrategy(full_name_column='course_professors', output_column='professor_surname'),
             )
         )
     )

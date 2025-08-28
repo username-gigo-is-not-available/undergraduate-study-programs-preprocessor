@@ -21,7 +21,7 @@ class ExtractionStrategy(DataFrameStrategy):
         return str(value).lower().strip() in {'nan', 'нема', ''} or not value
 
 
-class StudyProgramCodeStrategy(ExtractionStrategy):
+class StudyProgramCodeExtractionStrategy(ExtractionStrategy):
     def __init__(self, url_column: str, duration_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.url_column = url_column
@@ -40,7 +40,7 @@ class StudyProgramCodeStrategy(ExtractionStrategy):
         return df
 
 
-class CourseLevelStrategy(ExtractionStrategy):
+class CourseLevelExtractionStrategy(ExtractionStrategy):
     def __init__(self, code_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.code_column = code_column
@@ -54,7 +54,7 @@ class CourseLevelStrategy(ExtractionStrategy):
         return df
 
 
-class CourseAcademicYearStrategy(ExtractionStrategy):
+class CourseAcademicYearExtractionStrategy(ExtractionStrategy):
     def __init__(self, semester_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.semester_column = semester_column
@@ -68,7 +68,7 @@ class CourseAcademicYearStrategy(ExtractionStrategy):
         return df
 
 
-class CourseSemesterSeasonStrategy(ExtractionStrategy):
+class CourseSemesterSeasonExtractionStrategy(ExtractionStrategy):
     def __init__(self, semester_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.semester_column = semester_column
@@ -79,11 +79,12 @@ class CourseSemesterSeasonStrategy(ExtractionStrategy):
             if semester % 2 == 1:
                 return CourseSemesterSeasonType.WINTER
             return CourseSemesterSeasonType.SUMMER
+
         df[self.output_column] = df[self.semester_column].map(extract)
         return df
 
 
-class CoursePrerequisiteTypeStrategy(ExtractionStrategy):
+class CoursePrerequisiteTypeExtractionStrategy(ExtractionStrategy):
     def __init__(self, prerequisite_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.prerequisite_column = prerequisite_column
@@ -104,7 +105,7 @@ class CoursePrerequisiteTypeStrategy(ExtractionStrategy):
         return df
 
 
-class MinimumNumberOfCoursesStrategy(ExtractionStrategy):
+class MinimumNumberOfCoursesExtractionStrategy(ExtractionStrategy):
     def __init__(self, prerequisite_column: str, prerequisite_type_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.prerequisite_column = prerequisite_column
@@ -122,8 +123,20 @@ class MinimumNumberOfCoursesStrategy(ExtractionStrategy):
         )
         return df
 
+class CourseAbbreviationExtractionStrategy(ExtractionStrategy):
+    def __init__(self, course_name_mk_column: str, output_column: str) -> None:
+        super().__init__(output_column)
+        self.course_name_mk_column = course_name_mk_column
 
-class ProfessorNameStrategy(ExtractionStrategy):
+    def apply(self, df: pd.DataFrame) -> pd.DataFrame:
+        @cache
+        def extract(course_name: str) -> str:
+            return "".join([char[0].upper() for char in re.split("[\s-]", course_name)])
+
+        df[self.output_column] = df[self.course_name_mk_column].map(extract)
+        return df
+
+class ProfessorNameExtractionStrategy(ExtractionStrategy):
     def __init__(self, full_name_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.full_name_column = full_name_column
@@ -139,7 +152,7 @@ class ProfessorNameStrategy(ExtractionStrategy):
         return df
 
 
-class ProfessorSurnameStrategy(ExtractionStrategy):
+class ProfessorSurnameExtractionStrategy(ExtractionStrategy):
     def __init__(self, full_name_column: str, output_column: str) -> None:
         super().__init__(output_column)
         self.full_name_column = full_name_column

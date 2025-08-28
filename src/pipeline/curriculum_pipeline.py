@@ -4,7 +4,7 @@ from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import CourseSemesterSeasonStrategy, CourseAcademicYearStrategy
+from src.patterns.strategy.extraction import CourseSemesterSeasonExtractionStrategy, CourseAcademicYearExtractionStrategy
 from src.patterns.strategy.filtering import OrFilteringStrategy, NotEqualFilteringStrategy, NotNullFilteringStrategy, \
     GroupExistsFilteringStrategy, GroupHasAtLeastNMembersFilteringStrategy
 from src.pipeline.common_steps import clean_study_program_name_step, clean_course_code_step, clean_course_name_mk_step
@@ -135,14 +135,14 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='extract-course-semester-season',
                 function=PipelineStep.apply,
-                strategy=CourseSemesterSeasonStrategy(semester_column='course_semester', output_column='course_semester_season')
+                strategy=CourseSemesterSeasonExtractionStrategy(semester_column='course_semester', output_column='course_semester_season')
             )
         )
         .add_step(
             PipelineStep(
                 name='extract-course-academic-year',
                 function=PipelineStep.apply,
-                strategy=CourseAcademicYearStrategy(semester_column='course_semester', output_column='course_academic_year')
+                strategy=CourseAcademicYearExtractionStrategy(semester_column='course_semester', output_column='course_academic_year')
             )
         )
     )

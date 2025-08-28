@@ -28,6 +28,11 @@
       "doc": "The official name of the course in English."
     },
     {
+      "name": "course_abbreviation",
+      "type": "string",
+      "doc": "The abbreviation of the course name in Macedonian."
+    },
+    {
       "name": "course_url",
       "type": "string",
       "doc": "The unique URL to the official course description or page."

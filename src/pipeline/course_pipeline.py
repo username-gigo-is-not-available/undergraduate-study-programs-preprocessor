@@ -2,7 +2,7 @@ from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import CourseLevelStrategy
+from src.patterns.strategy.extraction import CourseLevelExtractionStrategy, CourseAbbreviationExtractionStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     PreserveAcronymsSentenceCaseStrategy
 from src.pipeline.common_steps import clean_course_code_step, clean_course_name_mk_step
@@ -40,12 +40,19 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='extract-course-level',
                 function=PipelineStep.apply,
-                strategy=CourseLevelStrategy(code_column='course_code', output_column='course_level')
+                strategy=CourseLevelExtractionStrategy(code_column='course_code', output_column='course_level')
             )
         )
     )
     .add_stage(
         PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
+        .add_step(
+            PipelineStep(
+                name='generate-course-abbreviation',
+                function=PipelineStep.apply,
+                strategy=CourseAbbreviationExtractionStrategy(course_name_mk_column='course_name_mk', output_column='course_abbreviation')
+            )
+        )
         .add_step(
             PipelineStep(
                 name='generate-course-id',
