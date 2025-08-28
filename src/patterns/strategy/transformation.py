@@ -1,10 +1,9 @@
 from difflib import SequenceMatcher
 from functools import cache
-from typing import Any
 
 import pandas as pd
 
-from src.configurations import StorageConfiguration, ApplicationConfiguration
+from src.configurations import ApplicationConfiguration
 from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.pipeline.models.enums import CoursePrerequisiteType
 
@@ -41,7 +40,8 @@ class MatchingStrategy(DataFrameStrategy):
 
 
 class CoursePrerequisiteStrategy(MatchingStrategy):
-    def __init__(self, column: str, course_name_mk_column: str, prerequisite_type_column: str, values: list[str], delimiter: str) -> None:
+    def __init__(self, column: str, course_name_mk_column: str, prerequisite_type_column: str, values: list[str],
+                 delimiter: str) -> None:
         super().__init__(column, values)
         self.course_name_mk_column = course_name_mk_column
         self.prerequisite_type_column = prerequisite_type_column
@@ -49,18 +49,19 @@ class CoursePrerequisiteStrategy(MatchingStrategy):
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         @cache
-        def match(prerequisite_course_name_mk: str, course_name_mk: str, prerequisite_type: CoursePrerequisiteType, course_names: list[str]) -> str:
+        def match(prerequisite_course_name_mk: str, course_name_mk: str, prerequisite_type: CoursePrerequisiteType,
+                  course_names: list[str]) -> str:
 
             if prerequisite_type == CoursePrerequisiteType.ONE:
 
-                course_prerequisite = super().get_most_similar_string(
+                course_prerequisite = MatchingStrategy.get_most_similar_string(
                     prerequisite_course_name_mk.strip(),
                     course_names
                 )
 
             elif prerequisite_type == CoursePrerequisiteType.ANY:
                 course_prerequisites_list = [
-                    super().get_most_similar_string(course.strip(), course_names)
+                    MatchingStrategy.get_most_similar_string(course.strip(), course_names)
                     for course in prerequisite_course_name_mk.split(self.delimiter)
                 ]
 
