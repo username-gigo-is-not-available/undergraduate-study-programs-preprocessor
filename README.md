@@ -158,7 +158,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
   the course based on matching the digits in the `course_prerequisites` divided by the ECTS credits per course (`6`).
   Default value is `0`.
 
-##### Transform
+##### Match
 
 - Transform the `course_prerequisite` column by splitting the values and validating the course names.
   if `course_prerequisite_type` is `NONE`, then `course_prerequisite` is `None`

@@ -12,7 +12,7 @@ class StageType(UpperStrEnum):
     CLEAN: str = auto()
     FILTER: str = auto()
     EXTRACT: str = auto()
-    TRANSFORM: str = auto()
+    MATCH: str = auto()
     GENERATE: str = auto()
     FLATTEN: str = auto()
     MERGE: str = auto()

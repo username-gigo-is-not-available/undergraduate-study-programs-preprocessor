@@ -60,10 +60,10 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='transform-data', stage_type=StageType.TRANSFORM)
+        PipelineStage(name='match-data', stage_type=StageType.MATCH)
         .add_step(
             PipelineStep(
-                name='transform-course-prerequisites',
+                name='match-course-prerequisites',
                 function=PipelineStep.apply,
                 strategy=CoursePrerequisiteMatchingStrategy(column='course_prerequisites',
                                                             course_name_mk_column='course_name_mk',
@@ -94,7 +94,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 name='look-up-course-id',
                 function=PipelineStep.merge,
                 on='course_name_mk',
-                merge_df=df_courses[['course_name_mk', 'course_id']]
+                merge_df=df_courses
             )
         )
         .add_step(

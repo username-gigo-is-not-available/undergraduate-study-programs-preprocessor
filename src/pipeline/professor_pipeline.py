@@ -35,7 +35,7 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='transform-data', stage_type=StageType.TRANSFORM)
+        PipelineStage(name='flatten-data', stage_type=StageType.FLATTEN)
         .add_step(
             PipelineStep(
                 name='flatten-course-professors',
