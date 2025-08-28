@@ -39,7 +39,7 @@ class MatchingStrategy(DataFrameStrategy):
         return max(similarity, key=lambda k: similarity[k]) if similarity else None
 
 
-class CoursePrerequisiteStrategy(MatchingStrategy):
+class CoursePrerequisiteMatchingStrategy(MatchingStrategy):
     def __init__(self, column: str, course_name_mk_column: str, prerequisite_type_column: str, values: list[str],
                  delimiter: str) -> None:
         super().__init__(column, values)

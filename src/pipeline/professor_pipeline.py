@@ -72,7 +72,6 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 function=PipelineStep.merge,
                 merge_df=df_courses,
                 on='course_code',
-                how='inner'
             )
         )
     )

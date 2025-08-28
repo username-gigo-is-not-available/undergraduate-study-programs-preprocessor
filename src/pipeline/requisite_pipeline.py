@@ -7,7 +7,7 @@ from src.patterns.builder.step import PipelineStep
 from src.patterns.strategy.extraction import CoursePrerequisiteTypeExtractionStrategy, MinimumNumberOfCoursesExtractionStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
-from src.patterns.strategy.transformation import CoursePrerequisiteStrategy
+from src.patterns.strategy.matching import CoursePrerequisiteMatchingStrategy
 from src.pipeline.common_steps import clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
@@ -64,12 +64,12 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='transform-course-prerequisites',
                 function=PipelineStep.apply,
-                strategy=CoursePrerequisiteStrategy(column='course_prerequisites',
-                                                    course_name_mk_column='course_name_mk',
-                                                    prerequisite_type_column='course_prerequisite_type',
-                                                    values=[row for row in df_courses[
+                strategy=CoursePrerequisiteMatchingStrategy(column='course_prerequisites',
+                                                            course_name_mk_column='course_name_mk',
+                                                            prerequisite_type_column='course_prerequisite_type',
+                                                            values=[row for row in df_courses[
                                                         'course_name_mk'].drop_duplicates().values.tolist()],
-                                                    delimiter="|")
+                                                            delimiter="|")
             )
         )
     )
@@ -85,6 +85,9 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                 drop_duplicates=True,
             )
         )
+    )
+    .add_stage(
+        PipelineStage(name='merge-data', stage_type=StageType.MERGE)
         .add_step(
             PipelineStep(
                 name='merge-with-course-data',
