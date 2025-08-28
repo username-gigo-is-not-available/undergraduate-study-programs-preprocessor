@@ -130,13 +130,13 @@ class DataTransformationMixin(StorageMixin, SchemaValidationMixin):
         )
 
     @normalize_column_args
-    def look_up(self, df: pd.DataFrame,
-                columns: str | list[str],
-                on: str | list[str] = None,
-                left_on: str | list[str] = None,
-                right_on: str | list[str] = None,
-                prefix: str | None = None,
-                how: Literal["left", "right", "inner", "outer", "cross"] = "inner"):
+    def self_merge(self, df: pd.DataFrame,
+                   columns: str | list[str],
+                   on: str | list[str] = None,
+                   left_on: str | list[str] = None,
+                   right_on: str | list[str] = None,
+                   prefix: str | None = None,
+                   how: Literal["left", "right", "inner", "outer", "cross"] = "inner"):
         lookup: pd.DataFrame = pd.DataFrame(df[columns]).drop_duplicates()
         lookup, right_on = self._apply_prefix(df, lookup, on, left_on, right_on, prefix)
         return pd.merge(df, lookup, left_on=left_on, right_on=right_on, how=how)

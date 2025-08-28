@@ -4,7 +4,8 @@ from src.configurations import DatasetConfiguration
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import CoursePrerequisiteTypeExtractionStrategy, MinimumNumberOfCoursesExtractionStrategy
+from src.patterns.strategy.extraction import CoursePrerequisiteTypeExtractionStrategy, \
+    MinimumNumberOfCoursesExtractionStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
 from src.patterns.strategy.matching import CoursePrerequisiteMatchingStrategy
@@ -68,7 +69,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
                                                             course_name_mk_column='course_name_mk',
                                                             prerequisite_type_column='course_prerequisite_type',
                                                             values=[row for row in df_courses[
-                                                        'course_name_mk'].drop_duplicates().values.tolist()],
+                                                                'course_name_mk'].drop_duplicates().values.tolist()],
                                                             delimiter="|")
             )
         )
@@ -90,20 +91,21 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         PipelineStage(name='merge-data', stage_type=StageType.MERGE)
         .add_step(
             PipelineStep(
-                name='merge-with-course-data',
+                name='look-up-course-id',
                 function=PipelineStep.merge,
                 on='course_name_mk',
-                merge_df=df_courses
+                merge_df=df_courses[['course_name_mk', 'course_id']]
             )
         )
         .add_step(
             PipelineStep(
                 name='look-up-course-prerequisite-id',
-                function=PipelineStep.look_up,
+                function=PipelineStep.self_merge,
                 left_on='course_prerequisites',
                 right_on='course_name_mk',
                 columns=['course_name_mk', 'course_id'],
                 prefix='prerequisite_'
+
             )
         )
     )

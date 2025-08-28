@@ -30,7 +30,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             .add_step(
                 PipelineStep(
                     name='look-up-prerequisite-study-program-id',
-                    function=PipelineStep.look_up,
+                    function=PipelineStep.self_merge,
                     left_on=['study_program_id', 'prerequisite_course_id'],
                     right_on=['study_program_id', 'course_id'],
                     columns=['study_program_id', 'course_id'],
