@@ -43,16 +43,17 @@ def course_pipeline() -> Pipeline:
                 strategy=CourseLevelExtractionStrategy(code_column='course_code', output_column='course_level')
             )
         )
+        .add_step(
+            PipelineStep(
+                name='extract-course-abbreviation',
+                function=PipelineStep.apply,
+                strategy=CourseAbbreviationExtractionStrategy(course_name_mk_column='course_name_mk',
+                                                              output_column='course_abbreviation')
+            )
+        )
     )
     .add_stage(
         PipelineStage(name='generate-data', stage_type=StageType.GENERATE)
-        .add_step(
-            PipelineStep(
-                name='generate-course-abbreviation',
-                function=PipelineStep.apply,
-                strategy=CourseAbbreviationExtractionStrategy(course_name_mk_column='course_name_mk', output_column='course_abbreviation')
-            )
-        )
         .add_step(
             PipelineStep(
                 name='generate-course-id',

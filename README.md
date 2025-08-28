@@ -65,6 +65,8 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 
 - Extract the `course_level` column from the `course_code` column. The `course_level` is the 4th character of the
   `course_code`
+- Extract the `course_abbreviation` column from the `course_name_mk` column. The `course_abbreviation` is the 1st characters from the `course_name_mk` parts
+  split on space (` `) or dash (`-`)
 
 ##### Generate
 
@@ -77,7 +79,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 ##### Store
 
 - Store the cleaned data in AVRO files with the following columns:
-  `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
+  `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_abbreviation`, `course_url`, `course_level`
 
 #### Professor:
 
@@ -286,7 +288,7 @@ which can be found at the following [URL](https://finki.ukim.mk/mk/dodiplomski-s
 This preprocessor will produce the following datasets:
 
 1. Study Programs: `study_program_id`, `study_program_code`, `study_program_name`, `study_program_duration`, `study_program_url`
-2. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_url`, `course_level`
+2. Courses: `course_id`, `course_code`, `course_name_mk`, `course_name_en`, `course_abbreviation`, `course_url`, `course_level`
 3. Professors: `professor_id`, `professor_name`, `professor_surname`
 4. Teaches: `teaches_id`, `course_id`, `professor_id`
 5. Curricula: `curiculum_id`, `course_type`, `course_semester`, `course_semester_season`, `course_academic_year`
