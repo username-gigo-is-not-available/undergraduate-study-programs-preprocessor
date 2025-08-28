@@ -38,14 +38,17 @@ class OrFilteringStrategy(FilteringStrategy):
         mask: pd.Series = df.index.isin(left_result.index) | df.index.isin(right_result.index)
         return df.loc[mask]
 
+
 class ColumnValueFilteringStrategy(FilteringStrategy):
     def __init__(self, column: str, value: Any):
         self.column = column
         self.value = value
 
+
 class ColumnReferenceFilteringStrategy(FilteringStrategy):
     def __init__(self, column: str):
         self.column = column
+
 
 class NotNullFilteringStrategy(ColumnReferenceFilteringStrategy):
     def __init__(self, column: str):
@@ -54,6 +57,7 @@ class NotNullFilteringStrategy(ColumnReferenceFilteringStrategy):
     def filter(self, df: pd.DataFrame) -> pd.DataFrame:
         return df[df[self.column].notnull()]
 
+
 class NotEqualFilteringStrategy(ColumnValueFilteringStrategy):
     def __init__(self, column: str, value: Any):
         super().__init__(column, value)
@@ -61,10 +65,12 @@ class NotEqualFilteringStrategy(ColumnValueFilteringStrategy):
     def filter(self, df: pd.DataFrame) -> pd.DataFrame:
         return df[df[self.column] != self.value]
 
+
 class GroupFilteringStrategy(FilteringStrategy):
     def __init__(self, group_by_columns: str | list[str], evaluated_columns: str | list[str]):
         self.group_by_columns = group_by_columns
         self.evaluated_columns = evaluated_columns
+
 
 class GroupExistsFilteringStrategy(GroupFilteringStrategy):
     def __init__(self, group_by_columns: str | list[str], evaluated_columns: str | list[str]):
@@ -74,6 +80,7 @@ class GroupExistsFilteringStrategy(GroupFilteringStrategy):
         mask: pd.DataFrame = df.groupby(self.group_by_columns)[self.evaluated_columns].transform(
             lambda x: x.notnull().any())
         return df[mask]
+
 
 class GroupHasAtLeastNMembersFilteringStrategy(GroupFilteringStrategy):
     def __init__(self, group_by_columns: str | list[str], evaluated_columns: str | list[str],
