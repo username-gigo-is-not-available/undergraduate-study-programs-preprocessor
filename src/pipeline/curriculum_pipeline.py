@@ -201,30 +201,6 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
         )
     )
     pipeline.add_stage(
-        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
-        .add_step(
-            PipelineStep(
-                name='validate-curriculum-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.CURRICULA,
-            )
-        )
-        .add_step(
-            PipelineStep(
-                name='validate-offers-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.OFFERS,
-            )
-        )
-        .add_step(
-            PipelineStep(
-                name='validate-includes-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.INCLUDES,
-            )
-        )
-    )
-    pipeline.add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(

@@ -64,16 +64,6 @@ def course_pipeline() -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
-        .add_step(
-            PipelineStep(
-                name='validate-course-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.COURSES,
-            )
-        )
-    )
-    .add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(

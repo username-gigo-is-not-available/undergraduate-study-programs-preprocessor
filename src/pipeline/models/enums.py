@@ -41,3 +41,7 @@ class DatasetType(UpperStrEnum):
     REQUIRES: str = auto()
     SATISFIES: str = auto()
     TEACHES: str = auto()
+
+class FileIOType(UpperStrEnum):
+    S3 = auto()
+    LOCAL = auto()

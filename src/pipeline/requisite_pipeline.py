@@ -137,30 +137,6 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         )
     )
     .add_stage(
-        PipelineStage(name='validate-data', stage_type=StageType.VALIDATE)
-        .add_step(
-            PipelineStep(
-                name='validate-requisite-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.REQUISITES,
-            )
-        )
-        .add_step(
-            PipelineStep(
-                name='validate-requires-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.REQUIRES,
-            )
-        )
-        .add_step(
-            PipelineStep(
-                name='validate-satisfy-schema',
-                function=PipelineStep.validate_data,
-                configuration=DatasetConfiguration.SATISFIES,
-            )
-        )
-    )
-    .add_stage(
         PipelineStage(name='store-data', stage_type=StageType.STORE)
         .add_step(
             PipelineStep(

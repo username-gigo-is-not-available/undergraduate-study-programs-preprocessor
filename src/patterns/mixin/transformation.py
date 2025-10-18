@@ -6,12 +6,11 @@ import pandas as pd
 
 from src.configurations import DatasetIOConfiguration, DatasetConfiguration
 from src.patterns.mixin.storage import StorageMixin
-from src.patterns.mixin.validation import SchemaValidationMixin
 from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.patterns.strategy.filtering import FilteringStrategy
 
 
-class DataTransformationMixin(StorageMixin, SchemaValidationMixin):
+class DataTransformationMixin(StorageMixin):
 
     @staticmethod
     def _to_list(value: str | list[str]) -> list[str]:
@@ -151,11 +150,11 @@ class DataTransformationMixin(StorageMixin, SchemaValidationMixin):
         return df
 
     def read_data(self, configuration: DatasetConfiguration) -> pd.DataFrame:
-        df: pd.DataFrame = self.storage_strategy.read_data(configuration.input_io_configuration.file_name)
+        df: pd.DataFrame = self.storage_strategy.read_data(configuration.input_io_configuration.table_name)
         return self.apply_io_configuration(df, configuration.input_io_configuration)
 
     def validate_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
-        schema: dict = self.storage_strategy.load_schema(configuration.schema_configuration.file_name)
+        schema: dict = self.storage_strategy.load_schema(configuration.schema_configuration.table_name)
         df_copy = df.copy()
         df_copy = self.apply_io_configuration(df_copy, configuration.output_io_configuration)
         super().validate_data(df_copy, schema)
@@ -164,6 +163,6 @@ class DataTransformationMixin(StorageMixin, SchemaValidationMixin):
     def save_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
         df_copy: pd.DataFrame = df.copy()
         df_copy = self.apply_io_configuration(df_copy, configuration.output_io_configuration)
-        self.storage_strategy.save_data(df_copy, configuration.output_io_configuration.file_name,
-                                        configuration.schema_configuration.file_name)
+        self.storage_strategy.save_data(df_copy, configuration.output_io_configuration.table_name,
+                                        configuration.schema_configuration.table_name)
         return df
