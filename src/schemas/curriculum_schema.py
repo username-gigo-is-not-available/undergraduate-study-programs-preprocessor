@@ -1,7 +1,6 @@
 from pyiceberg.schema import Schema
 from pyiceberg.types import (
     StringType,
-    UUIDType,
     IntegerType,
 )
 from pyiceberg.schema import NestedField
@@ -10,7 +9,7 @@ CURRICULUM_SCHEMA = Schema(
     NestedField(
         field_id=1,
         name="curriculum_id",
-        field_type=UUIDType(),
+        field_type=StringType(),
         required=True,
         doc="Universally unique identifier (UUID) of the curriculum",
     ),

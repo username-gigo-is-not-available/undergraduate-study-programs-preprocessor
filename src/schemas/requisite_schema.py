@@ -10,7 +10,7 @@ REQUISITE_SCHEMA = Schema(
     NestedField(
         field_id=1,
         name="requisite_id",
-        field_type=UUIDType(),
+        field_type=StringType(),
         required=True,
         doc="Universally unique identifier (UUID) of the requisite",
     ),
