@@ -30,17 +30,6 @@ class CourseSemesterSeasonType(UpperStrEnum):
     WINTER: str = auto()
     SUMMER: str = auto()
 
-class DatasetType(UpperStrEnum):
-    STUDY_PROGRAMS: str = auto()
-    COURSES: str = auto()
-    PROFESSORS: str = auto()
-    CURRICULA: str = auto()
-    REQUISITES: str = auto()
-    OFFERS: str = auto()
-    INCLUDES: str = auto()
-    REQUIRES: str = auto()
-    SATISFIES: str = auto()
-    TEACHES: str = auto()
 
 class FileIOType(UpperStrEnum):
     S3 = auto()
