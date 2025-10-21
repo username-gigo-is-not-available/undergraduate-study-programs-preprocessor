@@ -2,10 +2,11 @@ import logging
 
 import pandas as pd
 
-from src.patterns.mixin.transformation import DataTransformationMixin
+from src.transformation import DataFrameMixin
+from src.storage import IcebergClient
 
 
-class PipelineStep(DataTransformationMixin):
+class PipelineStep(DataFrameMixin, IcebergClient):
     def __init__(self, name: str, function: callable, *args, **kwargs):
         super().__init__()
         self.name: str = name

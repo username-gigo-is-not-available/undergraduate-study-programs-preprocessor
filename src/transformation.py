@@ -4,13 +4,11 @@ from typing import Any, Literal
 
 import pandas as pd
 
-from src.configurations import DatasetIOConfiguration, DatasetConfiguration
-from src.patterns.mixin.storage import StorageMixin
 from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.patterns.strategy.filtering import FilteringStrategy
 
 
-class DataTransformationMixin(StorageMixin):
+class DataFrameMixin:
 
     @staticmethod
     def _to_list(value: str | list[str]) -> list[str]:
@@ -22,14 +20,14 @@ class DataTransformationMixin(StorageMixin):
     def _normalize_column_args(**kwargs) -> dict[str, Any]:
         for key in ['columns', 'input_columns', 'output_columns', 'on', 'left_on', 'right_on']:
             if key in kwargs:
-                kwargs[key] = DataTransformationMixin._to_list(kwargs.get(key))
+                kwargs[key] = DataFrameMixin._to_list(kwargs.get(key))
         return kwargs
 
     @staticmethod
     def normalize_column_args(func: callable) -> callable:
         @wraps(func)
         def wrapper(*args, **kwargs) -> pd.DataFrame:
-            kwargs = DataTransformationMixin._normalize_column_args(**kwargs)
+            kwargs = DataFrameMixin._normalize_column_args(**kwargs)
             return func(*args, **kwargs)
 
         return wrapper
@@ -93,7 +91,7 @@ class DataTransformationMixin(StorageMixin):
         df_unique = df[input_columns].dropna().drop_duplicates()
 
         df_unique[output_columns] = df_unique.apply(
-            lambda row: pd.Series(uuid.uuid5(uuid.NAMESPACE_DNS, "_".join(str(val) for val in row))), axis=1
+            lambda row: pd.Series(str(uuid.uuid5(uuid.NAMESPACE_DNS, "_".join(str(val) for val in row)))), axis=1
         )
 
         df = df.merge(df_unique, on=input_columns, how='left')
@@ -140,29 +138,3 @@ class DataTransformationMixin(StorageMixin):
         lookup, right_on = self._apply_prefix(df, lookup, on, left_on, right_on, prefix)
         return pd.merge(df, lookup, left_on=left_on, right_on=right_on, how=how)
 
-    def apply_io_configuration(self, df: pd.DataFrame, configuration: DatasetIOConfiguration) -> pd.DataFrame:
-        if configuration.columns:
-            df = df[configuration.columns]
-        if configuration.drop_duplicates:
-            df = df.drop_duplicates()
-        if configuration.drop_na:
-            df = df.dropna()
-        return df
-
-    def read_data(self, configuration: DatasetConfiguration) -> pd.DataFrame:
-        df: pd.DataFrame = self.storage_strategy.read_data(configuration.input_io_configuration.table_name)
-        return self.apply_io_configuration(df, configuration.input_io_configuration)
-
-    def validate_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
-        schema: dict = self.storage_strategy.load_schema(configuration.schema_configuration.table_name)
-        df_copy = df.copy()
-        df_copy = self.apply_io_configuration(df_copy, configuration.output_io_configuration)
-        super().validate_data(df_copy, schema)
-        return df
-
-    def save_data(self, df: pd.DataFrame, configuration: DatasetConfiguration) -> pd.DataFrame:
-        df_copy: pd.DataFrame = df.copy()
-        df_copy = self.apply_io_configuration(df_copy, configuration.output_io_configuration)
-        self.storage_strategy.save_data(df_copy, configuration.output_io_configuration.table_name,
-                                        configuration.schema_configuration.table_name)
-        return df
