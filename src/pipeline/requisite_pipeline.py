@@ -1,14 +1,15 @@
 import pandas as pd
 
-from src.configurations import DatasetConfiguration
+from src.configurations import REQUISITES_DATASET_CONFIGURATION, SATISFIES_DATASET_CONFIGURATION, \
+    REQUIRES_DATASET_CONFIGURATION
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
 from src.patterns.strategy.extraction import CoursePrerequisiteTypeExtractionStrategy, \
     MinimumNumberOfCoursesExtractionStrategy
+from src.patterns.strategy.matching import CoursePrerequisiteMatchingStrategy
 from src.patterns.strategy.sanitization import RemoveExtraDelimitersStrategy, \
     ReplaceValuesStrategy
-from src.patterns.strategy.matching import CoursePrerequisiteMatchingStrategy
 from src.pipeline.common_steps import clean_course_name_mk_step
 from src.pipeline.models.enums import StageType
 
@@ -20,7 +21,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         .add_step(PipelineStep(
             name='load-course-data',
             function=PipelineStep.read_data,
-            configuration=DatasetConfiguration.REQUISITES
+            dataset_configuration=REQUISITES_DATASET_CONFIGURATION
         )
         )
     )
@@ -142,20 +143,20 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='store-requisites-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.REQUISITES
+                dataset_configuration=REQUISITES_DATASET_CONFIGURATION
             ))
         .add_step(
             PipelineStep(
                 name='store-requires-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.REQUIRES
+                dataset_configuration=REQUIRES_DATASET_CONFIGURATION
             )
         )
         .add_step(
             PipelineStep(
                 name='store-satisfies-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.SATISFIES
+                dataset_configuration=SATISFIES_DATASET_CONFIGURATION
             )
         )
     ))

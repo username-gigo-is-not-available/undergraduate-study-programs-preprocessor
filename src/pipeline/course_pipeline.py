@@ -1,4 +1,4 @@
-from src.configurations import DatasetConfiguration
+from src.configurations import COURSES_DATASET_CONFIGURATION
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -17,7 +17,7 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='load-course-data',
                 function=PipelineStep.read_data,
-                configuration=DatasetConfiguration.COURSES,
+                dataset_configuration=COURSES_DATASET_CONFIGURATION,
             )
         )
     )
@@ -69,7 +69,7 @@ def course_pipeline() -> Pipeline:
             PipelineStep(
                 name='store-course-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.COURSES,
+                dataset_configuration=COURSES_DATASET_CONFIGURATION,
             )
         )
     )

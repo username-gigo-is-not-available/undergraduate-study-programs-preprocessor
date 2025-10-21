@@ -1,6 +1,7 @@
 import pandas as pd
 
-from src.configurations import DatasetConfiguration, ApplicationConfiguration
+from src.configurations import ApplicationConfiguration, PROFESSORS_DATASET_CONFIGURATION, \
+    TEACHES_DATASET_CONFIGURATION
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -18,7 +19,7 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='load-professor-teaches-data',
                 function=PipelineStep.read_data,
-                configuration=DatasetConfiguration.PROFESSORS,
+                dataset_configuration=PROFESSORS_DATASET_CONFIGURATION,
             )
         )
     )
@@ -100,14 +101,14 @@ def professor_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='store-professor-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.PROFESSORS,
+                dataset_configuration=PROFESSORS_DATASET_CONFIGURATION,
             )
         )
         .add_step(
             PipelineStep(
                 name='store-teaches-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.TEACHES,
+                dataset_configuration=TEACHES_DATASET_CONFIGURATION,
             )
         )
     )

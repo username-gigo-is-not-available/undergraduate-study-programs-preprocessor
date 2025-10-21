@@ -1,10 +1,12 @@
 import pandas as pd
 
-from src.configurations import DatasetConfiguration
+from src.configurations import CURRICULA_DATASET_CONFIGURATION, OFFERS_DATASET_CONFIGURATION, \
+    INCLUDES_DATASET_CONFIGURATION
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
-from src.patterns.strategy.extraction import CourseSemesterSeasonExtractionStrategy, CourseAcademicYearExtractionStrategy
+from src.patterns.strategy.extraction import CourseSemesterSeasonExtractionStrategy, \
+    CourseAcademicYearExtractionStrategy
 from src.patterns.strategy.filtering import OrFilteringStrategy, NotEqualFilteringStrategy, NotNullFilteringStrategy, \
     GroupExistsFilteringStrategy, GroupHasAtLeastNMembersFilteringStrategy
 from src.pipeline.common_steps import clean_study_program_name_step, clean_course_code_step, clean_course_name_mk_step
@@ -98,7 +100,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='load-curriculum-data',
                 function=PipelineStep.read_data,
-                configuration=DatasetConfiguration.CURRICULA
+                dataset_configuration=CURRICULA_DATASET_CONFIGURATION
             )
         )
     )
@@ -162,7 +164,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 columns=list(
                     (
                         set(
-                            DatasetConfiguration.CURRICULA.output_io_configuration.columns
+                            CURRICULA_DATASET_CONFIGURATION.output_table_configuration.columns
                         ).difference({'curriculum_id'})
                     ).union({'course_id', 'study_program_id'})
                 ),
@@ -206,21 +208,21 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.CURRICULA
+                dataset_configuration=CURRICULA_DATASET_CONFIGURATION
             )
         )
         .add_step(
             PipelineStep(
                 name='store-offers-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.OFFERS
+                dataset_configuration=OFFERS_DATASET_CONFIGURATION
             )
         )
         .add_step(
             PipelineStep(
                 name='store-includes-data',
                 function=PipelineStep.save_data,
-                configuration=DatasetConfiguration.INCLUDES
+                dataset_configuration=INCLUDES_DATASET_CONFIGURATION
             )
         )
     )
