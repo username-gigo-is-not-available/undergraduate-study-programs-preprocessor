@@ -12,6 +12,12 @@ from src.pipeline.models.enums import FileIOType
 class IcebergClient:
     _s3_client: Minio = None
     _catalog: Catalog = None
+    _instance: "IcebergClient" = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self):
         if self._catalog is not None:
@@ -66,3 +72,12 @@ class IcebergClient:
 
         logging.info(f"Created snapshot_id: {table.current_snapshot().snapshot_id} for table {table.name()}")
         return df
+
+class DataStorageMixin:
+
+    def read_data(self, dataset_configuration: DatasetConfiguration) -> pd.DataFrame:
+        return IcebergClient().read_data(dataset_configuration)
+
+    def save_data(self, df: pd.DataFrame, dataset_configuration: DatasetConfiguration) -> pd.DataFrame:
+        return IcebergClient().save_data(df, dataset_configuration)
+

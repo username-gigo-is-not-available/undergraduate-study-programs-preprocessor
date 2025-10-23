@@ -8,7 +8,7 @@ from src.patterns.strategy.data_frame import DataFrameStrategy
 from src.patterns.strategy.filtering import FilteringStrategy
 
 
-class DataFrameMixin:
+class DataTransformationMixin:
 
     @staticmethod
     def _to_list(value: str | list[str]) -> list[str]:
@@ -20,14 +20,14 @@ class DataFrameMixin:
     def _normalize_column_args(**kwargs) -> dict[str, Any]:
         for key in ['columns', 'input_columns', 'output_columns', 'on', 'left_on', 'right_on']:
             if key in kwargs:
-                kwargs[key] = DataFrameMixin._to_list(kwargs.get(key))
+                kwargs[key] = DataTransformationMixin._to_list(kwargs.get(key))
         return kwargs
 
     @staticmethod
     def normalize_column_args(func: callable) -> callable:
         @wraps(func)
         def wrapper(*args, **kwargs) -> pd.DataFrame:
-            kwargs = DataFrameMixin._normalize_column_args(**kwargs)
+            kwargs = DataTransformationMixin._normalize_column_args(**kwargs)
             return func(*args, **kwargs)
 
         return wrapper
