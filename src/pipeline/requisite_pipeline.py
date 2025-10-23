@@ -1,7 +1,7 @@
 import pandas as pd
 
-from src.configurations import REQUISITES_DATASET_CONFIGURATION, SATISFIES_DATASET_CONFIGURATION, \
-    REQUIRES_DATASET_CONFIGURATION
+from src.configurations import REQUISITES, SATISFIES, \
+    REQUIRES
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -21,7 +21,7 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
         .add_step(PipelineStep(
             name='load-course-data',
             function=PipelineStep.read_data,
-            dataset_configuration=REQUISITES_DATASET_CONFIGURATION
+            dataset_configuration=REQUISITES
         )
         )
     )
@@ -143,20 +143,20 @@ def requisite_pipeline(df_courses: pd.DataFrame) -> Pipeline:
             PipelineStep(
                 name='store-requisites-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=REQUISITES_DATASET_CONFIGURATION
+                dataset_configuration=REQUISITES
             ))
         .add_step(
             PipelineStep(
                 name='store-requires-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=REQUIRES_DATASET_CONFIGURATION
+                dataset_configuration=REQUIRES
             )
         )
         .add_step(
             PipelineStep(
                 name='store-satisfies-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=SATISFIES_DATASET_CONFIGURATION
+                dataset_configuration=SATISFIES
             )
         )
     ))

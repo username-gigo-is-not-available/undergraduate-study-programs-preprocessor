@@ -1,4 +1,4 @@
-from src.configurations import STUDY_PROGRAMS_DATASET_CONFIGURATION
+from src.configurations import STUDY_PROGRAMS
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -15,7 +15,7 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='load-study-program-data',
                 function=PipelineStep.read_data,
-                dataset_configuration=STUDY_PROGRAMS_DATASET_CONFIGURATION
+                dataset_configuration=STUDY_PROGRAMS
             )
         )
     )
@@ -52,7 +52,7 @@ def study_programs_pipeline() -> Pipeline:
             PipelineStep(
                 name='store-study-program-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=STUDY_PROGRAMS_DATASET_CONFIGURATION
+                dataset_configuration=STUDY_PROGRAMS
             )
         )
     )

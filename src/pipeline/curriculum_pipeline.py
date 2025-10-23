@@ -1,7 +1,7 @@
 import pandas as pd
 
-from src.configurations import CURRICULA_DATASET_CONFIGURATION, OFFERS_DATASET_CONFIGURATION, \
-    INCLUDES_DATASET_CONFIGURATION
+from src.configurations import CURRICULA, OFFERS, \
+    INCLUDES
 from src.patterns.builder.pipeline import Pipeline
 from src.patterns.builder.stage import PipelineStage
 from src.patterns.builder.step import PipelineStep
@@ -100,7 +100,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='load-curriculum-data',
                 function=PipelineStep.read_data,
-                dataset_configuration=CURRICULA_DATASET_CONFIGURATION
+                dataset_configuration=CURRICULA
             )
         )
     )
@@ -164,7 +164,7 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
                 columns=list(
                     (
                         set(
-                            CURRICULA_DATASET_CONFIGURATION.output_table_configuration.columns
+                            CURRICULA.output_table_configuration.columns
                         ).difference({'curriculum_id'})
                     ).union({'course_id', 'study_program_id'})
                 ),
@@ -208,21 +208,21 @@ def curriculum_pipeline(df_study_programs: pd.DataFrame, df_courses: pd.DataFram
             PipelineStep(
                 name='store-curricula-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=CURRICULA_DATASET_CONFIGURATION
+                dataset_configuration=CURRICULA
             )
         )
         .add_step(
             PipelineStep(
                 name='store-offers-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=OFFERS_DATASET_CONFIGURATION
+                dataset_configuration=OFFERS
             )
         )
         .add_step(
             PipelineStep(
                 name='store-includes-data',
                 function=PipelineStep.save_data,
-                dataset_configuration=INCLUDES_DATASET_CONFIGURATION
+                dataset_configuration=INCLUDES
             )
         )
     )

@@ -60,7 +60,7 @@ class DatasetConfiguration:
         self.schema = schema
 
 
-STUDY_PROGRAMS_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+STUDY_PROGRAMS: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('STUDY_PROGRAMS_DATASET_NAME'),
     input_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('STUDY_PROGRAMS_DATASET_NAME'),
                                                  columns=
@@ -82,7 +82,7 @@ STUDY_PROGRAMS_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguratio
     schema=STUDY_PROGRAM_SCHEMA,
 )
 
-CURRICULA_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+CURRICULA: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('CURRICULA_DATASET_NAME'),
     input_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('CURRICULA_DATASET_NAME'),
                                                  columns=
@@ -108,7 +108,7 @@ CURRICULA_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=CURRICULUM_SCHEMA,
 )
 
-COURSES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+COURSES: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('COURSES_DATASET_NAME'),
     input_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('COURSES_DATASET_NAME'),
                                                  columns=
@@ -134,7 +134,7 @@ COURSES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=COURSE_SCHEMA,
 )
 
-REQUISITES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+REQUISITES: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('REQUISITES_DATASET_NAME'),
     input_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('COURSES_DATASET_NAME'),
                                                  columns=
@@ -154,7 +154,7 @@ REQUISITES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=REQUISITE_SCHEMA,
 )
 
-PROFESSORS_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+PROFESSORS: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('PROFESSORS_DATASET_NAME'),
     input_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('COURSES_DATASET_NAME'),
                                                  columns=[
@@ -173,7 +173,7 @@ PROFESSORS_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=PROFESSOR_SCHEMA,
 )
 
-OFFERS_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+OFFERS: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('OFFERS_DATASET_NAME'),
     input_table_configuration=None,
     output_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('OFFERS_DATASET_NAME'),
@@ -187,7 +187,7 @@ OFFERS_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=OFFERS_SCHEMA,
 )
 
-INCLUDES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+INCLUDES: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('INCLUDES_DATASET_NAME'),
     input_table_configuration=None,
     output_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('INCLUDES_DATASET_NAME'),
@@ -201,7 +201,7 @@ INCLUDES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=INCLUDES_SCHEMA,
 )
 
-REQUIRES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+REQUIRES: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('REQUIRES_DATASET_NAME'),
     input_table_configuration=None,
     output_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('REQUIRES_DATASET_NAME'),
@@ -215,7 +215,7 @@ REQUIRES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=REQUIRES_SCHEMA,
 )
 
-SATISFIES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+SATISFIES: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('SATISFIES_DATASET_NAME'),
     input_table_configuration=None,
     output_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('SATISFIES_DATASET_NAME'),
@@ -229,7 +229,7 @@ SATISFIES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
     schema=SATISFIES_SCHEMA,
 )
 
-TEACHES_DATASET_CONFIGURATION: DatasetConfiguration = DatasetConfiguration(
+TEACHES: DatasetConfiguration = DatasetConfiguration(
     dataset_name=ENVIRONMENT_VARIABLES.get('TEACHES_DATASET_NAME'),
     input_table_configuration=None,
     output_table_configuration=TableConfiguration(table_name=ENVIRONMENT_VARIABLES.get('TEACHES_DATASET_NAME'),

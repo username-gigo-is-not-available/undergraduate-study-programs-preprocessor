@@ -5,10 +5,10 @@ from minio import Minio
 from pyiceberg.schema import Schema
 from pyiceberg.catalog import Catalog
 
-from src.configurations import StorageConfiguration, STUDY_PROGRAMS_DATASET_CONFIGURATION, \
-    CURRICULA_DATASET_CONFIGURATION, COURSES_DATASET_CONFIGURATION, REQUISITES_DATASET_CONFIGURATION, \
-    PROFESSORS_DATASET_CONFIGURATION, OFFERS_DATASET_CONFIGURATION, INCLUDES_DATASET_CONFIGURATION, \
-    REQUIRES_DATASET_CONFIGURATION, SATISFIES_DATASET_CONFIGURATION, TEACHES_DATASET_CONFIGURATION
+from src.configurations import StorageConfiguration, STUDY_PROGRAMS, \
+    CURRICULA, COURSES, REQUISITES, \
+    PROFESSORS, OFFERS, INCLUDES, \
+    REQUIRES, SATISFIES, TEACHES
 from src.pipeline.models.enums import FileIOType
 from src.storage import IcebergClient
 
@@ -42,16 +42,16 @@ def initialize():
     catalog.create_namespace_if_not_exists(namespace)
 
     datasets = [
-        STUDY_PROGRAMS_DATASET_CONFIGURATION,
-        CURRICULA_DATASET_CONFIGURATION,
-        COURSES_DATASET_CONFIGURATION,
-        REQUISITES_DATASET_CONFIGURATION,
-        PROFESSORS_DATASET_CONFIGURATION,
-        OFFERS_DATASET_CONFIGURATION,
-        INCLUDES_DATASET_CONFIGURATION,
-        REQUIRES_DATASET_CONFIGURATION,
-        SATISFIES_DATASET_CONFIGURATION,
-        TEACHES_DATASET_CONFIGURATION
+        STUDY_PROGRAMS,
+        CURRICULA,
+        COURSES,
+        REQUISITES,
+        PROFESSORS,
+        OFFERS,
+        INCLUDES,
+        REQUIRES,
+        SATISFIES,
+        TEACHES
     ]
 
     for dataset in datasets:
