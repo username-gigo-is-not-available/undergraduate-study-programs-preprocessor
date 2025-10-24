@@ -14,7 +14,7 @@ SATISFIES_SCHEMA = Schema(
     ),
     NestedField(
         field_id=2,
-        name="prerequisite_course_id",
+        name="course_id",
         field_type=StringType(),
         required=True,
         doc="Identifier of the course that satisfies the requisite.",

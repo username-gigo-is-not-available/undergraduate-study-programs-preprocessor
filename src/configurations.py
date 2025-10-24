@@ -222,7 +222,7 @@ SATISFIES: DatasetConfiguration = DatasetConfiguration(
                                                   columns=
                                                   [
                                                       "satisfies_id",
-                                                      "prerequisite_course_id",
+                                                      "course_id",
                                                       "requisite_id"
                                                   ],
                                                   ),
