@@ -2,4 +2,4 @@ python-dotenv==1.1.1
 minio==7.2.16
 pandas==2.3.1
 pyiceberg==0.10.0
-pyarrow==21.0.0
+pyarrow==22.0.0
